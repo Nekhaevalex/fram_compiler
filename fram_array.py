@@ -1,0 +1,569 @@
+import pya
+import os
+import datetime
+import random
+
+from netlist_generator import *
+
+
+#---------------------Open Config-------------------------
+from array_config import *
+
+
+
+
+#--------------------support func------------------
+
+def find_pwr2(n,s):
+	if (n % 2 == 0):
+		s = s + 1
+		return (find_pwr2(n/2,s))
+	else:
+		return s
+
+
+
+
+
+
+
+def simple_path( start, end , width):
+	pth = pya.Path([start,end] , width)
+	poly = pth.simple_polygon()
+	return poly;
+
+
+
+
+
+
+def pwr2(num):
+
+	'states if a number is a power of two'
+
+	return ((num & (num - 1)) == 0) and num > 0
+
+
+#--------------------class definition-----------------------
+
+class My_Cell():
+
+	dimentions = (10,10)
+
+
+	def __init__ (self, cell):
+		self.cell = cell
+		self.cell_index = cell.cell_index()
+
+
+	
+
+	def place(self,cell,t):
+		cell_array = pya.CellInstArray(self.cell_index,t)
+		cell.insert(cell_array)
+
+	
+
+
+
+
+class Mos(My_Cell):
+	"""docstring for ClassName"""
+
+
+
+	def __init__ (self, cell, drain, gate, source, cell_index, width, length):
+		self.cell = cell
+		self.drain = drain
+		self.gate = gate
+		self.source = source
+		self.width = width
+		self.length = length
+		self.cell_index = cell_index
+		self.w = float(width)/1000
+		self.l = float(length)/1000
+#	def add_to_netlist (w,l, netlist):
+		
+	def add_to_netlist(self,n,d,g,s,b):
+		#print("transistor width is: "+str(self.width))
+		#print("transistor width is: "+str(self.w))
+		s = "M"+str(n)+" ("+d+" "+g+" "+s+" "+b+" ) "+self.cell.name+" "+str(self.w)+"u "+str(self.l)+"u nfing=1 mult=1 srcefirst=1 mismatch=1\n"
+		return s 
+
+
+
+class Memory_cell(My_Cell):
+	"""docstring for ClassName"""
+
+	def __init__ (self, cell, bl_pin, gnd_pin, wn_pin , cell_index):
+		
+		self.bl_pin = bl_pin
+		self.gnd_pin = gnd_pin
+		self.wn_pin = wn_pin
+		self.cell_index = cell_index
+		self.cell = cell
+
+
+
+
+
+class Sense_amp(My_Cell):
+	"""docstring for ClassName"""
+
+	def __init__ (self, cell, in_pin , cell_index):
+		
+		self.in_pin = in_pin
+		self.cell_index = cell_index
+		self.cell = cell
+
+
+class Top_driver(My_Cell):
+	"""docstring for ClassName"""
+
+	def __init__ (self, cell, out_pin , cell_index):
+		
+		self.out_pin = out_pin
+		self.cell_index = cell_index
+		self.cell = cell
+
+
+
+
+'''
+class Amp(pya.Cell):
+	"""docstring for ClassName"""
+	self.in_pin = pya.Point()
+	self.ref_pin = pya.Point()
+	self.vdd_pin = pya.Point()
+	self.gnd_pin = pya.Point()
+
+
+
+
+class Driver(pya.Cell):
+	"""docstring for ClassName"""
+	self.out_pin = pya.Point()
+	self.in_pin = pya.Point()
+	self.vdd_pin = pya.Point()
+	self.gnd_pin = pya.Point()
+
+'''
+
+
+#======================CODE BEGINS==========
+
+
+print("\n - Compilation started -\n")
+
+#=======================CHECK=====================
+
+
+
+if(n_decoders):
+	if pwr2(num_words):
+		n_decoders = True
+		print("decoders ++")
+	else:
+		if(n_decoders):
+			print("====WARNING: Number of words is not a power of 2:=======\n Generation of adress decoders impossible!")
+			n_decoders = False
+
+
+
+
+
+
+
+
+
+'''
+now = datetime.datetime.now()
+log = open("fram_compilation.log","w+")
+log.write("---------------------------------------------------\nCompilation of "+ output_name +" started."+now.strftime("%Y-%m-%d %H:%M")+"\n")
+log.write("Parameters of cell:\nword size = "+ str(word_size) +"\nnumber of words = "+ str(num_words))
+log.write("\n \n \n \n")
+'''
+#-----------------------Initialization--------------------
+
+
+layout = pya.Layout()
+layout.dbu = 1
+bitline = layout.create_cell("bitline")
+TOP = layout.create_cell("TOP")
+
+
+
+
+
+
+
+
+gdsFiles= ["./gds_files/sense_amp.gds","./gds_files/memory_cell.gds", "./gds_files/driver.gds","./gds_files/nch_25.gds","./gds_files/pch_25.gds" ]
+vias = ["./gds_files/multipart_vdd1.gds","./gds_files/multipart_gnd1.gds"]
+gdsFiles.extend(vias)
+
+# Read all cells
+for i in gdsFiles:
+	layout.read(i)
+	for j in layout.top_cells():
+		if (j.name == "memory_cell"):
+			memory_cell = j
+			print(j.name+" found")
+		if (j.name == "sense_amp"):
+			amp_cell = j
+			print(j.name+" found")
+		if (j.name == "driver"):
+			driver_cell = j
+			print(j.name+" found")
+		if (j.name == "nsvt25"):
+			nmos_cell = j
+			print(j.name+" found")
+		if (j.name == "psvt25"):
+			pmos_cell = j
+			print(j.name+"found")
+		if (j.name == "multipart_vdd1"):
+			multipart_vdd1_cell = j
+			print(j.name+" found")
+		if (j.name == "multipart_gnd1"):
+			multipart_gnd1_cell = j
+			print(j.name+" found")
+
+
+# self, cell, drain, gate, source, cell_index, width, length
+nmos = Mos( nmos_cell, pya.Point(450,200), pya.Point(150,200) , pya.Point(-170,200), nmos_cell.cell_index(), nmos_width, nmos_length)
+pmos = Mos (pmos_cell,pya.Point(450,200), pya.Point(150,200) , pya.Point(-170,200),pmos_cell.cell_index() , pmos_width , pmos_length)
+
+# def __init__ (self, cell, bl_pin, gnd_pin, wn_pin , cell_index):
+array_cell = Memory_cell(memory_cell,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200), memory_cell.cell_index() )
+# def __init__ (self, cell, in_pin , cell_index):
+sense_amp = Sense_amp(amp_cell,pya.Point(0,0),amp_cell.cell_index())
+
+driver = Top_driver( driver_cell,pya.Point(0,0),driver_cell.cell_index())
+
+
+multipart_vdd1 = My_Cell(multipart_vdd1_cell)
+multipart_gnd1 = My_Cell(multipart_gnd1_cell)
+
+
+#print(amp_cell.name)
+#bitline.move_instances(amp_cell)
+#bitline.move_instances(memory_cell)
+
+'''
+t = pya.Trans(   xpos,  ypos)
+cell_index=memory_cell.cell_index()
+array_cell_inst = pya.CellInstArray(cell_index,t)
+bitline.insert(array_cell_inst)
+t = pya.Trans(   xpos+1000, ypos)
+array_cell_inst = pya.CellInstArray(cell_index,t)
+bitline.insert(array_cell_inst)
+
+
+
+'''
+
+
+
+#-------------------------------------layers--------------------------------
+
+M1 =    layout.layer(31, 0)
+M3 =    layout.layer(32, 0)
+M4 =    layout.layer(34, 0)
+M5 =    layout.layer(35, 0)
+PO =    layout.layer(17,0)
+OD =    layout.layer(6,0)
+
+NW =    layout.layer(3,0)
+PP = 	layout.layer(25,0)
+NP = 	layout.layer(26,0)
+
+OD_25 = layout.layer(41,0)
+#NW drawing 3 0
+
+
+#-------------------------------------FORM BITLINE--------------------------------
+
+xpos = 0  - array_cell.bl_pin.x
+ypos = 0 - array_cell.bl_pin.y
+
+t = pya.Trans(   xpos    ,  ypos )
+
+
+'''
+for yIndex in range(0,num_words):
+	cell_index=memory_cell.cell_index()
+	array_cell_inst = pya.CellInstArray(cell_index,t)
+	bitline.insert(array_cell_inst)
+	ypos = ypos + 2*Ycell_size
+	t = pya.Trans(   xpos,  ypos)
+'''
+
+for yIndex in range(0,num_words):
+	array_cell.place(bitline,t)
+	ypos = ypos + 2*Ycell_size
+	t = pya.Trans(xpos,ypos)
+
+
+#------------------------------------Insert top driver and sense amp--------------------------------
+t = pya.Trans( 0, - 2 * Ycell_size )
+sense_amp.place(bitline,t)
+
+t = pya.Trans(driver.out_pin.x, 2*num_words*Ycell_size+ driver.out_pin.y )
+driver.place(bitline,t)
+
+#bitline.insert(amp_cell)
+
+#------------------ROUTING_BITLINE-------------------------
+bl_start = pya.Point(0, - 2 * Ycell_size )
+bl_end = pya.Point(0,2*num_words*Ycell_size+ driver.out_pin.y)
+
+bl_pth = pya.Path([bl_start,bl_end] , bl_width)
+bl_poly = bl_pth.simple_polygon()
+
+bitline.shapes(M1).insert(bl_poly)
+#bl_path = [(-4000,0.0),(-4000,Ycell_size*2.00*(num_words-1))]
+
+#----------------ADDING BITLINES---------------------------
+
+xpos = 0
+ypos = 0
+t = pya.Trans(   xpos,  ypos)
+
+for yIndex in range(0,word_size):
+	cell_index = bitline.cell_index()
+	bl_cell_inst = pya.CellInstArray(cell_index,t)
+	TOP.insert(bl_cell_inst)
+	xpos = xpos + 4*Xcell_size
+	t = pya.Trans(   xpos,  ypos)
+
+#-----------------------------DECODERS--------------------------
+
+if (n_decoders and decoders25):
+	decoder_cell = layout.create_cell("decoder_cell")
+	xpos1 = pmos_placement_width*4
+	ypos1 = 0
+	xpos2 = -nmos_placement_width*4
+	ypos2 = 0
+	num_addr_bus = find_pwr2(num_words,0)
+
+	for i in range (0, num_addr_bus):
+		t1 = pya.Trans(1 , False, pya.Vector(xpos1, ypos1))
+		t2 = pya.Trans(1 , False, pya.Vector(xpos2, ypos2))
+		pmos.place(decoder_cell,t1)
+		nmos.place(decoder_cell,t2)
+		xpos1 = xpos1 + pmos_placement_width*4
+		xpos2 = xpos2 - nmos_placement_width*4
+	# GND Via
+
+	# Vdd Via #MANUAL PLACEMENT!
+	xpos1 = pmos_placement_width*4 + 250
+	xpos2 = - nmos_placement_width*4 + 250
+	ypos1 = -nmos_width*2-60
+	ypos2 = -nmos_width*2-60
+
+	for i in range (0, num_addr_bus):
+		t1 = pya.Trans(1 , False, pya.Vector(xpos1, ypos1))
+		multipart_vdd1.place(decoder_cell,t1)
+		t2 =  pya.Trans(1 , False, pya.Vector(xpos2, ypos2))
+		multipart_gnd1.place(decoder_cell,t2)
+		xpos1 = xpos1 + pmos_placement_width*4
+		xpos2 = xpos2 - nmos_placement_width*4
+
+	#Decoder via extra routing ---VDD
+	start = pya.Point(pmos_placement_width ,  -nmos_width*2+170)
+	end = pya.Point(num_addr_bus*pmos_placement_width*4 , -nmos_width*2 +170)
+	decoder_cell.shapes(M1).insert(simple_path( start, end , 200))
+	decoder_cell.shapes(OD).insert(simple_path( start, end , 200))
+	# ---GND
+	start = pya.Point(- nmos_placement_width*4 ,  -nmos_width*2+170)
+	end = pya.Point(-num_addr_bus*nmos_placement_width*4 , -nmos_width*2 +170)
+	decoder_cell.shapes(M1).insert(simple_path( start, end , 200))
+	decoder_cell.shapes(OD).insert(simple_path( start, end , 200))
+
+
+	#Routing of decoder
+
+
+	start = pya.Point( -pmos_placement_width*5 ,  pmos.source.x)
+	end = pya.Point(num_addr_bus*pmos_placement_width*4 , pmos.source.x)
+	decoder_cell.shapes(M1).insert(simple_path( start, end , bl_width))
+	j=1
+	xpos = -150 -nmos_placement_width*4 # IN FUTURE CHANGE 150 to proper value
+	for i in range (0,num_addr_bus -1 ):
+		if (j%2 == 1 ):
+			start = pya.Point( xpos,  pmos.drain.x)
+			xpos = xpos - nmos_placement_width*4
+			end = pya.Point( xpos, pmos.drain.x)
+			decoder_cell.shapes(M1).insert(simple_path( start, end , bl_width))
+		else:
+			start = pya.Point( xpos,  pmos.source.x)
+			xpos = xpos - nmos_placement_width*4
+			end = pya.Point( xpos, pmos.source.x)
+			decoder_cell.shapes(M1).insert(simple_path( start, end , bl_width))
+		j=j+1
+
+
+	'''
+	start = pya.Point( nmos_width  ,  pmos.drain.x+50)
+	end = pya.Point(num_addr_bus*pmos_width*5 , pmos.drain.x+50)
+	decoder_cell.shapes(M1).insert(simple_path( start, end , bl_width))
+
+
+
+	step = 1 #even step 0
+
+
+	
+	
+	xpos1 = pmos_width*3
+	ypos1 = nmos.drain.x +50
+	xpos2 = -nmos_width*3
+	ypos2 = nmos.drain.x +50
+	
+	ypos01 = pmos.source.x+50
+	
+	for i in range (0, num_addr_bus):
+		if (step == 0):
+
+			start = pya.Point( xpos1 ,  ypos1)
+			end = pya.Point(xpos2 , ypos2)
+			decoder_cell.shapes(M1).insert(simple_path( start, end , bl_width))
+			xpos1 = xpos2
+			xpos2 = xpos2 - nmos_width*5
+			step = 1
+		else:
+			start = pya.Point( xpos1 ,  ypos01)
+			end = pya.Point(xpos2 , ypos01)
+			decoder_cell.shapes(M1).insert(simple_path( start, end , bl_width))
+			xpos1 = xpos2
+			xpos2 = xpos2 - nmos_width*5
+			step = 0
+	'''
+
+
+if (n_decoders and decoders25):
+
+	#Add decoders to TOP-cell
+	xpos = - num_addr_bus*pmos_placement_width*6
+	ypos = - pmos.source.x
+	t = pya.Trans(   xpos,  ypos )
+
+	for i in range(0,num_words):
+		cell_index = decoder_cell.cell_index()
+		decoder_cell_inst = pya.CellInstArray(cell_index,t)
+		TOP.insert(decoder_cell_inst)
+		ypos = ypos + 2*Ycell_size
+		t = pya.Trans(   xpos,  ypos)
+
+#--------------WORD line-------------------------------------
+
+#wl_pth = pya.Path([bl_start,bl_end] , bl_width)
+#wl_poly = bl_pth.simple_polygon()
+
+
+#bitline.shapes(l1).insert(simple_path( wl_start, wl_end , wl_width))
+
+xpos = 0
+ypos = 0
+
+for yIndex in range(0, num_words):
+	start = pya.Point(-1000, ypos)
+	end = pya.Point(4 * Xcell_size * word_size, ypos)
+	TOP.shapes(M5).insert(simple_path( start, end , wl_width))
+	ypos = ypos + 2*Ycell_size
+#	print(start.y , end.y)
+
+#--------------------------------GROUND HORIZONTAL----------------------
+xpos = 0
+ypos = -800
+
+for yIndex in range(0, num_words):
+	start = pya.Point(0, ypos)
+	end = pya.Point(Xcell_size*4*word_size,ypos)
+	TOP.shapes(M3).insert(simple_path( start, end , gnd_width))
+	ypos = ypos + 2*Ycell_size
+#	print(start.y , end.y)
+
+
+#=======================FINAL GDS OUTPUT===========
+
+
+layout.write("./gds_files/"+ output_name+".gds")
+print("\n layout has been saved as ./gds_files/"+ output_name+".gds\n" )
+
+#======================CREATE NETLIST (OBJECT WAY)=============
+
+GND = "0"
+VDD = "vdd"
+
+
+
+cell_size_sim = cell_x_size*cell_y_size
+
+#sense_amp_netlist = SenAmpSubsct(sense_amp.cell.name , nmos , pmos, )
+
+fram_netlist = Netlist(output_name , word_size , num_words,sense_amp,array_cell, driver,pmos,nmos,p00 ,cell_size_sim)
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+#------------------Create PDF file-------------------------
+array_cell_layout.rename("arrayLayout")
+visualizer = gdsMill.PdfLayout(array_cell_layout)
+
+
+#Making all colors radnom and set them
+if (color_set == "random" ):
+	log.write("------------------Colors in use----------------- \n")
+	for i in range(len(array_cell_layout.layerNumbersInUse)):
+		color = ("#"+random.choice('0123456789ABCDEF')+random.choice('0123456789ABCDEF')+random.choice('0123456789ABCDEF')+random.choice('0123456789ABCDEF') + random.choice('0123456789ABCDEF')+ random.choice('0123456789ABCDEF') )
+		visualizer.layerColors[array_cell_layout.layerNumbersInUse[i]] = color
+		log.write("Color for layer"+str(i)+" = "+color+"\n")
+log.write("\n \n \n")
+
+
+
+visualizer.setScale(500)
+visualizer.drawLayout()
+
+
+
+visualizer.writeToFile("./gdsFiles/array_gds/new_pdf.pdf")
+print("STAT: Pdf file saved")
+
+
+#layers = array_cell_layout.layerNumbersInUse()
+
+
+log.write("--------------------Layers in use:-----------------\n")
+log.write("\n Cell layers: \n ")
+for i in range(len(array_cell_layout.layerNumbersInUse)):
+	s = "Layer N "+str(i)+" = "+str(array_cell_layout.layerNumbersInUse[i])+"\n"
+	log.write(s) 
+
+
+log.write("\n \n \n ")
+log.write("\n Sen_Amp layers: \n ")
+log.write("--------------------Layers in use:-----------------\n")
+for i in range(len(amp_layout.layerNumbersInUse)):
+	s = "Layer N "+str(i)+" = "+str(amp_layout.layerNumbersInUse[i])+"\n"
+	log.write(s) 
+
+
+#-----------------------move log file to  folder and close----------
+
+log.close()
+os.rename("./fram_compilation.log", "./gds_files/fram_compilation.log")
+'''
+
+
+print ("In case of any confusion in files you are welcome to check README.txt ,\nor contact me via e-mail or phone.")
