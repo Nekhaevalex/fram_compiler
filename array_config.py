@@ -68,7 +68,6 @@ nmos_width = 400
 pmos_width = 400
 
 
-
 nmos_length = 280
 
 pmos_length = 280
