@@ -87,7 +87,7 @@ class Mos(My_Cell):
 	def add_to_netlist(self,n,d,g,s,b):
 		#print("transistor width is: "+str(self.width))
 		#print("transistor width is: "+str(self.w))
-		s = "M"+str(n)+" ("+d+" "+g+" "+s+" "+b+" ) "+self.cell.name+" "+str(self.w)+"u "+str(self.l)+"u nfing=1 mult=1 srcefirst=1 mismatch=1\n"
+		s = "M"+str(n)+" ("+d+" "+g+" "+s+" "+b+" ) "+self.cell.name+" w="+str(self.w)+" l="+str(self.l)+" nfing=1 mult=1 srcefirst=1 mismatch=1\n"
 		return s 
 
 

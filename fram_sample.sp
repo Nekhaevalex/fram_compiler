@@ -1,5 +1,5 @@
 ---------------------------------------------------
-//Compilation of fram_sample netlist started.2019-11-06 12:48
+//Compilation of fram_sample netlist started.2019-11-07 14:23
 //Parameters of cell:
 //word size = 8
 //number of words = 4
@@ -13,22 +13,22 @@ include conder.va
 //-========Subsercuits========-
 #Subsercuit sense_amp definition.
 subckt sense_amp in nb nt ref seb vdd gnd
-M0 (nb seb gnd gnd ) nsvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
+M0 (nb seb gnd gnd ) nsvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
-M1 (gnd seb nt gnd ) nsvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
+M1 (gnd seb nt gnd ) nsvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
-M2 (nt nb gnd gnd ) nsvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
+M2 (nt nb gnd gnd ) nsvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
-M3 (gnd nt nb gnd ) nsvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
+M3 (gnd nt nb gnd ) nsvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
-M4 (gnd nt nb gnd ) nsvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
+M4 (gnd nt nb gnd ) nsvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
-M5 (net25 seb vdd vdd ) psvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
+M5 (net25 seb vdd vdd ) psvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
-M6 (net25 ref net33 vdd ) psvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
-M7 (net29 in net25 vdd ) psvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
-M8 (nt nb net33 vdd ) psvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
-M9 (net29 nt nb vdd ) psvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
+M6 (net25 ref net33 vdd ) psvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
+M7 (net29 in net25 vdd ) psvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
+M8 (nt nb net33 vdd ) psvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
+M9 (net29 nt nb vdd ) psvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
 ends sense_amp
  //REMAINING 10 
@@ -36,10 +36,10 @@ ends sense_amp
  //Cell name:  driver// 
 
 subckt driver not_bl_drive_input bl_out vdd gnd
-M10 (vdd not_bl_drive_input net_d0 vdd ) psvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
-M11 (net_d0 not_bl_drive_input net_d1 vdd ) psvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
-M12 (net_d1 not_bl_drive_input net_d2 gnd ) nsvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
-M13 (net_d2 not_bl_drive_input gnd vdd ) psvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
+M10 (vdd not_bl_drive_input net_d0 vdd ) psvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
+M11 (net_d0 not_bl_drive_input net_d1 vdd ) psvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
+M12 (net_d1 not_bl_drive_input net_d2 gnd ) nsvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
+M13 (net_d2 not_bl_drive_input gnd vdd ) psvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
 ends driver// End of subcircuit definition.
 
@@ -47,9 +47,9 @@ ends driver// End of subcircuit definition.
  //Cell name:  memory_cell// 
 
 subckt memory_cell bl wl pl gnd
-M10 (bl wl net1 gnd ) nsvt25 0.4u 0.28u nfing=1 mult=1 srcefirst=1 mismatch=1
+M10 (bl wl net1 gnd ) nsvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
-X0 conder net1 pl 1e-14 2.5e-13
+I0 conder net1 pl 1e-14 2.5e-13
 ends memory_cell
 // End of subcircuit definition.
 

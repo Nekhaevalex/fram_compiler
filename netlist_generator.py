@@ -1,6 +1,6 @@
 import time
 import datetime
-
+import os
 
 class Subsercuit():
 	
@@ -121,7 +121,7 @@ class MemoryCellSub(Subsercuit):
 		s = s + "// \n"
 		s = s + "\nsubckt "+self.name+' '+bl+' '+wl+' '+pl+' '+self.GND+"\n"
 		s = s+self.nmos.add_to_netlist(n_sbskt_mos,bl,wl, net1 ,self.GND)+"\n"
-		s = s + "X0 conder "+net1+' '+pl+' '+str(self.p00)+' '+str(self.cell_size_sim)
+		s = s + "I0 conder "+net1+' '+pl+"  Ec=1.9 dT=1e-09 l=5e-07 w=5e-07 "+str(self.p00) #Ec=1.9 dT=1e-09 l=5e-07 w=5e-07 p00=0.25
 		s += "\nends "+self.name
 		s += "\n// End of subcircuit definition.\n"
 		return s
@@ -176,7 +176,7 @@ class DriverSub(Subsercuit):
 
 
 class Netlist():
-
+	path = os.getcwd()
 	n_sbskt_mos = 0 
 	GND = "0"
 	VDD = "vdd"
@@ -248,7 +248,9 @@ class Netlist():
 		self.nlst.close()
 
 	#def end_netlist():
-
+	def simulation_options():
+		s = "simulatorOptions options"
+	return s
 
 #	def add ()
 
