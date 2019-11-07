@@ -1,5 +1,5 @@
 ---------------------------------------------------
-//Compilation of fram_sample netlist started.2019-11-07 14:23
+//Compilation of fram_sample netlist started.2019-11-07 16:34
 //Parameters of cell:
 //word size = 8
 //number of words = 4
@@ -49,7 +49,7 @@ ends driver// End of subcircuit definition.
 subckt memory_cell bl wl pl gnd
 M10 (bl wl net1 gnd ) nsvt25 w=0.4 l=0.28 nfing=1 mult=1 srcefirst=1 mismatch=1
 
-I0 conder net1 pl 1e-14 2.5e-13
+I0 conder net1 pl  Ec=1.9 dT=1e-09 l=5e-07 w=5e-07 1e-14
 ends memory_cell
 // End of subcircuit definition.
 

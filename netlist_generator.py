@@ -184,7 +184,7 @@ class Netlist():
 	wl=[]
 	pl=[]
 
-	def __init__ (self, output_name , word_size , num_words , sen_amp,array_cell,driver ,pmos,nmos , p00, cell_size_sim):
+	def __init__ (self, output_name , word_size , num_words , sen_amp,array_cell,driver ,pmos,nmos , p00, cell_size_sim , *options):
 		print("\n Netlist: Creating netlist \n")
 		self.name = output_name
 		self.pmos = pmos
@@ -250,7 +250,7 @@ class Netlist():
 	#def end_netlist():
 	def simulation_options():
 		s = "simulatorOptions options"
-	return s
+		return s
 
 #	def add ()
 
