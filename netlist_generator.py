@@ -191,7 +191,7 @@ class Netlist():
 		self.nmos = nmos
 		self.memory_cell = array_cell
 		now = datetime.datetime.now()
-		self.nlst = open(output_name+".sp","w+")
+		self.nlst = open("./netlists/"+output_name+".sp","w+")
 		self.nlst.write("---------------------------------------------------\n//Compilation of "+ output_name +" netlist started."+now.strftime("%Y-%m-%d %H:%M")+"\n")
 		self.nlst.write("//Parameters of cell:\n//word size = "+ str(word_size) +"\n//number of words = "+ str(num_words))
 		self.nlst.write("\n \n \n \n")
@@ -243,7 +243,7 @@ class Netlist():
 		
 
 
-		print("\nNetlist has been generated as ./"+output_name+".sp .\n To view it type: ""cat "+output_name+".sp" "")
+		print("\nNetlist has been generated as ./netlists/"+output_name+".sp .\n To view it type: ""cat "+output_name+".sp" "")
 
 		self.nlst.close()
 
