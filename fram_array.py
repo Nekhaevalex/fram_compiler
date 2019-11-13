@@ -119,7 +119,7 @@ class Sense_amp(My_Cell):
 
 class Top_driver(My_Cell):
 	"""docstring for ClassName"""
-
+	top_vdd=  pya.Point( -500, 5350)
 	def __init__ (self, cell, out_pin , cell_index):
 		
 		self.out_pin = out_pin
@@ -267,7 +267,9 @@ bitline.insert(array_cell_inst)
 #-------------------------------------layers--------------------------------
 
 M1 =    layout.layer(31, 0)
-M3 =    layout.layer(32, 0)
+
+M2 =    layout.layer(32, 0)
+M3 =    layout.layer(33, 0)
 M4 =    layout.layer(34, 0)
 M5 =    layout.layer(35, 0)
 PO =    layout.layer(17,0)
@@ -305,16 +307,16 @@ for yIndex in range(0,num_words):
 
 
 #------------------------------------Insert top driver and sense amp--------------------------------
-t = pya.Trans( 0, - 2 * Ycell_size )
+t = pya.Trans( 0 - 50, - 3 * Ycell_size  )
 sense_amp.place(bitline,t)
 
-t = pya.Trans(driver.out_pin.x, 2*num_words*Ycell_size+ driver.out_pin.y )
+t = pya.Trans(driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
 driver.place(bitline,t)
 
 #bitline.insert(amp_cell)
 
 #------------------ROUTING_BITLINE-------------------------
-bl_start = pya.Point(0, - 2 * Ycell_size )
+bl_start = pya.Point(0, - 3 * Ycell_size )
 bl_end = pya.Point(0,2*num_words*Ycell_size+ driver.out_pin.y)
 
 bl_pth = pya.Path([bl_start,bl_end] , bl_width)
@@ -403,42 +405,7 @@ if (n_decoders and decoders25):
 		j=j+1
 
 
-	'''
-	start = pya.Point( nmos_width  ,  pmos.drain.x+50)
-	end = pya.Point(num_addr_bus*pmos_width*5 , pmos.drain.x+50)
-	decoder_cell.shapes(M1).insert(simple_path( start, end , bl_width))
 
-
-
-	step = 1 #even step 0
-
-
-	
-	
-	xpos1 = pmos_width*3
-	ypos1 = nmos.drain.x +50
-	xpos2 = -nmos_width*3
-	ypos2 = nmos.drain.x +50
-	
-	ypos01 = pmos.source.x+50
-	
-	for i in range (0, num_addr_bus):
-		if (step == 0):
-
-			start = pya.Point( xpos1 ,  ypos1)
-			end = pya.Point(xpos2 , ypos2)
-			decoder_cell.shapes(M1).insert(simple_path( start, end , bl_width))
-			xpos1 = xpos2
-			xpos2 = xpos2 - nmos_width*5
-			step = 1
-		else:
-			start = pya.Point( xpos1 ,  ypos01)
-			end = pya.Point(xpos2 , ypos01)
-			decoder_cell.shapes(M1).insert(simple_path( start, end , bl_width))
-			xpos1 = xpos2
-			xpos2 = xpos2 - nmos_width*5
-			step = 0
-	'''
 
 
 if (n_decoders and decoders25):
@@ -469,7 +436,7 @@ ypos = 0
 for yIndex in range(0, num_words):
 	start = pya.Point(-1000, ypos)
 	end = pya.Point(4 * Xcell_size * word_size, ypos)
-	TOP.shapes(M5).insert(simple_path( start, end , wl_width))
+	TOP.shapes(M2).insert(simple_path( start, end , wl_width))
 	ypos = ypos + 2*Ycell_size
 #	print(start.y , end.y)
 
@@ -483,6 +450,23 @@ for yIndex in range(0, num_words):
 	TOP.shapes(M3).insert(simple_path( start, end , gnd_width))
 	ypos = ypos + 2*Ycell_size
 #	print(start.y , end.y)
+
+#--------------------- extra driver ground
+
+
+#driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
+start = pya.Point( - 500 ,2*num_words*Ycell_size+ driver.out_pin.y)
+end =  pya.Point(word_size*Xcell_size*4 , 2*num_words*Ycell_size+ driver.out_pin.y)
+TOP.shapes(M2).insert(simple_path(start,end,2*gnd_width))
+
+
+#-------------------------- VDD FOR TOP DRIVERS
+
+start = pya.Point( - 1000 ,2*num_words*Ycell_size+ driver.out_pin.y + driver.top_vdd.y)
+end =  pya.Point(word_size*Xcell_size*4 , 2*num_words*Ycell_size+ driver.out_pin.y + driver.top_vdd.y)
+TOP.shapes(M2).insert(simple_path(start,end,gnd_width))
+
+
 
 
 #=======================FINAL GDS OUTPUT===========

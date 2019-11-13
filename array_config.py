@@ -12,7 +12,7 @@ Ycell_size = 1000
 
 word_size = 8
 
-num_words = 4
+num_words = 512
 
 #output_name = "FRAM_{0}_{1}.gds".format(word_size,num_words)
 output_name = "fram_sample"
