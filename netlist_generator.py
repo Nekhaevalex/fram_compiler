@@ -243,7 +243,7 @@ class Netlist():
 		
 
 
-		print("\nNetlist has been generated as ./netlists/"+output_name+".sp .\n To view it type: ""cat "+output_name+".sp" "")
+		print("\nNetlist has been generated as ./netlists/"+output_name+".sp .\n To view it type: ""cat ./netlists/"+output_name+".sp" "")
 
 		self.nlst.close()
 

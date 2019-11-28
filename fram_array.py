@@ -3,6 +3,7 @@ import os
 import datetime
 import random
 
+from layout_class import *
 from netlist_generator import *
 
 
@@ -30,8 +31,8 @@ def find_pwr2(n,s):
 def simple_path( start, end , width):
 	pth = pya.Path([start,end] , width)
 	poly = pth.simple_polygon()
-	return poly;
-
+	return poly
+#TOP.shapes(M2).insert(poly)
 
 
 
@@ -126,7 +127,13 @@ class Top_driver(My_Cell):
 		self.cell_index = cell_index
 		self.cell = cell
 
-
+class PL_driver(My_Cell):
+	"""docstring for ClassName"""
+	#top_vdd=  pya.Point( -500, 5350)
+	def __init__ (self, cell, out_pin , cell_index):
+		self.out_pin = out_pin
+		self.cell_index = cell_index
+		self.cell = cell
 
 
 '''
@@ -191,6 +198,9 @@ layout.dbu = 1
 bitline = layout.create_cell("bitline")
 TOP = layout.create_cell("TOP")
 
+# One cell for all multipart Pahts 
+multipart_cell = layout.create_cell("multipart")
+multipart_cell_index = multipart_cell.cell_index()
 
 
 
@@ -198,9 +208,12 @@ TOP = layout.create_cell("TOP")
 
 
 
-gdsFiles= ["./gds_files/sense_amp.gds","./gds_files/memory_cell.gds", "./gds_files/driver.gds","./gds_files/nch_25.gds","./gds_files/pch_25.gds" ]
+
+gdsFiles= ["./gds_files/sense_amp.gds","./gds_files/memory_cell.gds", "./gds_files/nch_25.gds","./gds_files/pch_25.gds" ]
 vias = ["./gds_files/multipart_vdd1.gds","./gds_files/multipart_gnd1.gds"]
+drivers = ["./gds_files/driver.gds","./gds_files/PL_driver.gds"]
 gdsFiles.extend(vias)
+gdsFiles.extend(drivers)
 
 # Read all cells
 for i in gdsFiles:
@@ -227,6 +240,11 @@ for i in gdsFiles:
 		if (j.name == "multipart_gnd1"):
 			multipart_gnd1_cell = j
 			print(j.name+" found")
+		if (j.name == "c_inv_3u"):
+			pl_driver_cell = j 
+			print(j.name + " found")
+
+
 
 
 # self, cell, drain, gate, source, cell_index, width, length
@@ -241,8 +259,23 @@ sense_amp = Sense_amp(amp_cell,pya.Point(0,0),amp_cell.cell_index())
 driver = Top_driver( driver_cell,pya.Point(0,0),driver_cell.cell_index())
 
 
+PL_driver = PL_driver ( pl_driver_cell,pya.Point(1400,500),pl_driver_cell.cell_index())
+
+
+
 multipart_vdd1 = My_Cell(multipart_vdd1_cell)
 multipart_gnd1 = My_Cell(multipart_gnd1_cell)
+
+
+
+
+#print(driver.cell_index)
+#print(multipart_gnd1.cell_index)
+#print(multipart_vdd1.cell_index)
+
+
+
+
 
 
 #print(amp_cell.name)
@@ -257,8 +290,6 @@ bitline.insert(array_cell_inst)
 t = pya.Trans(   xpos+1000, ypos)
 array_cell_inst = pya.CellInstArray(cell_index,t)
 bitline.insert(array_cell_inst)
-
-
 
 '''
 
@@ -282,6 +313,31 @@ NP = 	layout.layer(26,0)
 OD_25 = layout.layer(41,0)
 #NW drawing 3 0
 
+#==================Declare Multipart path===================
+
+
+nod_straps = [(NP, 460 , 0),(M1,200 , 1),(OD,200, 1)] #[(layer,width,lenth {0 = long } , ),()]
+
+#nod_pins = [(layer,side)]
+#nod_pins = (OD , 120)
+nod_pin_size = 120
+nod_pin_layer = OD
+nod_tie = MultipartPath( "nod_tie" , nod_pin_layer, nod_pin_size,*nod_straps)
+
+
+##place(cell,begin,end)
+
+#pod_pins = (OD , 120)
+pod_pin_size = 120
+pod_pin_layer = OD
+pod_straps = [(PP, 460),(M1,200),(OD,200)]
+nod_tie = MultipartPath( "pod_tie",pod_pin_layer, pod_pin_size ,*pod_straps)
+
+
+
+nod_tie.place(multipart_cell,pya.Point(-1000,0),pya.Point(-1000,-10000))
+
+nod_tie.place(multipart_cell,pya.Point(-4000,-10000),pya.Point(-4000,0))
 
 #-------------------------------------FORM BITLINE--------------------------------
 
@@ -422,6 +478,26 @@ if (n_decoders and decoders25):
 		ypos = ypos + 2*Ycell_size
 		t = pya.Trans(   xpos,  ypos)
 
+
+#=======================PL DRIVERS=========================
+
+
+# Initial point
+xpos =  4*Xcell_size*word_size
+ypos = - PL_driver.out_pin.x
+t = pya.Trans(1 , True, pya.Vector(xpos, ypos))
+
+#Adding - fix now
+for i in range(0,num_words):
+	PL_driver.place(TOP,t)
+	ypos = ypos + 2*Ycell_size
+	t = pya.Trans(1 , True, pya.Vector(xpos, ypos))
+	#nmos.place(decoder_cell,t2)
+
+
+
+
+
 #--------------WORD line-------------------------------------
 
 #wl_pth = pya.Path([bl_start,bl_end] , bl_width)
@@ -440,6 +516,23 @@ for yIndex in range(0, num_words):
 	ypos = ypos + 2*Ycell_size
 #	print(start.y , end.y)
 
+
+
+#---------------------------Plate line---------------------
+xpos = 0
+ypos = 0
+
+for yIndex in range(0, num_words):
+	start = pya.Point(-1000, ypos)
+	end = pya.Point(4 * Xcell_size * word_size, ypos)
+	TOP.shapes(M4).insert(simple_path( start, end , gnd_width))
+	ypos = ypos + 2*Ycell_size
+
+
+
+
+
+
 #--------------------------------GROUND HORIZONTAL----------------------
 xpos = 0
 ypos = -800
@@ -447,9 +540,11 @@ ypos = -800
 for yIndex in range(0, num_words):
 	start = pya.Point(0, ypos)
 	end = pya.Point(Xcell_size*4*word_size,ypos)
-	TOP.shapes(M3).insert(simple_path( start, end , gnd_width))
+	TOP.shapes(M2).insert(simple_path( start, end , gnd_width))
 	ypos = ypos + 2*Ycell_size
 #	print(start.y , end.y)
+
+
 
 #--------------------- extra driver ground
 
@@ -460,6 +555,7 @@ end =  pya.Point(word_size*Xcell_size*4 , 2*num_words*Ycell_size+ driver.out_pin
 TOP.shapes(M2).insert(simple_path(start,end,2*gnd_width))
 
 
+
 #-------------------------- VDD FOR TOP DRIVERS
 
 start = pya.Point( - 1000 ,2*num_words*Ycell_size+ driver.out_pin.y + driver.top_vdd.y)
@@ -468,6 +564,10 @@ TOP.shapes(M2).insert(simple_path(start,end,gnd_width))
 
 
 
+#======================Add multipart cell==========
+t = pya.Trans(   0,  0)
+mp_cell_array = pya.CellInstArray(multipart_cell.cell_index(),t)
+TOP.insert(mp_cell_array)
 
 #=======================FINAL GDS OUTPUT===========
 

@@ -9,10 +9,11 @@ Ycell_size = 1000
 
 #Coords for pins ??!!?!!?
 
-
+#Horizontal size
 word_size = 8
+#Vertical size
+num_words = 8
 
-num_words = 512
 
 #output_name = "FRAM_{0}_{1}.gds".format(word_size,num_words)
 output_name = "fram_sample"
@@ -24,11 +25,11 @@ array_cell = "array_cell.gds"
 
 #-----------------------Tracks---------------------
 
-
-bl_width = 130 # width of bitline
-
-wl_width = 120 # width of wordline
-
+# width of bitline
+bl_width = 130 
+# width of wordline
+wl_width = 120 
+#Width of extra gnd routing
 gnd_width = 150
 
 
@@ -40,7 +41,8 @@ cell_x_size = 5e-07
 
 cell_y_size = 5e-07
 
-p00 = 1e-14   # Polarization
+# polarysation 
+p00 = 1e-14   
 
 
 
@@ -51,11 +53,13 @@ p00 = 1e-14   # Polarization
 
 #---------------------Other setings------------------
 
+# if you need decoders of word line or not (True/False)		
+n_decoders = False 		
 
-n_decoders = True # if you need decoders of word line or not (True/False)		
 
-
-decoders25 = True # if True, will place 2.5V decoders, else (False) will make 1.2 Decoders + converter!
+# if True, will place 2.5V decoders, else (False) will make 1.2 Decoders + converter!
+# 1.2 decoders not there anyway!
+decoders25 = True
 
 
 
