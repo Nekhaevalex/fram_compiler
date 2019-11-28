@@ -13,13 +13,17 @@ class MultipartPath():
 	def place(self,multipart_cell,begin,end): # TOP TO BOTTOM RIGHT TO LEFT!!
 		#Need to understand orientation of 
 		orrint = 0 # 0 = null ; 1 = vertical; 2 = horisontal ; 3 = error
+		direct = "NULL"
+		pins = self.pins
 		vertcal_lenth = abs(end.y - begin.y)
 		horisontal_lenth = abs(end.x - begin.x)
+		print("Vertical:" +str(vertcal_lenth)+" Horisontal: "+str(horisontal_lenth))
 		if (vertcal_lenth > horisontal_lenth):
+			print("vertcal_lenth > horisontal_lenth")
 			orrint = 1 #vertical
-			if (end.y - begin.y > 0):
+			if (end.y   > begin.y):
 				direct = "UP"
-			if (end.y - begin.y > 0):
+			if (end.y <=  begin.y ):
 				direct = "DOWN"
 		else :
 			orrint = 2 #horisontal
@@ -83,8 +87,9 @@ class MultipartPath():
 				coord.y=coord.y+140
 		if ((orrint == 1) & (direct == "DOWN")):
 			coord = begin
-			coord.y = coord.y - 70
 			poly = []
+			coord.y = coord.y - 70
+			print(type(poly))
 			while (coord.y >= end.y + ( 200 + pins[1])):
 				coord_end = coord
 				coord_end.y=coord_end.y - pins[1]/2
@@ -93,3 +98,5 @@ class MultipartPath():
 				coord.y=coord.y - 140
 		for i in range(len(poly)):
 			multipart_cell.shapes(pins[0]).insert(poly[i])
+
+
