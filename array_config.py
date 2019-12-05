@@ -4,7 +4,7 @@
 
 #-----------DIMENSIONS FOR THE LAYOUT. NOT AN ACTUAL DIMENTIONS-------------
 
-Xcell_size = 480
+Xcell_size = 500
 Ycell_size = 1000
 
 #Coords for pins ??!!?!!?

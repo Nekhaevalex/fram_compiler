@@ -15,6 +15,8 @@ class MultipartPath():
 		orrint = 0 # 0 = null ; 1 = vertical; 2 = horisontal ; 3 = error
 		direct = "NULL"
 		pins = self.pins
+		print("pin lenth:")
+		print(pins[1])
 		vertcal_lenth = abs(end.y - begin.y)
 		horisontal_lenth = abs(end.x - begin.x)
 		print("Vertical:" +str(vertcal_lenth)+" Horisontal: "+str(horisontal_lenth))
@@ -75,28 +77,33 @@ class MultipartPath():
 				coord.x = coord.x + 70
 				for i in range(n): #top.shapes(l1).insert(pya.Box(0, 0, 1000, 2000))
 		'''
+		coord = pya.Point(begin.x,begin.y)
 		if ((orrint == 1) & (direct == "UP") ):
-			coord = begin
 			coord.y = coord.y + 70
+			coord_end = pya.Point(coord.x , coord.y)
 			poly = []
-			while (coord.y <= end.y - (200 + pins[1])) :
-				coord_end = coord
-				coord_end.y = coord_end.y + pins[1]/2
+			while (coord.y <= end.y - (100 + pins[1])) :
+				coord_end = pya.Point(coord.x , coord.y)
+				coord_end.y = coord_end.y + pins[1]
 				pth = pya.Path([coord, coord_end] , pins[1])
 				poly.append(pth.simple_polygon())
-				coord.y=coord.y+140
+				print("after")
+				print(coord_end.y)
+				print(coord.y)
+				coord.y=coord.y+140*2
 		if ((orrint == 1) & (direct == "DOWN")):
-			coord = begin
 			poly = []
 			coord.y = coord.y - 70
-			print(type(poly))
-			while (coord.y >= end.y + ( 200 + pins[1])):
-				coord_end = coord
-				coord_end.y=coord_end.y - pins[1]/2
+			while (coord.y >= end.y + ( 100 + pins[1])):
+				coord_end = pya.Point(coord.x , coord.y)
+				coord_end.y=coord_end.y - pins[1]
 				pth = pya.Path([coord, coord_end] , pins[1])
 				poly.append(pth.simple_polygon())
-				coord.y=coord.y - 140
+				a = pth.simple_polygon()
+				multipart_cell.shapes(pins[0]).insert(a)
+				coord.y=coord.y - 140 * 2
 		for i in range(len(poly)):
 			multipart_cell.shapes(pins[0]).insert(poly[i])
+
 
 

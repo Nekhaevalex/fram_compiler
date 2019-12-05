@@ -309,7 +309,7 @@ OD =    layout.layer(6,0)
 NW =    layout.layer(3,0)
 PP = 	layout.layer(25,0)
 NP = 	layout.layer(26,0)
-
+CO =    layout.layer(30,0)
 OD_25 = layout.layer(41,0)
 #NW drawing 3 0
 
@@ -318,26 +318,46 @@ OD_25 = layout.layer(41,0)
 
 nod_straps = [(NP, 460 , 0),(M1,200 , 1),(OD,200, 1)] #[(layer,width,lenth {0 = long } , ),()]
 
-#nod_pins = [(layer,side)]
-#nod_pins = (OD , 120)
+
 nod_pin_size = 120
 nod_pin_layer = OD
 nod_tie = MultipartPath( "nod_tie" , nod_pin_layer, nod_pin_size,*nod_straps)
 
 
-##place(cell,begin,end)
 
-#pod_pins = (OD , 120)
 pod_pin_size = 120
-pod_pin_layer = OD
+pod_pin_layer = CO
 pod_straps = [(PP, 460),(M1,200),(OD,200)]
 nod_tie = MultipartPath( "pod_tie",pod_pin_layer, pod_pin_size ,*pod_straps)
 
 
 
-nod_tie.place(multipart_cell,pya.Point(-1000,0),pya.Point(-1000,-10000))
+#nod_tie.place(multipart_cell,pya.Point(-1000,0),pya.Point(-1000,-10000))
 
-nod_tie.place(multipart_cell,pya.Point(-4000,-10000),pya.Point(-4000,0))
+#nod_tie.place(multipart_cell,pya.Point(-4000,-10000),pya.Point(-4000,0))
+
+
+#=================================TEST=========================
+
+
+'''
+xpos = -10000
+ypos = -10000
+
+t = pya.Trans(   xpos    ,  ypos )
+driver.place(TOP,t)
+
+xpos = -10000 -5000
+# this is how to make smth reversed
+t = pya.Trans(-2 , True, pya.Vector(xpos, ypos))
+
+
+driver.place(TOP,t)
+'''
+
+
+
+
 
 #-------------------------------------FORM BITLINE--------------------------------
 
@@ -345,6 +365,8 @@ xpos = 0  - array_cell.bl_pin.x
 ypos = 0 - array_cell.bl_pin.y
 
 t = pya.Trans(   xpos    ,  ypos )
+
+
 
 
 '''
@@ -363,8 +385,11 @@ for yIndex in range(0,num_words):
 
 
 #------------------------------------Insert top driver and sense amp--------------------------------
-t = pya.Trans( 0 - 50, - 3 * Ycell_size  )
-sense_amp.place(bitline,t)
+
+#t = pya.Trans( 0 - 50, - 3 * Ycell_size  )
+#sense_amp.place(bitline,t)
+
+
 
 t = pya.Trans(driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
 driver.place(bitline,t)
@@ -393,6 +418,25 @@ for yIndex in range(0,word_size):
 	TOP.insert(bl_cell_inst)
 	xpos = xpos + 4*Xcell_size
 	t = pya.Trans(   xpos,  ypos)
+
+#----------------------------Adding Sen_amp-------------
+xpos = -1500
+ypos = 0
+n = 2
+for i in range(num_words):
+	if (n % 2 != 0):
+		t = pya.Trans( xpos  , - 3 * Ycell_size  )
+		sense_amp.place(TOP,t)
+	if (n% 2 == 0):
+		t = pya.Trans(-2 , True, pya.Vector(xpos + 2650, ypos  - 3000))
+		sense_amp.place(TOP,t)
+	xpos = xpos + 4*Xcell_size
+	n+=1
+
+
+
+
+
 
 #-----------------------------DECODERS--------------------------
 
