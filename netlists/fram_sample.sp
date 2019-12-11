@@ -1,5 +1,5 @@
 ---------------------------------------------------
-//Compilation of fram_sample netlist started.2019-12-03 23:01
+//Compilation of fram_sample netlist started.2019-12-11 03:06
 //Parameters of cell:
 //word size = 8
 //number of words = 8

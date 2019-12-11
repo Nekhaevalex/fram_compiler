@@ -21,7 +21,6 @@ class MultipartPath():
 		horisontal_lenth = abs(end.x - begin.x)
 		print("Vertical:" +str(vertcal_lenth)+" Horisontal: "+str(horisontal_lenth))
 		if (vertcal_lenth > horisontal_lenth):
-			print("vertcal_lenth > horisontal_lenth")
 			orrint = 1 #vertical
 			if (end.y   > begin.y):
 				direct = "UP"
@@ -29,9 +28,9 @@ class MultipartPath():
 				direct = "DOWN"
 		else :
 			orrint = 2 #horisontal
-			if (end.x - begin.x > 0):
+			if (end.x > begin.x ):
 				direct = "RIGHT"
-			if (end.x - begin.x > 0):
+			if (end.x  < begin.x):
 				direct = "LEFT"
 		print("ORRIIIINT:")
 		print(orrint)
@@ -39,9 +38,66 @@ class MultipartPath():
 		print(direct)
 		straps = self.straps
 		self.num=self.num + 1
-		pth = pya.Path([begin,end] , straps[0][1])
-		poly = pth.simple_polygon()
-		multipart_cell.shapes(straps[0][0]).insert(poly)
+		begin_short = pya.Point(begin.x , begin.y)
+		end_short = pya.Point(end.x , end.y)
+		if (orrint == 1):
+			if (direct == "UP"):
+				begin_short.y = begin.y + 130
+				end_short.y = end.y -130
+			if (direct == "DOWN"):
+				begin_short.y = begin.y - 130
+				end_short.y = end.y + 130
+		elif (orrint == 2):
+			if (direct == "RIGHT"):
+				begin_short.x = begin.x +130
+				end_short.x = end.x -130
+			if (direct == "LEFT"):
+				begin_short.x = begin.x - 130
+				end_short.x = end.x + 130
+
+
+		#--------Adding lines-------
+		for i in range(0,len(straps)):
+			if (straps[i][2] == 0): #long line
+				pth = pya.Path([begin,end] , straps[i][1])
+				#print("added stap in layer"+str(straps[i][0]))
+				poly = pth.simple_polygon()
+				multipart_cell.shapes(straps[i][0]).insert(poly)
+			if (straps[i][2] == 1): #short line
+				pth = pya.Path([begin_short,end_short] , straps[i][1])
+				#print("added stap in layer"+str(straps[i][0]))
+				poly = pth.simple_polygon()
+				multipart_cell.shapes(straps[i][0]).insert(poly)
+			if (straps[i][2] == 2):
+				begin_inv1 = pya.Point(begin.x,begin.y)
+				begin_inv2 = pya.Point(begin.x,begin.y)
+				end_inv1 = pya.Point(end.x,end.y)
+				end_inv2 = pya.Point(end.x,end.y)
+				straif = straps[i][1]/2 + (straps[i][3])
+				if (orrint == 1):
+					begin_inv1.x  += straif
+					end_inv1.x += straif
+					begin_inv2.x -= straif
+					end_inv2.x -= straif
+					pth1 = pya.Path([begin_inv1 , end_inv1] , straps[i][3]*2)
+					pth2 = pya.Path([begin_inv2 , end_inv2] , straps[i][3]*2)
+					poly1 = pth1.simple_polygon()
+					poly2 = pth2.simple_polygon()
+					multipart_cell.shapes(straps[i][0]).insert(poly1)
+					multipart_cell.shapes(straps[i][0]).insert(poly2)
+				elif (orrint == 2):
+					begin_inv1.y  += straif
+					end_inv1.y += straif
+					begin_inv2.y -= straif
+					end_inv2.y -= straif
+					pth1 = pya.Path([begin_inv1 , end_inv1] , straps[i][3]*2)
+					pth2 = pya.Path([begin_inv2 , end_inv2] , straps[i][3]*2)
+					poly1 = pth1.simple_polygon()
+					poly2 = pth2.simple_polygon()
+					multipart_cell.shapes(straps[i][0]).insert(poly1)
+					multipart_cell.shapes(straps[i][0]).insert(poly2)
+
+
 		if (orrint == 1):
 			if (direct == "UP"):
 				begin.y = begin.y + 130
@@ -58,26 +114,9 @@ class MultipartPath():
 				end.x = end.x + 130
 		else:
 			print("Wrong!!")  
-		for i in range(1,len(straps)):
-			pth = pya.Path([begin,end] , straps[i][1])
-			#print("added stap in layer"+str(straps[i][0]))
-			poly = pth.simple_polygon()
-			multipart_cell.shapes(straps[i][0]).insert(poly)
-		'''
-		n = 0
-		if (orrint == 1 ):
-			n = vertcal_lenth/260
-		if (orrint == 2)
-			n = horisontal_lenth/260
-		if (n == 0)
-			print("ERROR DEFINING orientation in"+self.name+str(self.num))
-		else:
-			if((orrint == 1) && (direct == "TOP") ):
-				coord = begin
-				coord.x = coord.x + 70
-				for i in range(n): #top.shapes(l1).insert(pya.Box(0, 0, 1000, 2000))
-		'''
+
 		coord = pya.Point(begin.x,begin.y)
+		poly = []
 		if ((orrint == 1) & (direct == "UP") ):
 			coord.y = coord.y + 70
 			coord_end = pya.Point(coord.x , coord.y)
@@ -87,9 +126,6 @@ class MultipartPath():
 				coord_end.y = coord_end.y + pins[1]
 				pth = pya.Path([coord, coord_end] , pins[1])
 				poly.append(pth.simple_polygon())
-				print("after")
-				print(coord_end.y)
-				print(coord.y)
 				coord.y=coord.y+140*2
 		if ((orrint == 1) & (direct == "DOWN")):
 			poly = []
@@ -102,8 +138,30 @@ class MultipartPath():
 				a = pth.simple_polygon()
 				multipart_cell.shapes(pins[0]).insert(a)
 				coord.y=coord.y - 140 * 2
+		if ((orrint == 2) & (direct == "RIGHT")):
+			coord.x = coord.x + 70
+			coord_end = pya.Point(coord.x , coord.y)
+			while (coord.x <= end.x - (100 + pins[1])) :
+				coord_end = pya.Point(coord.x , coord.y)
+				coord_end.x = coord_end.x+ pins[1]
+				pth = pya.Path([coord, coord_end] , pins[1])
+				poly.append(pth.simple_polygon())
+				a = pth.simple_polygon()
+				multipart_cell.shapes(pins[0]).insert(a)
+				coord.x=coord.x+140*2
+		if ((orrint == 2) & (direct == "LEFT")):
+			coord.x = coord.x - 70
+			while (coord.x >= end.x + ( 100 + pins[1])):
+				coord_end = pya.Point(coord.x , coord.y)
+				coord_end.x = coord_end.x - pins[1]
+				pth = pya.Path([coord, coord_end] , pins[1])
+				poly.append(pth.simple_polygon())
+				a = pth.simple_polygon()
+				multipart_cell.shapes(pins[0]).insert(a)
+				coord.x=coord.x - 140 * 2
+
 		for i in range(len(poly)):
 			multipart_cell.shapes(pins[0]).insert(poly[i])
-
+		
 
 

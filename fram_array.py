@@ -215,6 +215,8 @@ drivers = ["./gds_files/driver.gds","./gds_files/PL_driver.gds"]
 gdsFiles.extend(vias)
 gdsFiles.extend(drivers)
 
+
+
 # Read all cells
 for i in gdsFiles:
 	layout.read(i)
@@ -316,19 +318,21 @@ OD_25 = layout.layer(41,0)
 #==================Declare Multipart path===================
 
 
-nod_straps = [(NP, 460 , 0),(M1,200 , 1),(OD,200, 1)] #[(layer,width,lenth {0 = long } , ),()]
-
+nod_straps = [(NP, 460 , 0),(M1,200 , 1),(OD,200, 1)] #[(layer,width,lenth {0 = long } {1 = short} {2 = inverted long} , ),()]
+nod_straps_implant = [(NP, 460 , 0),(M1,200 , 1),(OD,200, 1),(PP, 460, 2 , 100)]# , True, (PP, 460 , 200)
 
 nod_pin_size = 120
 nod_pin_layer = OD
 nod_tie = MultipartPath( "nod_tie" , nod_pin_layer, nod_pin_size,*nod_straps)
-
+nod_tie_implant = MultipartPath( "nod_tie_implant" , nod_pin_layer, nod_pin_size,*nod_straps_implant) 
 
 
 pod_pin_size = 120
 pod_pin_layer = CO
 pod_straps = [(PP, 460),(M1,200),(OD,200)]
-nod_tie = MultipartPath( "pod_tie",pod_pin_layer, pod_pin_size ,*pod_straps)
+pod_straps_implant = [(PP, 460 , 0),(M1,200 , 1),(OD,200, 1),(NP, 200, 2 , 100)]
+pod_tie = MultipartPath( "pod_tie",pod_pin_layer, pod_pin_size ,*pod_straps)
+pod_tie = MultipartPath( "pod_tie_implant",pod_pin_layer, pod_pin_size ,*pod_straps_implant)
 
 
 
@@ -336,6 +340,7 @@ nod_tie = MultipartPath( "pod_tie",pod_pin_layer, pod_pin_size ,*pod_straps)
 
 #nod_tie.place(multipart_cell,pya.Point(-4000,-10000),pya.Point(-4000,0))
 
+#nod_tie_implant.place(multipart_cell,pya.Point(-4000,-6000),pya.Point(-8000,-6000))
 
 #=================================TEST=========================
 
