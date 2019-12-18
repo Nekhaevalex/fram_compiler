@@ -196,6 +196,7 @@ log.write("\n \n \n \n")
 layout = pya.Layout()
 layout.dbu = 1
 bitline = layout.create_cell("bitline")
+bitline1 = layout.create_cell("bitline1")#mirror
 TOP = layout.create_cell("TOP")
 
 # One cell for all multipart Pahts 
@@ -334,7 +335,9 @@ pod_straps_implant = [(PP, 460 , 0),(M1,200 , 1),(OD,200, 1),(NP, 200, 2 , 100)]
 pod_tie = MultipartPath( "pod_tie",pod_pin_layer, pod_pin_size ,*pod_straps)
 pod_tie = MultipartPath( "pod_tie_implant",pod_pin_layer, pod_pin_size ,*pod_straps_implant)
 
+#nod = vdd
 
+#pod = gnd
 
 #nod_tie.place(multipart_cell,pya.Point(-1000,0),pya.Point(-1000,-10000))
 
@@ -383,8 +386,11 @@ for yIndex in range(0,num_words):
 	t = pya.Trans(   xpos,  ypos)
 '''
 
+n=0
+
 for yIndex in range(0,num_words):
 	array_cell.place(bitline,t)
+	array_cell.place(bitline1,t)
 	ypos = ypos + 2*Ycell_size
 	t = pya.Trans(xpos,ypos)
 
@@ -396,8 +402,16 @@ for yIndex in range(0,num_words):
 
 
 
+
+
 t = pya.Trans(driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
 driver.place(bitline,t)
+
+
+t = pya.Trans(-2 , True, pya.Vector(-1700, 2*num_words*Ycell_size+ driver.out_pin.y) )
+driver.place(bitline1,t)
+
+
 
 #bitline.insert(amp_cell)
 
@@ -417,12 +431,24 @@ xpos = 0
 ypos = 0
 t = pya.Trans(   xpos,  ypos)
 
-for yIndex in range(0,word_size):
-	cell_index = bitline.cell_index()
-	bl_cell_inst = pya.CellInstArray(cell_index,t)
-	TOP.insert(bl_cell_inst)
-	xpos = xpos + 4*Xcell_size
-	t = pya.Trans(   xpos,  ypos)
+n=0
+
+#for yIndex in range(0,word_size):
+for yIndex in range(0,2):
+	if ( n % 2 == 0):
+		cell_index = bitline.cell_index()
+		bl_cell_inst = pya.CellInstArray(cell_index,t)
+		TOP.insert(bl_cell_inst)
+		xpos = xpos + 4*Xcell_size
+		t = pya.Trans(   xpos,  ypos)
+	if ( n % 2 != 0):
+		cell_index = bitline1.cell_index()
+		bl_cell_inst = pya.CellInstArray(cell_index,t)
+		TOP.insert(bl_cell_inst)
+		xpos = xpos + 4*Xcell_size
+		t = pya.Trans(   xpos,  ypos)
+	n+=1
+
 
 #----------------------------Adding Sen_amp-------------
 xpos = -1500
@@ -599,17 +625,11 @@ for yIndex in range(0, num_words):
 
 
 #driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
-start = pya.Point( - 500 ,2*num_words*Ycell_size+ driver.out_pin.y)
-end =  pya.Point(word_size*Xcell_size*4 , 2*num_words*Ycell_size+ driver.out_pin.y)
-TOP.shapes(M2).insert(simple_path(start,end,2*gnd_width))
 
 
 
 #-------------------------- VDD FOR TOP DRIVERS
 
-start = pya.Point( - 1000 ,2*num_words*Ycell_size+ driver.out_pin.y + driver.top_vdd.y)
-end =  pya.Point(word_size*Xcell_size*4 , 2*num_words*Ycell_size+ driver.out_pin.y + driver.top_vdd.y)
-TOP.shapes(M2).insert(simple_path(start,end,gnd_width))
 
 
 
