@@ -212,7 +212,7 @@ multipart_cell_index = multipart_cell.cell_index()
 
 gdsFiles= ["./gds_files/sense_amp.gds","./gds_files/memory_cell.gds", "./gds_files/nch_25.gds","./gds_files/pch_25.gds" ]
 vias = ["./gds_files/multipart_vdd1.gds","./gds_files/multipart_gnd1.gds"]
-drivers = ["./gds_files/driver.gds","./gds_files/PL_driver.gds"]
+drivers = ["./gds_files/driver.gds","./gds_files/driver_vdd.gds","./gds_files/driver_gnd.gds","./gds_files/PL_driver.gds", "./gds_files/driver_3u.gds", "./gds_files/driver_3u_m.gds" ]
 gdsFiles.extend(vias)
 gdsFiles.extend(drivers)
 
@@ -246,9 +246,18 @@ for i in gdsFiles:
 		if (j.name == "c_inv_3u"):
 			pl_driver_cell = j 
 			print(j.name + " found")
-
-
-
+		if (j.name == "driver_gnd"):
+			driver_gnd_cell = j
+			print(j.name+" found")
+		if (j.name == "driver_vdd"):
+			driver_vdd_cell = j
+			print(j.name+" found")
+		if (j.name== "driver_3u"):
+			driver_3u_cell = j
+			print(j.name+" found")
+		if (j.name== "driver_3u_m"):
+			driver_3u_m_cell = j
+			print(j.name+" found")
 
 # self, cell, drain, gate, source, cell_index, width, length
 nmos = Mos( nmos_cell, pya.Point(450,200), pya.Point(150,200) , pya.Point(-170,200), nmos_cell.cell_index(), nmos_width, nmos_length)
@@ -261,6 +270,12 @@ sense_amp = Sense_amp(amp_cell,pya.Point(0,0),amp_cell.cell_index())
 
 driver = Top_driver( driver_cell,pya.Point(0,0),driver_cell.cell_index())
 
+
+driver_vdd = My_Cell(driver_vdd_cell)
+driver_gnd = My_Cell(driver_gnd_cell)
+
+driver_3u = My_Cell(driver_3u_cell)
+driver_3u_m = My_Cell(driver_3u_m_cell)
 
 PL_driver = PL_driver ( pl_driver_cell,pya.Point(1400,500),pl_driver_cell.cell_index())
 
@@ -333,7 +348,7 @@ pod_pin_layer = CO
 pod_straps = [(PP, 460),(M1,200),(OD,200)]
 pod_straps_implant = [(PP, 460 , 0),(M1,200 , 1),(OD,200, 1),(NP, 200, 2 , 100)]
 pod_tie = MultipartPath( "pod_tie",pod_pin_layer, pod_pin_size ,*pod_straps)
-pod_tie = MultipartPath( "pod_tie_implant",pod_pin_layer, pod_pin_size ,*pod_straps_implant)
+pod_tie_implant = MultipartPath( "pod_tie_implant",pod_pin_layer, pod_pin_size ,*pod_straps_implant)
 
 #nod = vdd
 
@@ -405,11 +420,19 @@ for yIndex in range(0,num_words):
 
 
 t = pya.Trans(driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
-driver.place(bitline,t)
+driver_vdd.place(bitline,t)
 
 
-t = pya.Trans(-2 , True, pya.Vector(-1700, 2*num_words*Ycell_size+ driver.out_pin.y) )
-driver.place(bitline1,t)
+#t = pya.Trans(-2 , True, pya.Vector(-1700, 2*num_words*Ycell_size+ driver.out_pin.y) )
+t = pya.Trans(driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
+driver_gnd.place(bitline1,t)
+
+
+
+#-----------Bitline power and gnd lines 
+
+
+
 
 
 
@@ -417,7 +440,7 @@ driver.place(bitline1,t)
 
 #------------------ROUTING_BITLINE-------------------------
 bl_start = pya.Point(0, - 3 * Ycell_size )
-bl_end = pya.Point(0,2*num_words*Ycell_size+ driver.out_pin.y)
+bl_end = pya.Point(0,2*num_words*Ycell_size+ driver.out_pin.y/2)
 
 bl_pth = pya.Path([bl_start,bl_end] , bl_width)
 bl_poly = bl_pth.simple_polygon()
@@ -433,8 +456,7 @@ t = pya.Trans(   xpos,  ypos)
 
 n=0
 
-#for yIndex in range(0,word_size):
-for yIndex in range(0,2):
+for yIndex in range(0,word_size):
 	if ( n % 2 == 0):
 		cell_index = bitline.cell_index()
 		bl_cell_inst = pya.CellInstArray(cell_index,t)
@@ -560,14 +582,22 @@ if (n_decoders and decoders25):
 # Initial point
 xpos =  4*Xcell_size*word_size
 ypos = - PL_driver.out_pin.x
+
+
+n = 0
 t = pya.Trans(1 , True, pya.Vector(xpos, ypos))
 
-#Adding - fix now
 for i in range(0,num_words):
-	PL_driver.place(TOP,t)
-	ypos = ypos + 2*Ycell_size
-	t = pya.Trans(1 , True, pya.Vector(xpos, ypos))
-	#nmos.place(decoder_cell,t2)
+	if (n % 2 == 0):
+		driver_3u.place(TOP,t)
+		ypos = ypos + 2*Ycell_size
+		t = pya.Trans(1 , True, pya.Vector(xpos, ypos))
+	if (n % 2 != 0):
+		driver_3u_m.place(TOP,t)
+		ypos = ypos + 2*Ycell_size
+		t = pya.Trans(1 , True, pya.Vector(xpos, ypos))
+	n+=1
+
 
 
 
@@ -628,7 +658,9 @@ for yIndex in range(0, num_words):
 
 
 
-#-------------------------- VDD FOR TOP DRIVERS
+#====================Add huhe OD_25 polygon
+
+
 
 
 
