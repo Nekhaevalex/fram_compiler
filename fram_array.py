@@ -2,6 +2,8 @@ import pya
 import os
 import datetime
 import random
+#import sys
+
 
 from layout_class import *
 from netlist_generator import *
@@ -96,13 +98,13 @@ class Mos(My_Cell):
 class Memory_cell(My_Cell):
 	"""docstring for ClassName"""
 
-	def __init__ (self, cell, bl_pin, gnd_pin, wn_pin , cell_index):
-		
+	def __init__ (self, cell, bl_pin, gnd_pin, wn_pin ):
+		self.cell = cell
+		self.cell_index = cell.cell_index()
 		self.bl_pin = bl_pin
 		self.gnd_pin = gnd_pin
 		self.wn_pin = wn_pin
-		self.cell_index = cell_index
-		self.cell = cell
+		
 
 
 
@@ -159,8 +161,8 @@ class Driver(pya.Cell):
 
 #======================CODE BEGINS==========
 
-
-print("\n - Compilation started -\n")
+now = datetime.datetime.now()
+print("\n - Compilation started "+now.strftime("%Y-%m-%d %H:%M")+"-\n")
 
 #=======================CHECK=====================
 
@@ -210,11 +212,19 @@ multipart_cell_index = multipart_cell.cell_index()
 
 
 
-gdsFiles= ["./gds_files/sense_amp.gds","./gds_files/memory_cell.gds", "./gds_files/nch_25.gds","./gds_files/pch_25.gds" ]
+gdsFiles= [ "./gds_files/nch_25.gds","./gds_files/pch_25.gds" ]
 vias = ["./gds_files/multipart_vdd1.gds","./gds_files/multipart_gnd1.gds"]
 drivers = ["./gds_files/driver.gds","./gds_files/driver_vdd.gds","./gds_files/driver_gnd.gds","./gds_files/PL_driver.gds", "./gds_files/driver_3u.gds", "./gds_files/driver_3u_m.gds" ]
+amps = ["./gds_files/sense_amp.gds","./gds_files/sense_amp_vdd.gds","./gds_files/sense_amp_gnd.gds",]
+memory_cells_string = ["./gds_files/memory_cell.gds","./gds_files/memory_cell_600.gds"]
+
 gdsFiles.extend(vias)
 gdsFiles.extend(drivers)
+gdsFiles.extend(amps)
+gdsFiles.extend(memory_cells_string)
+if (estimation == "Phox_picture_estimation"):
+	est_string = ["./gds_files/nazca_export.gds"]
+	gdsFiles.extend(est_string)
 
 
 
@@ -252,19 +262,42 @@ for i in gdsFiles:
 		if (j.name == "driver_vdd"):
 			driver_vdd_cell = j
 			print(j.name+" found")
-		if (j.name== "driver_3u"):
+		if (j.name == "driver_3u"):
 			driver_3u_cell = j
 			print(j.name+" found")
-		if (j.name== "driver_3u_m"):
+		if (j.name == "driver_3u_m"):
 			driver_3u_m_cell = j
 			print(j.name+" found")
+		if (j.name == "sense_amp_vdd"):
+			sense_amp_vdd_cell = j
+			print(j.name+" found")
+		if (j.name == "sense_amp_gnd"):
+			sense_amp_gnd_cell = j
+			print(j.name+" found")
+		if (j.name == "memory_cell_600"):
+			memory_cell_600 = j
+
+
+
+
+		if (estimation == "Phox_picture_estimation"):
+			if (j.name == "nazca"):
+				nazca_cell = j
+				print(j.name+" found")
+
+
+
+
 
 # self, cell, drain, gate, source, cell_index, width, length
 nmos = Mos( nmos_cell, pya.Point(450,200), pya.Point(150,200) , pya.Point(-170,200), nmos_cell.cell_index(), nmos_width, nmos_length)
 pmos = Mos (pmos_cell,pya.Point(450,200), pya.Point(150,200) , pya.Point(-170,200),pmos_cell.cell_index() , pmos_width , pmos_length)
 
 # def __init__ (self, cell, bl_pin, gnd_pin, wn_pin , cell_index):
-array_cell = Memory_cell(memory_cell,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200), memory_cell.cell_index() )
+array_cell = Memory_cell(memory_cell,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200) )
+
+array_cell_600 = Memory_cell(memory_cell_600,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200) )
+
 # def __init__ (self, cell, in_pin , cell_index):
 sense_amp = Sense_amp(amp_cell,pya.Point(0,0),amp_cell.cell_index())
 
@@ -277,12 +310,17 @@ driver_gnd = My_Cell(driver_gnd_cell)
 driver_3u = My_Cell(driver_3u_cell)
 driver_3u_m = My_Cell(driver_3u_m_cell)
 
+
+sense_amp_vdd = My_Cell(sense_amp_vdd_cell)
+sense_amp_gnd = My_Cell(sense_amp_gnd_cell)
+
 PL_driver = PL_driver ( pl_driver_cell,pya.Point(1400,500),pl_driver_cell.cell_index())
 
 
 
 multipart_vdd1 = My_Cell(multipart_vdd1_cell)
 multipart_gnd1 = My_Cell(multipart_gnd1_cell)
+
 
 
 
@@ -377,9 +415,11 @@ t = pya.Trans(-2 , True, pya.Vector(xpos, ypos))
 
 driver.place(TOP,t)
 '''
-
-
-
+#Estimation
+if (estimation == "Phox_picture_estimation"):
+	nazca = My_Cell(nazca_cell)
+	t = pya.Trans(Xcell_size * word_size*10 , Ycell_size * num_words * 10  )
+	nazca.place(TOP,t)
 
 
 #-------------------------------------FORM BITLINE--------------------------------
@@ -401,13 +441,21 @@ for yIndex in range(0,num_words):
 	t = pya.Trans(   xpos,  ypos)
 '''
 
-n=0
 
-for yIndex in range(0,num_words):
-	array_cell.place(bitline,t)
-	array_cell.place(bitline1,t)
-	ypos = ypos + 2*Ycell_size
-	t = pya.Trans(xpos,ypos)
+n=0
+if (cell_type == "1200nm"):
+	for yIndex in range(0,num_words):
+		array_cell.place(bitline,t)
+		array_cell.place(bitline1,t)
+		ypos = ypos + 2*Ycell_size
+		t = pya.Trans(xpos,ypos)
+
+if (cell_type == "600nm"):
+	for yIndex in range(0,num_words):
+		array_cell_600.place(bitline,t)
+		array_cell_600.place(bitline1,t)
+		ypos = ypos + 2*Ycell_size
+		t = pya.Trans(xpos,ypos)
 
 
 #------------------------------------Insert top driver and sense amp--------------------------------
@@ -419,12 +467,12 @@ for yIndex in range(0,num_words):
 
 
 
-t = pya.Trans(driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
+t = pya.Trans(driver.out_pin.x+650, 2*num_words*Ycell_size+ driver.out_pin.y )
 driver_vdd.place(bitline,t)
 
 
 #t = pya.Trans(-2 , True, pya.Vector(-1700, 2*num_words*Ycell_size+ driver.out_pin.y) )
-t = pya.Trans(driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
+t = pya.Trans(driver.out_pin.x+650, 2*num_words*Ycell_size+ driver.out_pin.y )
 driver_gnd.place(bitline1,t)
 
 
@@ -447,6 +495,24 @@ bl_poly = bl_pth.simple_polygon()
 
 bitline.shapes(M1).insert(bl_poly)
 #bl_path = [(-4000,0.0),(-4000,Ycell_size*2.00*(num_words-1))]
+
+
+
+bitline1.shapes(M1).insert(simple_path(bl_start,bl_end,bl_width))
+#decoder_cell.shapes(OD).insert(simple_path( start, end , 200))
+
+
+
+
+#----------------------------Adding Sen_amp-------------
+
+
+
+t = pya.Trans(-1000,-2800)
+sense_amp_gnd.place(bitline,t)
+sense_amp_vdd.place(bitline1,t)
+
+
 
 #----------------ADDING BITLINES---------------------------
 
@@ -471,20 +537,6 @@ for yIndex in range(0,word_size):
 		t = pya.Trans(   xpos,  ypos)
 	n+=1
 
-
-#----------------------------Adding Sen_amp-------------
-xpos = -1500
-ypos = 0
-n = 2
-for i in range(num_words):
-	if (n % 2 != 0):
-		t = pya.Trans( xpos  , - 3 * Ycell_size  )
-		sense_amp.place(TOP,t)
-	if (n% 2 == 0):
-		t = pya.Trans(-2 , True, pya.Vector(xpos + 2650, ypos  - 3000))
-		sense_amp.place(TOP,t)
-	xpos = xpos + 4*Xcell_size
-	n+=1
 
 
 
@@ -580,12 +632,18 @@ if (n_decoders and decoders25):
 
 
 # Initial point
-xpos =  4*Xcell_size*word_size
-ypos = - PL_driver.out_pin.x
+xpos =  4*Xcell_size*word_size 
+ypos = - PL_driver.out_pin.x + 250
 
 
 n = 0
 t = pya.Trans(1 , True, pya.Vector(xpos, ypos))
+start = pya.Point (0,450)
+end =  pya.Point (0,3270)
+driver_3u_m.cell.shapes(M1).insert(simple_path( start, end , Ycell_size))
+start = pya.Point (1820,4270)
+end =  pya.Point (1820,7090)
+driver_3u_m.cell.shapes(M1).insert(simple_path( start, end , Ycell_size))
 
 for i in range(0,num_words):
 	if (n % 2 == 0):
@@ -596,7 +654,13 @@ for i in range(0,num_words):
 		driver_3u_m.place(TOP,t)
 		ypos = ypos + 2*Ycell_size
 		t = pya.Trans(1 , True, pya.Vector(xpos, ypos))
+
 	n+=1
+
+
+#------------------Pl drivers metal intersections
+
+
 
 
 
@@ -612,7 +676,7 @@ for i in range(0,num_words):
 #bitline.shapes(l1).insert(simple_path( wl_start, wl_end , wl_width))
 
 xpos = 0
-ypos = 0
+ypos = 500
 
 for yIndex in range(0, num_words):
 	start = pya.Point(-1000, ypos)
@@ -628,8 +692,8 @@ xpos = 0
 ypos = 0
 
 for yIndex in range(0, num_words):
-	start = pya.Point(-1000, ypos)
-	end = pya.Point(4 * Xcell_size * word_size, ypos)
+	start = pya.Point( - 1000 , ypos)
+	end = pya.Point(4 * Xcell_size * word_size + 500 , ypos)
 	TOP.shapes(M4).insert(simple_path( start, end , gnd_width))
 	ypos = ypos + 2*Ycell_size
 
@@ -642,11 +706,11 @@ for yIndex in range(0, num_words):
 xpos = 0
 ypos = -800
 
-for yIndex in range(0, num_words):
-	start = pya.Point(0, ypos)
-	end = pya.Point(Xcell_size*4*word_size,ypos)
-	TOP.shapes(M2).insert(simple_path( start, end , gnd_width))
-	ypos = ypos + 2*Ycell_size
+for yIndex in range( 0 , num_words ):
+	start = pya.Point( 0 , ypos)
+	end = pya.Point( Xcell_size * 4 * word_size , ypos )
+	TOP.shapes(M2).insert( simple_path( start, end , gnd_width ))
+	ypos = ypos + 2 * Ycell_size
 #	print(start.y , end.y)
 
 
@@ -654,11 +718,9 @@ for yIndex in range(0, num_words):
 #--------------------- extra driver ground
 
 
-#driver.out_pin.x+20, 2*num_words*Ycell_size+ driver.out_pin.y )
 
 
-
-#====================Add huhe OD_25 polygon
+#====================Add huge OD_25 polygon
 
 
 
@@ -683,9 +745,7 @@ VDD = "vdd"
 
 
 
-cell_size_sim = cell_x_size*cell_y_size
-
-#sense_amp_netlist = SenAmpSubsct(sense_amp.cell.name , nmos , pmos, )
+cell_size_sim = cell_x_size * cell_y_size
 
 fram_netlist = Netlist(output_name , word_size , num_words,sense_amp,array_cell, driver,pmos,nmos,p00 ,cell_size_sim)
 

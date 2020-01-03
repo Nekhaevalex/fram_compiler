@@ -1,18 +1,30 @@
 #This is simple array config file
 
 
+#==========Type of cell
+
+cell_type = "600nm"
+#cell_type = "1200nm"
+# 600 or 1200 nm cell
+
+
+
 
 #-----------DIMENSIONS FOR THE LAYOUT. NOT AN ACTUAL DIMENTIONS-------------
 
 Xcell_size = 500
-Ycell_size = 1000
+Ycell_size = 900
 
-#Coords for pins ??!!?!!?
+# stable is:
+#Xcell_size = 500
+#Ycell_size = 1000
+
+
 
 #Horizontal size
-word_size = 8
+word_size = 16
 #Vertical size
-num_words = 8
+num_words = 16
 
 
 #output_name = "FRAM_{0}_{1}.gds".format(word_size,num_words)
@@ -35,12 +47,13 @@ gnd_width = 150
 
 #---------------------------Memory cells  (FOR SIMULATION ONLY NOW!!)
 
+if (cell_type == "600nm"):
+	cell_x_size = 5e-07
+	cell_y_size = 5e-07
 
-cell_x_size = 5e-07
-
-
-cell_y_size = 5e-07
-
+if (cell_type == "1200nm"):
+	cell_x_size = 12e-07
+	cell_y_size = 12e-07
 # polarysation 
 p00 = 1e-14   
 
@@ -61,6 +74,8 @@ n_decoders = False
 # 1.2 decoders not there anyway!
 decoders25 = True
 
+#Estimation is there to place a real sized picture reference to appreciate the small size of a memory chip
+estimation = "False" # or "Phox_picture_estimation"
 
 
 
