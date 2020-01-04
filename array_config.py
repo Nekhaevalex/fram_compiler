@@ -22,9 +22,9 @@ Ycell_size = 900
 
 
 #Horizontal size
-word_size = 16
+word_size = 8
 #Vertical size
-num_words = 16
+num_words = 8
 
 
 #output_name = "FRAM_{0}_{1}.gds".format(word_size,num_words)
@@ -40,7 +40,7 @@ array_cell = "array_cell.gds"
 # width of bitline
 bl_width = 130 
 # width of wordline
-wl_width = 120 
+wl_width = 140 
 #Width of extra gnd routing
 gnd_width = 150
 
@@ -67,7 +67,7 @@ p00 = 1e-14
 #---------------------Other setings------------------
 
 # if you need decoders of word line or not (True/False)		
-n_decoders = False 		
+n_decoders = True	
 
 
 # if True, will place 2.5V decoders, else (False) will make 1.2 Decoders + converter!

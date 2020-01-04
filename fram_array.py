@@ -164,7 +164,7 @@ class Driver(pya.Cell):
 now = datetime.datetime.now()
 print("\n - Compilation started "+now.strftime("%Y-%m-%d %H:%M")+"-\n")
 
-#=======================CHECK=====================
+#=======================CHECK===============
 
 
 
@@ -267,6 +267,7 @@ for i in gdsFiles:
 			print(j.name+" found")
 		if (j.name == "driver_3u_m"):
 			driver_3u_m_cell = j
+			driver_3u_m_top_cell = j
 			print(j.name+" found")
 		if (j.name == "sense_amp_vdd"):
 			sense_amp_vdd_cell = j
@@ -351,7 +352,7 @@ bitline.insert(array_cell_inst)
 
 
 
-#-------------------------------------layers--------------------------------
+#-----------------layers-----------------------------------
 
 M1 =    layout.layer(31, 0)
 
@@ -631,8 +632,10 @@ if (n_decoders and decoders25):
 #=======================PL DRIVERS=========================
 
 
-# Initial point
-xpos =  4*Xcell_size*word_size 
+
+
+xpos_0 =  4*Xcell_size*word_size # Initial point
+xpos =  xpos_0
 ypos = - PL_driver.out_pin.x + 250
 
 
@@ -645,7 +648,7 @@ start = pya.Point (1820,4270)
 end =  pya.Point (1820,7090)
 driver_3u_m.cell.shapes(M1).insert(simple_path( start, end , Ycell_size))
 
-for i in range(0,num_words):
+for i in range(0,num_words-1):
 	if (n % 2 == 0):
 		driver_3u.place(TOP,t)
 		ypos = ypos + 2*Ycell_size
@@ -656,14 +659,24 @@ for i in range(0,num_words):
 		t = pya.Trans(1 , True, pya.Vector(xpos, ypos))
 
 	n+=1
+#extra driver with its own vdd (because of the "mirror" placement  system)
+driver_3u_m_top = My_Cell(driver_3u_m_top_cell)
+nod_tie.place(driver_3u_m_top_cell,pya.Point(2000, 4275),pya.Point( 2000 , 7080 ))
+driver_3u_m.place(TOP,t)
 
 
-#------------------Pl drivers metal intersections
+#------------------Pl drivers metal intersections-----------------------------
 
 
 
+#------------------Pl drivers large N-well-------------------------
 
 
+#top.shapes(l1).insert(pya.Box(0, 0, 1000, 2000))
+
+TOP.shapes(NW).insert(pya.Box(xpos_0  + 3720  , 0 ,xpos_0  + 3720+ 4850 , 2*Ycell_size*(num_words-1) ))
+
+#( pya.Point(4*Xcell_size*word_size + 3700  , -1500 ),pya.Point( 4*Xcell_size*word_size + 3700 +4000, 2*Ycell_size*num_words )))
 
 
 
