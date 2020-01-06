@@ -735,6 +735,12 @@ for yIndex in range( 0 , num_words ):
 
 #====================Add huge OD_25 polygon
 
+xpos_0 =  2*Xcell_size*word_size # Initial point X
+ypos_0 =  2*Ycell_size*num_words # Initial point Y
+
+
+TOP.shapes(OD_25).insert(pya.Box( 0 - xpos_0,0 , xpos_0*word_size , ypos_0 * num_words ,  ))
+
 
 
 
