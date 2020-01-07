@@ -67,7 +67,7 @@ p00 = 1e-14
 #---------------------Other setings------------------
 
 # if you need decoders of word line or not (True/False)		
-n_decoders = True	
+n_decoders = False	
 
 
 # if True, will place 2.5V decoders, else (False) will make 1.2 Decoders + converter!

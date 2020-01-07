@@ -198,7 +198,7 @@ log.write("\n \n \n \n")
 layout = pya.Layout()
 layout.dbu = 1
 bitline = layout.create_cell("bitline")
-bitline1 = layout.create_cell("bitline1")#mirror
+bitline_m = layout.create_cell("bitline_m")#mirror
 TOP = layout.create_cell("TOP")
 
 # One cell for all multipart Pahts 
@@ -261,6 +261,7 @@ for i in gdsFiles:
 			print(j.name+" found")
 		if (j.name == "driver_vdd"):
 			driver_vdd_cell = j
+			driver_vdd_1_cell = j
 			print(j.name+" found")
 		if (j.name == "driver_3u"):
 			driver_3u_cell = j
@@ -307,6 +308,7 @@ driver = Top_driver( driver_cell,pya.Point(0,0),driver_cell.cell_index())
 
 driver_vdd = My_Cell(driver_vdd_cell)
 driver_gnd = My_Cell(driver_gnd_cell)
+driver_vdd_1 = My_Cell(driver_vdd_1_cell)
 
 driver_3u = My_Cell(driver_3u_cell)
 driver_3u_m = My_Cell(driver_3u_m_cell)
@@ -447,34 +449,40 @@ n=0
 if (cell_type == "1200nm"):
 	for yIndex in range(0,num_words):
 		array_cell.place(bitline,t)
-		array_cell.place(bitline1,t)
+		array_cell.place(bitline_m,t)
 		ypos = ypos + 2*Ycell_size
 		t = pya.Trans(xpos,ypos)
 
 if (cell_type == "600nm"):
 	for yIndex in range(0,num_words):
 		array_cell_600.place(bitline,t)
-		array_cell_600.place(bitline1,t)
+		array_cell_600.place(bitline_m,t)
 		ypos = ypos + 2*Ycell_size
 		t = pya.Trans(xpos,ypos)
 
 
 #------------------------------------Insert top driver and sense amp--------------------------------
 
-#t = pya.Trans( 0 - 50, - 3 * Ycell_size  )
-#sense_amp.place(bitline,t)
 
+start = pya.Point(-1690,12090)
+end = pya.Point(-1690,14390)
 
+driver_gnd.cell.shapes(M1).insert(simple_path( start, end , Ycell_size))
+
+start = pya.Point(-1690,1090)
+end = pya.Point(-1690,3390)
+
+driver_vdd.cell.shapes(M1).insert(simple_path( start, end , Ycell_size))
 
 
 
 t = pya.Trans(driver.out_pin.x+650, 2*num_words*Ycell_size+ driver.out_pin.y )
-driver_vdd.place(bitline,t)
+driver_gnd.place(bitline,t)
 
 
 #t = pya.Trans(-2 , True, pya.Vector(-1700, 2*num_words*Ycell_size+ driver.out_pin.y) )
 t = pya.Trans(driver.out_pin.x+650, 2*num_words*Ycell_size+ driver.out_pin.y )
-driver_gnd.place(bitline1,t)
+driver_vdd.place(bitline_m,t)
 
 
 
@@ -499,7 +507,7 @@ bitline.shapes(M1).insert(bl_poly)
 
 
 
-bitline1.shapes(M1).insert(simple_path(bl_start,bl_end,bl_width))
+bitline_m.shapes(M1).insert(simple_path(bl_start,bl_end,bl_width))
 #decoder_cell.shapes(OD).insert(simple_path( start, end , 200))
 
 
@@ -511,7 +519,7 @@ bitline1.shapes(M1).insert(simple_path(bl_start,bl_end,bl_width))
 
 t = pya.Trans(-1000,-2800)
 sense_amp_gnd.place(bitline,t)
-sense_amp_vdd.place(bitline1,t)
+sense_amp_vdd.place(bitline_m,t)
 
 
 
@@ -531,7 +539,7 @@ for yIndex in range(0,word_size):
 		xpos = xpos + 4*Xcell_size
 		t = pya.Trans(   xpos,  ypos)
 	if ( n % 2 != 0):
-		cell_index = bitline1.cell_index()
+		cell_index = bitline_m.cell_index()
 		bl_cell_inst = pya.CellInstArray(cell_index,t)
 		TOP.insert(bl_cell_inst)
 		xpos = xpos + 4*Xcell_size
@@ -739,7 +747,7 @@ xpos_0 =  2*Xcell_size*word_size # Initial point X
 ypos_0 =  2*Ycell_size*num_words # Initial point Y
 
 
-TOP.shapes(OD_25).insert(pya.Box( 0 - xpos_0,0 , xpos_0*word_size , ypos_0 * num_words ,  ))
+#TOP.shapes(OD_25).insert(pya.Box( 0 - xpos_0,0 , xpos_0*word_size , ypos_0 * num_words ,  ))
 
 
 
