@@ -669,7 +669,7 @@ for i in range(0,num_words-1):
 	n+=1
 #extra driver with its own vdd (because of the "mirror" placement  system)
 driver_3u_m_top = My_Cell(driver_3u_m_top_cell)
-nod_tie.place(driver_3u_m_top_cell,pya.Point(2000, 4275),pya.Point( 2000 , 7080 ))
+nod_tie.place(driver_3u_m_top_cell,pya.Point(1800, 4275),pya.Point( 1800 , 7080 ))
 driver_3u_m.place(TOP,t)
 
 

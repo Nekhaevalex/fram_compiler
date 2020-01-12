@@ -1,8 +1,10 @@
-This is a README file for MIPT lab fram memory compiler.
+# FRAM gds and netlist compiler
 
-Author: Solovyanov Mikhail
+##This is a README file for MIPT lab fram memory compiler.
 
-About:
+##Author: Solovyanov Mikhail
+
+###About:
 Compiler is aimed to create gds and simulation representation of embedded FRAM memory array with given paramethers. You are free to change them in annotated array_config file.
 
 Compiler includes pre-made views of all cells such as:
@@ -15,7 +17,7 @@ Compiler includes pre-made views of all cells such as:
 
 
 
-List of all files:
+###List of all files:
 
 fram_array.py - main python file creates GDS view and calles netlist class.
 netlist_generator.py - contains Netlist class
