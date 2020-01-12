@@ -17,7 +17,7 @@ Compiler includes pre-made views of all cells such as:
 
 
 
-###List of all files:
+### List of all files:
 
 fram_array.py - main python file creates GDS view and calles netlist class.
 netlist_generator.py - contains Netlist class
