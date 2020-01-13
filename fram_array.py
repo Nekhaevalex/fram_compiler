@@ -6,7 +6,8 @@ import random
 
 
 from layout_class import *
-from netlist_generator import *
+from cells import *
+#from netlist_generator import *
 
 
 #---------------------Open Config-------------------------
@@ -49,93 +50,6 @@ def pwr2(num):
 
 #--------------------class definition-----------------------
 
-class My_Cell():
-
-	dimentions = (10,10)
-
-
-	def __init__ (self, cell):
-		self.cell = cell
-		self.cell_index = cell.cell_index()
-
-
-	
-
-	def place(self,cell,t):
-		cell_array = pya.CellInstArray(self.cell_index,t)
-		cell.insert(cell_array)
-
-	
-
-
-
-
-class Mos(My_Cell):
-	"""docstring for ClassName"""
-
-
-
-	def __init__ (self, cell, drain, gate, source, cell_index, width, length):
-		self.cell = cell
-		self.drain = drain
-		self.gate = gate
-		self.source = source
-		self.width = width
-		self.length = length
-		self.cell_index = cell_index
-		self.w = float(width)/1000
-		self.l = float(length)/1000
-#	def add_to_netlist (w,l, netlist):
-		
-	def add_to_netlist(self,n,d,g,s,b):
-		#print("transistor width is: "+str(self.width))
-		#print("transistor width is: "+str(self.w))
-		s = "M"+str(n)+" ("+d+" "+g+" "+s+" "+b+" ) "+self.cell.name+" w="+str(self.w)+" l="+str(self.l)+" nfing=1 mult=1 srcefirst=1 mismatch=1\n"
-		return s 
-
-
-
-class Memory_cell(My_Cell):
-	"""docstring for ClassName"""
-
-	def __init__ (self, cell, bl_pin, gnd_pin, wn_pin ):
-		self.cell = cell
-		self.cell_index = cell.cell_index()
-		self.bl_pin = bl_pin
-		self.gnd_pin = gnd_pin
-		self.wn_pin = wn_pin
-		
-
-
-
-
-
-class Sense_amp(My_Cell):
-	"""docstring for ClassName"""
-
-	def __init__ (self, cell, in_pin , cell_index):
-		
-		self.in_pin = in_pin
-		self.cell_index = cell_index
-		self.cell = cell
-
-
-class Top_driver(My_Cell):
-	"""docstring for ClassName"""
-	top_vdd=  pya.Point( -500, 5350)
-	def __init__ (self, cell, out_pin , cell_index):
-		
-		self.out_pin = out_pin
-		self.cell_index = cell_index
-		self.cell = cell
-
-class PL_driver(My_Cell):
-	"""docstring for ClassName"""
-	#top_vdd=  pya.Point( -500, 5350)
-	def __init__ (self, cell, out_pin , cell_index):
-		self.out_pin = out_pin
-		self.cell_index = cell_index
-		self.cell = cell
 
 
 '''
@@ -296,9 +210,17 @@ nmos = Mos( nmos_cell, pya.Point(450,200), pya.Point(150,200) , pya.Point(-170,2
 pmos = Mos (pmos_cell,pya.Point(450,200), pya.Point(150,200) , pya.Point(-170,200),pmos_cell.cell_index() , pmos_width , pmos_length)
 
 # def __init__ (self, cell, bl_pin, gnd_pin, wn_pin , cell_index):
-array_cell = Memory_cell(memory_cell,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200) )
+array_cell = Memory_cell(memory_cell,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200),1200 )
 
-array_cell_600 = Memory_cell(memory_cell_600,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200) )
+array_cell_600 = Memory_cell(memory_cell_600,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200),600 )
+
+
+if (cell_type == "600nm"):
+	main_cell = array_cell_600
+if (cell_type == "1200nm"):
+	main_cell = array_cell
+
+main_cell.p00 = p00
 
 # def __init__ (self, cell, in_pin , cell_index):
 sense_amp = Sense_amp(amp_cell,pya.Point(0,0),amp_cell.cell_index())
@@ -341,16 +263,6 @@ multipart_gnd1 = My_Cell(multipart_gnd1_cell)
 #bitline.move_instances(amp_cell)
 #bitline.move_instances(memory_cell)
 
-'''
-t = pya.Trans(   xpos,  ypos)
-cell_index=memory_cell.cell_index()
-array_cell_inst = pya.CellInstArray(cell_index,t)
-bitline.insert(array_cell_inst)
-t = pya.Trans(   xpos+1000, ypos)
-array_cell_inst = pya.CellInstArray(cell_index,t)
-bitline.insert(array_cell_inst)
-
-'''
 
 
 
@@ -427,8 +339,8 @@ if (estimation == "Phox_picture_estimation"):
 
 #-------------------------------------FORM BITLINE--------------------------------
 
-xpos = 0  - array_cell.bl_pin.x
-ypos = 0 - array_cell.bl_pin.y
+xpos = 0  - main_cell.bl_pin.x
+ypos = 0 - main_cell.bl_pin.y
 
 t = pya.Trans(   xpos    ,  ypos )
 
@@ -446,19 +358,13 @@ for yIndex in range(0,num_words):
 
 
 n=0
-if (cell_type == "1200nm"):
-	for yIndex in range(0,num_words):
-		array_cell.place(bitline,t)
-		array_cell.place(bitline_m,t)
-		ypos = ypos + 2*Ycell_size
-		t = pya.Trans(xpos,ypos)
 
-if (cell_type == "600nm"):
-	for yIndex in range(0,num_words):
-		array_cell_600.place(bitline,t)
-		array_cell_600.place(bitline_m,t)
-		ypos = ypos + 2*Ycell_size
-		t = pya.Trans(xpos,ypos)
+for yIndex in range(0,num_words):
+	main_cell.place(bitline,t)
+	main_cell.place(bitline_m,t)
+	ypos = ypos + 2*Ycell_size
+	t = pya.Trans(xpos,ypos)
+
 
 
 #------------------------------------Insert top driver and sense amp--------------------------------
@@ -774,9 +680,13 @@ VDD = "vdd"
 
 cell_size_sim = cell_x_size * cell_y_size
 
-fram_netlist = Netlist(output_name , word_size , num_words,sense_amp,array_cell, driver,pmos,nmos,p00 ,cell_size_sim)
+#fram_netlist = Netlist(output_name , word_size , num_words,sense_amp,array_cell, driver,pmos,nmos,p00 ,cell_size_sim , args*)
 
 
+
+
+
+#fram_netlist = Netlist(output_name , word_size , num_words,sense_amp,array_cell, driver,pmos,nmos,p00 ,cell_size_sim , args*)
 
 
 

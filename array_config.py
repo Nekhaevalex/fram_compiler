@@ -5,7 +5,7 @@
 
 cell_type = "600nm"
 #cell_type = "1200nm"
-# 600 or 1200 nm cell
+# 600nm or 1200nm cell
 
 
 

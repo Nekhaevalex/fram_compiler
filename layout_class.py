@@ -34,10 +34,6 @@ class MultipartPath():
 				direct = "RIGHT"
 			if (end.x  < begin.x):
 				direct = "LEFT"
-		print("ORRIIIINT:")
-		print(orrint)
-		print("DIRECT:")
-		print(direct)
 		straps = self.straps
 		self.num=self.num + 1
 		begin_short = pya.Point(begin.x , begin.y)
@@ -115,7 +111,7 @@ class MultipartPath():
 				begin.x = begin.x - 130
 				end.x = end.x + 130
 		else:
-			print("Wrong!!")  
+			print("Wrong!! Error in strap placement!")  
 
 		coord = pya.Point(begin.x,begin.y)
 		poly = []
