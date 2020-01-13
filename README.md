@@ -16,6 +16,22 @@ Compiler includes pre-made views of all cells such as:
 - PL driver = driver for plate line
 
 
+### Usage:
+
+For quick run just run: python3 fram_array.py
+
+Also you are welcome to make changes in array_config.py file which is a main config.
+
+
+### Dependencies
+Require:
+klayout for python (pip3 install klayout / pip install klayout )
+
+tested on python3.6
+
+
+Optional:
+gdsMill for pdf print (in future)
 
 ### List of all files:
 
