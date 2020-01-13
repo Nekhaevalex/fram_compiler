@@ -7,6 +7,18 @@ import random
 #import sys
 
 
+'''
+try:
+	import gdsMill
+except Exception as e:
+	raise
+else:
+	pass
+finally:
+	pass
+'''
+
+
 from layout_class import * # All layout functios
 from cells import * # All cell generation classes
 #from netlist_generator import * # netlist generator class
@@ -566,18 +578,12 @@ ypos_0 =  2*Ycell_size*num_words # Initial point Y
 
 #TOP.shapes(OD_25).insert(pya.Box( 0 - xpos_0,0 , xpos_0*word_size , ypos_0 * num_words ,  ))
 
-
-
-
-
-
 #======================Add multipart cell==========
 t = pya.Trans(   0,  0)
 mp_cell_array = pya.CellInstArray(multipart_cell.cell_index(),t)
 TOP.insert(mp_cell_array)
 
 #=======================FINAL GDS OUTPUT===========
-
 
 layout.write("./gds_files/"+ output_name+".gds")
 print("\n layout has been saved as ./gds_files/"+ output_name+".gds\n" )
@@ -592,19 +598,7 @@ VDD = "vdd"
 cell_size_sim = cell_x_size * cell_y_size
 
 #fram_netlist = Netlist(output_name , word_size , num_words,sense_amp,array_cell, driver,pmos,nmos,p00 ,cell_size_sim , args*)
-
-
-
-
-
 #fram_netlist = Netlist(output_name , word_size , num_words,sense_amp,array_cell, driver,pmos,nmos,p00 ,cell_size_sim , args*)
-
-
-
-
-
-
-
 
 
 
