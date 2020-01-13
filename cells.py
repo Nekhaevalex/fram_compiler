@@ -104,30 +104,62 @@ class Memory_cell(My_Cell):
 class Sense_amp(My_Cell):
 	"""docstring for ClassName"""
 
-	def __init__ (self, cell, in_pin , cell_index):
+	def __init__ (self, cell):
 		
-		self.in_pin = in_pin
-		self.cell_index = cell_index
+		#self.in_pin = in_pin
+		self.cell_index = cell.cell_index()
 		self.cell = cell
 
 
 class Top_driver(My_Cell):
 	"""docstring for ClassName"""
+	out_pin = pya.Point (0,0)
 	top_vdd=  pya.Point( -500, 5350)
-	def __init__ (self, cell, out_pin , cell_index):
-		
-		self.out_pin = out_pin
-		self.cell_index = cell_index
+	def __init__ (self, cell):
+		self.cell_index = cell.cell_index()
 		self.cell = cell
 
-	#def sbskt_def(self, n_mos, bl , wl , pl , gnd  ):
+	def sbskt_def(self, n_mos, in_pin , out_pin , vdd , gnd  ):
+
+		s = "////Subsercuit   "+ self.cell.name+"  ////"
+		s += "\nsubckt "+self.cell.name+' '+in_pin+' '+out_pin+' '+vdd+' '+gnd+"\n"
+		s += "M"+str(n_mos)+" ( "+vdd+" "+in_pin+" netv "+vdd+" ) psvt25 w=0.4 l=2.5\n"
+		n_mos += 1
+		s += "M"+str(n_mos)+" ( netv "+in_pin+" "+out_pin+" "+vdd+" ) psvt25 w=0.4 l=2.5\n"
+		n_mos += 1
+		s += "M"+str(n_mos)+" ( "+out_pin+""+in_pin+" netg "+gnd+" ) nsvt25 w=0.4 l=2.5\n"
+		n_mos += 1
+		s += "M"+str(n_mos)+" ( netg "+in_pin+" "+gnd+" "+vdd+" ) psvt25 w=0.4 l=2.5\n"
+		n_mos += 1
+		s += "ends "+self.cell.name +"\n"
+		return s
+
+	def add_to_netlist(self,n_inst, in_pin , out_pin , vdd , gnd ):
+		s = "I"+str(n_inst)+" ("+in_pin+' '+out_pin+' '+vdd+' '+gnd+") "+self.cell.name+"\n"
+		return s
 
 
 
 class PL_driver(My_Cell):
 	"""docstring for ClassName"""
 	#top_vdd=  pya.Point( -500, 5350)
-	def __init__ (self, cell, out_pin , cell_index):
-		self.out_pin = out_pin
-		self.cell_index = cell_index
+	def __init__ (self, cell):
+		self.cell_index = cell.cell_index()
 		self.cell = cell
+
+	def sbskt_def(self, n_mos, in_pin , out_pin , vdd , gnd  ):
+		s = "////Subsercuit   "+ self.cell.name+"  ////"
+		s = s + "\nsubckt "+self.cell.name+' '+in_pin+' '+out_pin+' '+vdd+' '+gnd+"\n"
+		s += "M"+str(n_mos)+" ( "+vdd+" "+in_pin+" "+out_pin+" "+vdd+" ) psvt25 w=0.4 l=3.0\n"
+		n_mos += 1
+		s += "M"+str(n_mos)+" ( "+out_pin+""+in_pin+" "+gnd+" "+gnd+" ) nsvt25 w=0.4 l=3.0\n"
+		n_mos += 1
+		s += "ends "+self.cell.name +"\n"
+		return s
+
+
+	def add_to_netlist(self,n_inst, in_pin , out_pin , vdd , gnd ):
+		s = "I"+str(n_inst)+" ("+in_pin+' '+out_pin+' '+vdd+' '+gnd+") "+self.cell.name+"\n"
+		return s
+
+

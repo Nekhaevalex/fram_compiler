@@ -112,7 +112,7 @@ log.write("\n \n \n \n")
 layout = pya.Layout()
 layout.dbu = 1
 bitline = layout.create_cell("bitline")
-bitline_m = layout.create_cell("bitline_m")#mirror
+bitline_m = layout.create_cell("bitline_m")#mirror of top driver and sen amp
 TOP = layout.create_cell("TOP")
 
 # One cell for all multipart Pahts 
@@ -211,7 +211,6 @@ pmos = Mos (pmos_cell,pya.Point(450,200), pya.Point(150,200) , pya.Point(-170,20
 
 # def __init__ (self, cell, bl_pin, gnd_pin, wn_pin , cell_index):
 array_cell = Memory_cell(memory_cell,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200),1200 )
-
 array_cell_600 = Memory_cell(memory_cell_600,pya.Point(650,1200),pya.Point(400,1350), pya.Point(1120,1200),600 )
 
 
@@ -222,54 +221,25 @@ if (cell_type == "1200nm"):
 
 main_cell.p00 = p00
 
-# def __init__ (self, cell, in_pin , cell_index):
-sense_amp = Sense_amp(amp_cell,pya.Point(0,0),amp_cell.cell_index())
 
-driver = Top_driver( driver_cell,pya.Point(0,0),driver_cell.cell_index())
+driver = Top_driver( driver_cell)
 
+driver_vdd = Top_driver(driver_vdd_cell)
+driver_gnd = Top_driver(driver_gnd_cell)
+driver_vdd_1 = Top_driver(driver_vdd_1_cell)
 
-driver_vdd = My_Cell(driver_vdd_cell)
-driver_gnd = My_Cell(driver_gnd_cell)
-driver_vdd_1 = My_Cell(driver_vdd_1_cell)
+driver_3u = PL_driver(driver_3u_cell)
+driver_3u_m = PL_driver(driver_3u_m_cell)
 
-driver_3u = My_Cell(driver_3u_cell)
-driver_3u_m = My_Cell(driver_3u_m_cell)
-
-
-sense_amp_vdd = My_Cell(sense_amp_vdd_cell)
-sense_amp_gnd = My_Cell(sense_amp_gnd_cell)
-
-PL_driver = PL_driver ( pl_driver_cell,pya.Point(1400,500),pl_driver_cell.cell_index())
-
-
+sense_amp_vdd = Sense_amp(sense_amp_vdd_cell)
+sense_amp_gnd = Sense_amp(sense_amp_gnd_cell)
 
 multipart_vdd1 = My_Cell(multipart_vdd1_cell)
 multipart_gnd1 = My_Cell(multipart_gnd1_cell)
 
-
-
-
-
-#print(driver.cell_index)
-#print(multipart_gnd1.cell_index)
-#print(multipart_vdd1.cell_index)
-
-
-
-
-
-
-#print(amp_cell.name)
-#bitline.move_instances(amp_cell)
-#bitline.move_instances(memory_cell)
-
-
-
-
 #-----------------layers-----------------------------------
 
 M1 =    layout.layer(31, 0)
-
 M2 =    layout.layer(32, 0)
 M3 =    layout.layer(33, 0)
 M4 =    layout.layer(34, 0)
