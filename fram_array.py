@@ -1,3 +1,5 @@
+# Main fram compiler file. 
+
 import pya
 import os
 import datetime
@@ -5,15 +7,13 @@ import random
 #import sys
 
 
-from layout_class import *
-from cells import *
-#from netlist_generator import *
+from layout_class import * # All layout functios
+from cells import * # All cell generation classes
+#from netlist_generator import * # netlist generator class
 
 
 #---------------------Open Config-------------------------
 from array_config import *
-
-
 
 
 #--------------------support func------------------
@@ -26,52 +26,19 @@ def find_pwr2(n,s):
 		return s
 
 
-
-
-
-
-
 def simple_path( start, end , width):
 	pth = pya.Path([start,end] , width)
 	poly = pth.simple_polygon()
 	return poly
 #TOP.shapes(M2).insert(poly)
 
-
-
-
-
 def pwr2(num):
-
 	'states if a number is a power of two'
-
 	return ((num & (num - 1)) == 0) and num > 0
 
 
 #--------------------class definition-----------------------
-
-
-
-'''
-class Amp(pya.Cell):
-	"""docstring for ClassName"""
-	self.in_pin = pya.Point()
-	self.ref_pin = pya.Point()
-	self.vdd_pin = pya.Point()
-	self.gnd_pin = pya.Point()
-
-
-
-
-class Driver(pya.Cell):
-	"""docstring for ClassName"""
-	self.out_pin = pya.Point()
-	self.in_pin = pya.Point()
-	self.vdd_pin = pya.Point()
-	self.gnd_pin = pya.Point()
-
-'''
-
+# Moved to file -> cells.py
 
 #======================CODE BEGINS==========
 
@@ -286,20 +253,7 @@ pod_tie_implant = MultipartPath( "pod_tie_implant",pod_pin_layer, pod_pin_size ,
 #=================================TEST=========================
 
 
-'''
-xpos = -10000
-ypos = -10000
 
-t = pya.Trans(   xpos    ,  ypos )
-driver.place(TOP,t)
-
-xpos = -10000 -5000
-# this is how to make smth reversed
-t = pya.Trans(-2 , True, pya.Vector(xpos, ypos))
-
-
-driver.place(TOP,t)
-'''
 #Estimation
 if (estimation == "Phox_picture_estimation"):
 	nazca = My_Cell(nazca_cell)
@@ -317,14 +271,6 @@ t = pya.Trans(   xpos    ,  ypos )
 
 
 
-'''
-for yIndex in range(0,num_words):
-	cell_index=memory_cell.cell_index()
-	array_cell_inst = pya.CellInstArray(cell_index,t)
-	bitline.insert(array_cell_inst)
-	ypos = ypos + 2*Ycell_size
-	t = pya.Trans(   xpos,  ypos)
-'''
 
 
 n=0
@@ -363,11 +309,6 @@ driver_vdd.place(bitline_m,t)
 
 
 #-----------Bitline power and gnd lines 
-
-
-
-
-
 
 #bitline.insert(amp_cell)
 
