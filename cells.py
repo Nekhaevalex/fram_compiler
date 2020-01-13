@@ -143,6 +143,7 @@ class Top_driver(My_Cell):
 class PL_driver(My_Cell):
 	"""docstring for ClassName"""
 	#top_vdd=  pya.Point( -500, 5350)
+	out_pin = pya.Point(1400,500)
 	def __init__ (self, cell):
 		self.cell_index = cell.cell_index()
 		self.cell = cell
