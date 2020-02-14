@@ -5,6 +5,8 @@ import datetime
 import random
 
 import mylayout
+
+import technology
 #import sys
 
 
@@ -14,6 +16,7 @@ class Fram(My_Layout):
 	def __init__(self, Config):
 		check_os_content(gds_files)
 		check_os_content(netlists)
+
 
 
 

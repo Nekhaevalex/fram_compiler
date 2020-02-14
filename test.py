@@ -6,9 +6,10 @@ import random
 
 import inspect
 
+from config import Config
 from cells import My_Cell
 from layout import My_Layout
-
+import technology
 
 
 def check_os_content(name ):
@@ -73,3 +74,26 @@ s = My_Cell(layout.read_cell_from_gds("sense_amp"))
 
 pinmap = s.find_pin_map(M1_pin)
 
+layers = {}
+layers["M1"] =    (31, 0)
+layers["M2"] =    (32, 0)
+layers["M3"] =    (33, 0)
+layers["M4"] =    (34, 0)
+layers["M5"] =    (35, 0)
+layers["PO"] =    (17,0)
+layers["OD"] =    (6,0)
+layers["NW"] =    (3,0)
+layers["PP"] = 	  (25,0)
+layers["NP"] = 	  (26,0)
+layers["CO"] =    (30,0)
+layers["OD_25"] = (41,0)
+
+
+for key , value in layers.items():
+	print(value)
+
+
+print("=====")
+print(layout.layers())
+
+print(layout.layer_dict["M1"])

@@ -1,13 +1,19 @@
 import pya
 
 import os
+import sys
 
 
 
 class My_Layout(pya.Layout):
-
+	layer_dict = {}
+	'''My layout is a child klayout layout class , but have some extended functionality to use 
+	in my design. '''
 	def __init__(self):
 		pya.Layout.__init__(self)
+		self.init_tec()
+
+
 
 
 
@@ -34,13 +40,24 @@ class My_Layout(pya.Layout):
 
 
 
+	def init_tec(self):
+		try:
+			from technology import Technology
+			self.technology = Technology()
+			self.layer_dict = self.technology.layers  # copy dict to have less troubles acsessing it!
+		except:
+			print("\n======Error!======\n \"Technology\" file not found! Maybe you miss technology.py")
+			sys.exit("\n \n Termination due to error reported above!")
+
+
+
 
 
 	def check_os_content(self, name ):
 		try:
 			os.path.isfile(name)
 		except Exception:
-			print("there is no folder/file with the name \""  + name + "\"  terminating compilation. Add file and try again!")
+			print("\n======Error!======\n There is no folder/file with the name \""  + name + "\"  terminating compilation. Add file and try again!")
 			sys.exit("\n \n Termination due to error reported above.")
 		else:
 			pass

@@ -15,10 +15,10 @@ class Config:
 
 	# Ferroelectric params
 
-	p00 = 1e-14 
+	p00 = 1e-14 # Polarization
 
 
-	pdf_output = False
+	pdf_output = False # Nor working yet
 
 
 	output_name = "fram_sample"
@@ -49,5 +49,21 @@ class Config:
 
 
 
-	def __init__(self, arg):
+
+
+
+
+
+	def __init__(self):
 		pass
+
+
+	def get_layers(self, file = "layers.txt"):
+		size_to_read = 0
+		with open(file,'r') as text:
+			for line in text:
+				if (line[0] != '#'):
+					# get line here
+					word = line.split()
+					print(f"word = {word}")
+
