@@ -12,7 +12,7 @@ import technology
 
 
 class Fram():
-	"""docstring for ClassName"""
+	"""Main class contain layout (My_Layout) and netlist (Netlist) olcts"""
 	def __init__(self, Config):
 		check_os_content(gds_files)
 		check_os_content(netlists)
