@@ -72,7 +72,7 @@ M1_pin = layout.layer(131,0)
 
 s = My_Cell(layout.read_cell_from_gds("sense_amp"))
 
-pinmap = s.find_pin_map(M1_pin)
+pinmap = s.find_pin_map([M1_pin])
 
 layers = {}
 layers["M1"] =    (31, 0)
@@ -93,7 +93,26 @@ for key , value in layers.items():
 	print(value)
 
 
+
 print("=====")
 print(layout.layers())
 
 print(layout.layer_dict["M1"])
+
+print("=====")
+
+b = s.find_boundary()
+print("Box:")
+print(b.bottom)
+print(b.p1.x)
+print(b.p1.y)
+
+print("=====")
+
+
+print("=====")
+
+for key,value in layout.layer_dict.items():
+	print(f"{key} = {value}")
+
+print(layout.layer_infos())

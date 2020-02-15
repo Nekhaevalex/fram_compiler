@@ -11,7 +11,7 @@ import technology
 
 
 
-class Fram(My_Layout):
+class Fram():
 	"""docstring for ClassName"""
 	def __init__(self, Config):
 		check_os_content(gds_files)

@@ -5,10 +5,11 @@ import sys
 
 
 
-class My_Layout(pya.Layout):
-	layer_dict = {}
+class My_Layout(pya.Layout):	 
 	'''My layout is a child klayout layout class , but have some extended functionality to use 
 	in my design. '''
+	layer_dict = {} # name layer and layers are reserved as methods of klayout
+	dbu = 1
 	def __init__(self):
 		pya.Layout.__init__(self)
 		self.init_tec()
