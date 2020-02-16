@@ -45,9 +45,11 @@ class My_Layout(pya.Layout):
 		try:
 			from technology import Technology
 			self.technology = Technology()
-			self.layer_dict = self.technology.layers  # copy dict to have less troubles acsessing it!
+			for layer_key ,value in self.technology.layers.items():
+					self.layer_dict[layer_key] = self.layer(value[0],value[1])
+
 		except:
-			print("\n======Error!======\n \"Technology\" file not found! Maybe you miss technology.py")
+			print("\n======Error in layout.py !======\n \"Technology\" file not found! Maybe you miss technology.py or error in  init_tec() method")
 			sys.exit("\n \n Termination due to error reported above!")
 
 
