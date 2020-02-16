@@ -12,10 +12,13 @@ class My_Cell:
 	def __init__(self, cell): #+ netlist
 		self.cell = cell
 		self.boundary_box = self.find_boundary()
+		self.height = self.find_dimensions()[0]
+		self.width = self.find_dimensions()[1]
 		#self.netlist = netlist
 
 
 	def place(self,target,t):
+		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cell.cell_index,t)
 		target.insert(insert)
 		
@@ -33,11 +36,6 @@ class My_Cell:
 					#print(i.text_string)# - text itself
 		return pin_map
 
-	'''
-	def print_pins(self):
-		for keys,val in self.pin_map:
-			print(f'{keys} = {val}')
-	'''
 
 
 	def find_boundary(self,layer= None): #default layer is PR Bndry
@@ -47,22 +45,27 @@ class My_Cell:
 		if (layer != None):
 			boundary = self.cell.bbox_per_layer(layer)
 			return boundary
-		#if(len(self.cell.each_shape(layer)) == 1):
-		#	print("only one box")
-		#	boundary = self.cell.each_shape(layer)[0]
-		#else:
-		#	print("more then one layer")
 
 			
 		#return boundary
 
 	def find_dimensions(self, layer = None):
 		if (layer == None):
-			boundary = 0
-
+			boundary = self.find_boundary()
+			dx = boundary.width()
+			dy = boundary.height()
+			return(dx,dy)
 		else:
-			pass
+			boundary = self.find_boundary(layer)
+			boundary = self.find_boundary()
+			dx = boundary.width()
+			dy = boundary.height()
+			return(dx,dy)
 
+
+
+	def get_cell_name(self):
+		pass
 
 
 class Memory_Cell(My_Cell):
