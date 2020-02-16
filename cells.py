@@ -11,7 +11,7 @@ class My_Cell:
 	"""docstring for ClassName"""
 	def __init__(self, cell): #+ netlist
 		self.cell = cell
-		self.pin_map = self.find_pin_map
+		self.boundary_box = self.find_boundary()
 		#self.netlist = netlist
 
 
@@ -28,16 +28,23 @@ class My_Cell:
 			#print("===== + 1 =======")
 				if (i.is_text()):
 					pin_map[i.text_string] = i
+					#pin_map[i.text_string+'_layer'] 
 					#print(i.text) - text object
-					#print(i.text_string) - text itself
+					#print(i.text_string)# - text itself
 		return pin_map
 
+	'''
+	def print_pins(self):
+		for keys,val in self.pin_map:
+			print(f'{keys} = {val}')
+	'''
 
-	def find_boundary(self,layer=(0,0)): #default layer is PR Bndry
-		if (layer == (0,0)):
+
+	def find_boundary(self,layer= None): #default layer is PR Bndry
+		if (layer == None):
 			boundary = self.cell.bbox()
 			return boundary
-		if (layer != (0,0)):
+		if (layer != None):
 			boundary = self.cell.bbox_per_layer(layer)
 			return boundary
 		#if(len(self.cell.each_shape(layer)) == 1):
@@ -49,6 +56,12 @@ class My_Cell:
 			
 		#return boundary
 
+	def find_dimensions(self, layer = None):
+		if (layer == None):
+			boundary = 0
+
+		else:
+			pass
 
 
 

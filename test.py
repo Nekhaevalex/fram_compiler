@@ -12,6 +12,9 @@ from layout import My_Layout
 import technology
 
 
+import utils
+
+
 def check_os_content(name ):
 	try:
 		os.path.isfile(name)
@@ -22,7 +25,13 @@ def check_os_content(name ):
 		print("Imported  \""  + name + "\" !")
 
 
+
 '''
+
+def print_pins(pin_map):
+	for keys,val in pin_map.items():
+		print(f'{keys} = {val}')
+
 
 def read_cell_from_gds(self,name):
 
@@ -50,56 +59,40 @@ layout = My_Layout()
 
 layout.dbu = 1
 
-#-----------------layers-----------------------------------
-
-M1 =    layout.layer(31, 0)
-
-M2 =    layout.layer(32, 0)
-M3 =    layout.layer(33, 0)
-M4 =    layout.layer(34, 0)
-M5 =    layout.layer(35, 0)
-PO =    layout.layer(17,0)
-OD =    layout.layer(6,0)
-
-NW =    layout.layer(3,0)
-PP = 	layout.layer(25,0)
-NP = 	layout.layer(26,0)
-CO =    layout.layer(30,0)
-OD_25 = layout.layer(41,0)
-M1_pin = layout.layer(131,0)
-
 
 
 s = My_Cell(layout.read_cell_from_gds("sense_amp"))
 
-pinmap = s.find_pin_map([M1_pin])
+pinmap = s.find_pin_map([layout.layer_dict["M1_pin"]])
 
-layers = {}
-layers["M1"] =    (31, 0)
-layers["M2"] =    (32, 0)
-layers["M3"] =    (33, 0)
-layers["M4"] =    (34, 0)
-layers["M5"] =    (35, 0)
-layers["PO"] =    (17,0)
-layers["OD"] =    (6,0)
-layers["NW"] =    (3,0)
-layers["PP"] = 	  (25,0)
-layers["NP"] = 	  (26,0)
-layers["CO"] =    (30,0)
-layers["OD_25"] = (41,0)
+print(f' Type of pinmap is {type(pinmap)}')
 
 
-for key , value in layers.items():
-	print(value)
+
+
+
+
+
+#for key , value in layers.items():
+#	print(value)
 
 
 
 print("=====")
-print(layout.layers())
 
-print(layout.layer_dict["M1"])
+#print(layout.layer_dict["M1"])
 
-print("=====")
+print("    NW: ")
+
+
+b = s.find_boundary(layout.layer_dict["M1"])
+print("Box:")
+print(b.bottom)
+print(b.p1.x)
+print(b.p1.y)
+
+
+
 
 b = s.find_boundary()
 print("Box:")
@@ -110,9 +103,11 @@ print(b.p1.y)
 print("=====")
 
 
+
+'''
+
 print("=====")
 
 for key,value in layout.layer_dict.items():
 	print(f"{key} = {value}")
-
-print(layout.layer_infos())
+'''
