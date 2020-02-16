@@ -7,27 +7,18 @@ import random
 import inspect
 
 from config import Config
-from cells import My_Cell
-from layout import My_Layout
+from cells import *
+from layout import *
 import technology
 
 
 import utils
 
 
-def check_os_content(name ):
-	try:
-		os.path.isfile(name)
-	except Exception:
-		print("there is no folder/file with the name \""  + name + "\"  terminating compilation. Add file and try again!")
-		sys.exit("\n \n Terminated dueto error reported above.")
-	else:
-		print("Imported  \""  + name + "\" !")
 
 
 
 '''
-
 def print_pins(pin_map):
 	for keys,val in pin_map.items():
 		print(f'{keys} = {val}')

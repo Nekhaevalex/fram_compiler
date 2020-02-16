@@ -23,7 +23,7 @@ class My_Layout(pya.Layout):
 
 	def create_mycell(self,cell):
 		mycell = My_Cell(cell)
-		return My_Cell
+		return mycell
 
 
 
@@ -33,7 +33,7 @@ class My_Layout(pya.Layout):
 
 		cell = self.create_cell(name)
 
-		self.check_os_content("./gds_files/" + name + ".gds")
+		self.if_file_exists("./gds_files/" + name + ".gds")
 
 		self.read("./gds_files/" + name + ".gds")
 		for j in self.top_cells():
@@ -56,15 +56,12 @@ class My_Layout(pya.Layout):
 			sys.exit("\n \n Termination due to error reported above!")
 
 
-
-
-
-	def check_os_content(self, name ):
-		try:
-			os.path.isfile(name)
-		except Exception as e:
+	def if_file_exists(self,name):
+		if (os.path.isfile(name)):
+			return 1
+		else: 
 			print("\n======Error!======\n There is no folder/file with the name \""  + name + "\"  terminating compilation. Add file and try again!")
-			print(f"more exact: {e}")
+			print(f"Try add: {name}")
 			sys.exit("\n \n Termination due to error reported above.")
-		else:
-			pass
+
+

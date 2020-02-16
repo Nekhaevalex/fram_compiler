@@ -19,8 +19,9 @@ class My_Cell:
 
 	def place(self,target,t):
 		'''Add copy of this cell to {target} cell'''
-		istance = pya.CellInstArray(self.cell.cell_index,t)
-		target.insert(insert)
+		istance = pya.CellInstArray(self.cell.cell_index(),t)
+		target.insert(istance)
+
 		
 
 	def find_pin_map(self, layers):
