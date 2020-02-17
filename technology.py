@@ -35,5 +35,9 @@ class Technology:
 	#NW drw 3 0
 
 
+	def create_layers():
+		pass
+
+
 	def __init__(self):
 		pass

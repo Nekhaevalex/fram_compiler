@@ -23,8 +23,6 @@ class Config:
 
 	output_name = "fram_sample"
 
-
-
 	#Files to look out. No extention needed. Generator will look for example:
 	# Filename: cell. ./gds_files/cell.gds ./sp_files/cell.sp
 	files = []
@@ -47,8 +45,10 @@ class Config:
 	top_driver_vdd_name = "driver_vdd"
 	top_driver__gnd_name = "driver_gnd"
 
+	boundary_layer = "None" #Main boundary layer used to find boundary of cells. If left "None" boundary determins automatically
 
 
+	bl_width = 150
 
 
 
@@ -65,3 +65,6 @@ class Config:
 					word = line.split()
 					print(f"word = {word}")
 
+
+
+		

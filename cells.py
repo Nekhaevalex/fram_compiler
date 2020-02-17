@@ -16,13 +16,10 @@ class My_Cell:
 		self.width = self.find_dimensions()[1]
 		#self.netlist = netlist
 
-
 	def place(self,target,t):
 		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cell.cell_index(),t)
 		target.insert(istance)
-
-		
 
 	def find_pin_map(self, layers):
 		'''create dictionary with text klayout.Text objects and its klayout.Point s'''
@@ -35,6 +32,7 @@ class My_Cell:
 					#pin_map[i.text_string+'_layer'] 
 					#print(i.text) - text object
 					#print(i.text_string)# - text itself
+		self.pin_map = pin_map
 		return pin_map
 
 
@@ -62,8 +60,6 @@ class My_Cell:
 			dx = boundary.width()
 			dy = boundary.height()
 			return(dx,dy)
-
-
 
 	def get_cell_name(self):
 		pass
