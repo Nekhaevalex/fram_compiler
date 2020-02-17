@@ -66,8 +66,9 @@ class Bitline:
 		self.bitline_cell = My_Cell(layout.create_cell(self.cell_name))
 		self.memory_cell = Memory_Cell
 		self.layout = layout
-		self.layer_map = l
-		xpos = self.bitline_pinmap["bl"].text.xayout.layer_dict
+		self.layer_map = layout.layer_dict
+
+
 		xpos = 0
 
 		ypos = 0
