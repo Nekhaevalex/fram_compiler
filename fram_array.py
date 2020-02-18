@@ -93,11 +93,13 @@ class Bitline:
 	def bitline_routing(self):
 		self.bitline_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
 
-		xpos = self.bitline_pinmap["bl"].text.x
+		xpos = self.bitline_pinmap["bl"].text.x - self.Config.bl_width
 		ypos = self.bitline_pinmap["bl"].text.y
 
 		simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
 		
+
+
 class Array_Core:
 	"""Multiplying bitlines class"""
 	cell_name = "core"
@@ -122,11 +124,15 @@ class Array_Core:
 
 
 
+
 	def create_core_gds(self,layout,Bitline,Config):
 		pass
 
 	def create_netlist():
 		pass
+		
+	def write_line_routing():
+		self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
 		
 
 
