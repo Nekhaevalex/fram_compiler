@@ -143,8 +143,8 @@ class Array_Core:
 		self.y_offset = Bitline.y_offset
 		self.add_markers()
 		self.write_line_routing()
-
-		print(f'created core with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
+		if (self.Config.debug_level > 0 ):
+			print(f'Created core with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
 
 	def create_netlist():
 		pass
@@ -157,6 +157,8 @@ class Array_Core:
 		for i in range (0,self.Config.word_size):
 			simple_path(self.array_core_cell.cell, self.layer_map["M2"], pya.Point(xpos,ypos), pya.Point(self.x_offset,ypos) , self.Config.bl_width)
 			ypos = ypos + self.Y_step
+		if (self.Config.debug_level > 1 ):
+			print(f'Complited routing of bitline with end point as ({xpos} , {ypos})')
 
 
 	def add_markers(self):
@@ -165,7 +167,7 @@ class Array_Core:
 		ypos = self.bitline.line_coords[1][1]
 		for i in range(0, self.Config.word_size):
 			text = pya.Text(f"end_of_BL{i}", xpos , ypos)
-			print(f'x = {xpos} , y = {ypos}')
+			#print(f'x = {xpos} , y = {ypos}') #Debug
 			self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
 			xpos = xpos + self.X_step
 
