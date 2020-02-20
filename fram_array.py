@@ -26,6 +26,7 @@ class Fram():
 
 		self.memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds("memory_cell"))
 
+		self.sense_amp = Sense_Amp(self.fram_layout.read_dual_cell_from_gds(["sense_amp_gnd_name"],["sense_amp_vdd_name"]))
 
 		self.create_bitline(self.memory_cell,Config) # Create bitline class
 		self.create_array_core(self.bitline,Config) # Create array of bitlines
