@@ -51,8 +51,8 @@ class My_Cell:
 	def find_dimensions(self, layer = None):
 		if (layer == None):
 			boundary = self.find_boundary()
-			dx = boundary.width()
-			dy = boundary.height()
+			dy = boundary.width()
+			dx = boundary.height()
 			return(dx,dy)
 		else:
 			boundary = self.find_boundary(layer)

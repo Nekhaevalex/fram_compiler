@@ -64,6 +64,7 @@ class My_Layout(pya.Layout):
 			print(f"Try add: {name}")
 			sys.exit("\n \n Termination due to error reported above.")
 
-	def add_big_box(self,layer,coords)
+	def add_big_box(self,layer,coords):
+		pass
 
 

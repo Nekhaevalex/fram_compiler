@@ -48,7 +48,7 @@ class Fram():
 		output_path = "./gds_files/"+ Config.output_name+".gds"
 		self.fram_layout.write(output_path)
 		print(f'Wow! GDS output file is now created in "{output_path}" !')
-		return output_path
+		return output_path	
 
 
 
@@ -65,10 +65,17 @@ class Bitline:
 		self.Config =Config
 		self.bitline_cell = My_Cell(layout.create_cell(self.cell_name))
 		self.memory_cell = Memory_Cell
+		self.Y_step = Memory_Cell.height
 		self.layout = layout
 		self.layer_map = layout.layer_dict
 
+		self.create_gds(layout,Memory_Cell,Config)
 
+
+
+
+
+	def create_gds(self,layout,Memory_Cell,Config):
 		xpos = 0
 
 		ypos = 0
@@ -76,15 +83,12 @@ class Bitline:
 		for i in range(0,Config.num_words):
 			t = pya.Trans(xpos,ypos)
 			Memory_Cell.place(self.bitline_cell.cell, t)
-			ypos += Memory_Cell.height
+			#ypos += Memory_Cell.height
+			ypos += self.Y_step
 
 		
 		self.y_offset = ypos
 		self.bitline_routing()
-
-
-	def create_gds(self,layout,Memory_Cell,Config):
-		pass
 	def create_netlist(self):
 		pass
 	def add_bitline_instance(self,t):
@@ -105,10 +109,18 @@ class Array_Core:
 	cell_name = "core"
 	def __init__(self, layout, Bitline , Config):
 		self.layout = layout
+		self.Config = Config
 		self.array_core_cell = My_Cell(layout.create_cell(self.cell_name))
 		self.memory_cell = Bitline.memory_cell
 		self.layer_map = self.layout.layer_dict	
+		self.X_step = self.memory_cell.width
+		self.Y_step = self.memory_cell.height
+		self.create_core_gds(layout,Bitline,Config)
 
+
+
+
+	def create_core_gds(self,layout,Bitline,Config):
 		xpos = 0
 
 		ypos = 0
@@ -116,26 +128,24 @@ class Array_Core:
 		for i in range (0,Config.word_size):
 			t = pya.Trans(xpos,ypos)
 			Bitline.bitline_cell.place(self.array_core_cell.cell,t)
-			xpos += self.memory_cell.width
+			xpos += self.X_step
 
 		self.x_offset = xpos
 		self.y_offset = Bitline.y_offset
+
+		self.write_line_routing()
+
 		print(f'created core with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
-
-
-
-
-	def create_core_gds(self,layout,Bitline,Config):
-		pass
 
 	def create_netlist():
 		pass
 		
-	def write_line_routing():
+	def write_line_routing(self):
 		self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
 		
-
-
+		xpos = self.memory_cell_pinmap["wn"].text.x
+		ypos = self.memory_cell_pinmap["wn"].text.y
+		simple_path(self.array_core_cell.cell, self.layer_map["M2"], pya.Point(xpos,ypos), pya.Point(xpos,self.x_offset) , self.Config.bl_width)
 
 
 # ===================== CODE ============

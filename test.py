@@ -72,7 +72,7 @@ print(f' Type of pinmap is {type(pinmap)}')
 print("=====")
 
 #print(layout.layer_dict["M1"])
-
+'''
 print("    NW: ")
 
 
@@ -101,4 +101,11 @@ print("=====")
 
 for key,value in layout.layer_dict.items():
 	print(f"{key} = {value}")
-'''
+print("==========")
+
+
+m = My_Cell(layout.read_cell_from_gds("memory_cell"))
+pinmap = m.find_pin_map([layout.layer_dict["M1_pin"],layout.layer_dict["M2_pin"]])
+
+for key,value in pinmap.items():
+	print(f"{key} = {value}")
