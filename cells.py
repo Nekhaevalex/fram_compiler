@@ -67,3 +67,9 @@ class My_Cell:
 
 class Memory_Cell(My_Cell):
 	pass
+
+
+class Sense_Amp(My_Cell):
+	"""docstring for ClassName"""
+	def __init__(self,cell):
+		pass		

@@ -40,7 +40,23 @@ class My_Layout(pya.Layout):
 			if ( j.name == name ):
 				cell = j
 				return j
+
+
+	def read_dual_cell_from_gds(self,names):
 		
+		cell[0] = self.create_cell(names[0])
+		cell[1] = self.create_cell(names[1])
+
+
+		self.if_file_exists("./gds_files/" + names[0] + ".gds")
+		self.if_file_exists("./gds_files/" + names[1] + ".gds")
+		n = 0
+		for name in names:
+			self.read("./gds_files/" + name + ".gds")
+			for j in self.top_cells():
+				if (j.name == name):
+					cell[n] = j
+					n = n + 1
 
 
 

@@ -145,8 +145,9 @@ class Array_Core:
 		
 		xpos = self.memory_cell_pinmap["wn"].text.x
 		ypos = self.memory_cell_pinmap["wn"].text.y
-		simple_path(self.array_core_cell.cell, self.layer_map["M2"], pya.Point(xpos,ypos), pya.Point(xpos,self.x_offset) , self.Config.bl_width)
-
+		for i in range (0,self.Config.word_size):
+			simple_path(self.array_core_cell.cell, self.layer_map["M2"], pya.Point(xpos,ypos), pya.Point(self.x_offset,ypos) , self.Config.bl_width)
+			ypos = ypos + self.Y_step
 
 # ===================== CODE ============
 
