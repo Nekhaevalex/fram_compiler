@@ -26,7 +26,9 @@ class Fram():
 
 		self.memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds("memory_cell"))
 
-		self.sense_amp = Sense_Amp(self.fram_layout.read_dual_cell_from_gds(["sense_amp_gnd_name"],["sense_amp_vdd_name"]))
+
+		sense_amp_cells = ( self.fram_layout.read_cell_from_gds("sense_amp_gnd") , self.fram_layout.read_cell_from_gds("sense_amp_vdd") )
+		self.sense_amp = Sense_Amp(sense_amp_cells)
 
 		self.create_bitline(self.memory_cell,Config) # Create bitline class
 		self.create_array_core(self.bitline,Config) # Create array of bitlines
@@ -85,7 +87,11 @@ class Bitline:
 			t = pya.Trans(xpos,ypos)
 			Memory_Cell.place(self.bitline_cell.cell, t)
 			#ypos += Memory_Cell.height
+			#text = pya.Text(f"here is the connection# {i}", xpos , ypos)
 			ypos += self.Y_step
+
+			#self.bitline_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
+
 
 		
 		self.y_offset = ypos
@@ -98,11 +104,12 @@ class Bitline:
 	def bitline_routing(self):
 		self.bitline_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
 
-		xpos = self.bitline_pinmap["bl"].text.x - self.Config.bl_width
+		xpos = self.bitline_pinmap["bl"].text.x 
 		ypos = self.bitline_pinmap["bl"].text.y
-
+		self.line_coords = ((xpos,ypos) , (xpos, self.y_offset) )
 		simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
-		
+
+
 
 
 class Array_Core:
@@ -111,6 +118,7 @@ class Array_Core:
 	def __init__(self, layout, Bitline , Config):
 		self.layout = layout
 		self.Config = Config
+		self.bitline = Bitline
 		self.array_core_cell = My_Cell(layout.create_cell(self.cell_name))
 		self.memory_cell = Bitline.memory_cell
 		self.layer_map = self.layout.layer_dict	
@@ -133,7 +141,7 @@ class Array_Core:
 
 		self.x_offset = xpos
 		self.y_offset = Bitline.y_offset
-
+		self.add_markers()
 		self.write_line_routing()
 
 		print(f'created core with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
@@ -149,6 +157,17 @@ class Array_Core:
 		for i in range (0,self.Config.word_size):
 			simple_path(self.array_core_cell.cell, self.layer_map["M2"], pya.Point(xpos,ypos), pya.Point(self.x_offset,ypos) , self.Config.bl_width)
 			ypos = ypos + self.Y_step
+
+
+	def add_markers(self):
+		''' ===  Add some text to the tips of the lines and bitlines  ===    '''
+		xpos = self.bitline.line_coords[1][0]
+		ypos = self.bitline.line_coords[1][1]
+		for i in range(0, self.Config.word_size):
+			text = pya.Text(f"end_of_BL{i}", xpos , ypos)
+			print(f'x = {xpos} , y = {ypos}')
+			self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
+			xpos = xpos + self.X_step
 
 # ===================== CODE ============
 

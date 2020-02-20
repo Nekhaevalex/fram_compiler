@@ -69,6 +69,9 @@ class Memory_Cell(My_Cell):
 	pass
 
 
+
+
+
 class Sense_Amp():
 	"""docstring for ClassName"""
 	def __init__(self,cells):
@@ -99,6 +102,7 @@ class Sense_Amp():
 						#print(i.text_string)# - text itself
 		self.pin_map = pin_map
 		return pin_map
+
 
 	def place(self,target,t,mode = 0):
 		'''Add copy of this cell to {target} cell'''

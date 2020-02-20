@@ -43,9 +43,9 @@ class My_Layout(pya.Layout):
 
 
 	def read_dual_cell_from_gds(self,names):
-		
-		cell[0] = self.create_cell(names[0])
-		cell[1] = self.create_cell(names[1])
+		cells = []
+		cells[0] = self.create_cell(names[0])
+		cells[1] = self.create_cell(names[1])
 
 
 		self.if_file_exists("./gds_files/" + names[0] + ".gds")
@@ -55,9 +55,9 @@ class My_Layout(pya.Layout):
 			self.read("./gds_files/" + name + ".gds")
 			for j in self.top_cells():
 				if (j.name == name):
-					cell[n] = j
+					cells[n] = j
 					n = n + 1
-
+		return cells
 
 
 	def init_tec(self):
