@@ -69,7 +69,7 @@ class Memory_Cell(My_Cell):
 	pass
 
 
-class Sense_Amp(My_Cell):
+class Sense_Amp():
 	"""docstring for ClassName"""
 	def __init__(self,cells):
 		self.cells = cells
@@ -99,3 +99,8 @@ class Sense_Amp(My_Cell):
 						#print(i.text_string)# - text itself
 		self.pin_map = pin_map
 		return pin_map
+
+	def place(self,target,t,mode = 0):
+		'''Add copy of this cell to {target} cell'''
+		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
+		target.insert(istance)
