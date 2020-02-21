@@ -23,5 +23,13 @@ def simple_path(cell, layer, start, end , width):
 	cell.shapes(layer).insert(poly)
 
 
+def find_pwr2(n,s):
+	if (n % 2 == 0):
+		s = s + 1
+		return (find_pwr2(n/2,s))
+	else:
+		return s
+
+
 
 		

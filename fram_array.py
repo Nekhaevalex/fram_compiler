@@ -200,30 +200,39 @@ class Array_Core:
 	def add_sense_amp(self):
 		M1_pin = self.layer_map["M1_pin"]
 		bl_pinmap = self.array_core_cell.find_pin_map([M1_pin])
-		print_pins(bl_pinmap)
+		print_pins(bl_pinmap) # remove
+
+
+
+
+
 
 
 	def add_markers(self):
 		''' ===  Add some text to the tips of the lines and bitlines  ===    '''
+		bl_end_markers = []
 		xpos = self.bitline.line_coords[1][0]
 		ypos = self.bitline.line_coords[1][1]
 		for i in range(0, self.Config.word_size):
-			text = pya.Text(f"end_of_BL{i}", xpos , ypos)
-			#print(f'x = {xpos} , y = {ypos}') #Debug
-			self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
+			if ( self.Config.marker_as_text == True ):
+				text = pya.Text(f"end_of_BL{i}", xpos , ypos)
+				#print(f'x = {xpos} , y = {ypos}') #Debug
+				self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
+			bl_end_markers.append(pya.Point(xpos,ypos))
 			xpos = xpos + self.X_step
 
 		xpos = self.bitline.line_coords[0][0]
 		ypos = self.bitline.line_coords[0][1]
 		for i in range(0, self.Config.word_size):
-			text = pya.Text(f"begin_of_BL{i}", xpos , ypos)
-			#print(f'x = {xpos} , y = {ypos}') #Debug
-			self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
+			if ( self.Config.marker_as_text ):
+				text = pya.Text(f"begin_of_BL{i}", xpos , ypos)
+				#print(f'x = {xpos} , y = {ypos}') #Debug
+				self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
+			bl_begin_markers.append(pya.Point(xpos,ypos))
 			xpos = xpos + self.X_step
 
 
-
-# ===================== CODE ============
+# ===================== CODE HERE! ============
 
 
 config = Config()

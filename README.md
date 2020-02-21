@@ -20,12 +20,14 @@ Compiler includes pre-made views of all cells such as:
 
 For quick run just run: python3 fram_array.py
 
-Also you are welcome to make changes in array_config.py file which is a main config.
+Also you are welcome to make changes in config.py file which is a main config.
 
+Debug level show how much of an iformation you wanna get about the prosessing to the terminal.
 
 ### Dependencies
 Require:
-klayout for python (pip3 install klayout / pip install klayout )
+Python 3 ! (python 2 is not supported)
+klayout for python ( "pip3 install klayout" )
 
 tested on python3.6
 
@@ -34,11 +36,6 @@ Optional:
 gdsMill for pdf print (in future)
 
 ### List of all files:
-
-fram_array.py - main python file creates GDS view and calles netlist class.
-netlist_generator.py - contains Netlist class
-array_config = config file you are free to specify some paramethers here.
-layout_class - contains class dedicated to create multipart path (usefull in some situations)
 
 
 ---------output---------------

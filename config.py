@@ -56,6 +56,13 @@ class Config:
 
 
 
+
+
+	''' Create markers as: '''
+	marker_as_text = False
+	marker_as_point = True
+
+
 	def __init__(self):
 		pass
 
