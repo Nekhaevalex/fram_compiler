@@ -198,10 +198,13 @@ class Array_Core:
 
 
 	def add_sense_amp(self):
+		'''
 		M1_pin = self.layer_map["M1_pin"]
 		bl_pinmap = self.array_core_cell.find_pin_map([M1_pin])
 		print_pins(bl_pinmap) # remove
+		'''
 
+		
 
 
 
@@ -230,6 +233,9 @@ class Array_Core:
 				self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
 			bl_begin_markers.append(pya.Point(xpos,ypos))
 			xpos = xpos + self.X_step
+
+
+
 
 
 # ===================== CODE HERE! ============
