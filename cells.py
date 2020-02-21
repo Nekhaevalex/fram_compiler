@@ -5,9 +5,10 @@ import os
 
 
 
-class My_Cell:
-	'''My_Cell class represents a physical device with two represetitives as My_Cell.cell = layout representation and My_Cell.netlist as a netlist '''
+class Module:
+	'''Module class represents a physical device with two represetitives as Module.cell = layout representation and Module.netlist as a netlist '''
 	pin_map = {}
+	placement = "core"
 	"""docstring for ClassName"""
 	def __init__(self, cell , Config): #+ netlist
 		self.cell = cell
@@ -65,7 +66,7 @@ class My_Cell:
 		pass
 
 
-class Memory_Cell(My_Cell):
+class Memory_Cell(Module):
 	pass
 
 
@@ -74,6 +75,7 @@ class Memory_Cell(My_Cell):
 
 class Sense_Amp():
 	cell_name = "sense_amp"
+	placement = "bottom"
 	"""docstring for ClassName"""
 	def __init__(self,cells,Config):
 		self.cells = cells

@@ -22,7 +22,7 @@ class My_Layout(pya.Layout):
 
 
 	def create_mycell(self,cell):
-		mycell = My_Cell(cell)
+		mycell = Module(cell)
 		return mycell
 
 

@@ -52,7 +52,7 @@ layout.dbu = 1
 
 
 
-s = My_Cell(layout.read_cell_from_gds("sense_amp"))
+s = Module(layout.read_cell_from_gds("sense_amp"))
 
 pinmap = s.find_pin_map([layout.layer_dict["M1_pin"]])
 
@@ -104,7 +104,7 @@ for key,value in layout.layer_dict.items():
 print("==========")
 
 
-m = My_Cell(layout.read_cell_from_gds("memory_cell"))
+m = Module(layout.read_cell_from_gds("memory_cell"))
 pinmap = m.find_pin_map([layout.layer_dict["M1_pin"],layout.layer_dict["M2_pin"]])
 
 for key,value in pinmap.items():

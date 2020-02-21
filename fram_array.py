@@ -17,7 +17,6 @@ import technology
 #import sys
 
 
-
 class Fram():
 	"""Main class contain layout (My_Layout) and netlist (Netlist) olcts"""
 	def __init__(self, Config):
@@ -45,7 +44,6 @@ class Fram():
 	def read_memory_cell(self):
 		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name) , self.Config)
 		return memory_cell
-
 
 
 	def read_sense_amp_cell(self):
@@ -85,7 +83,7 @@ class Bitline:
 
 	def __init__(self, layout ,Memory_Cell ,Config):
 		self.Config =Config
-		self.bitline_cell = My_Cell(layout.create_cell(self.cell_name),Config)
+		self.bitline_cell = Module(layout.create_cell(self.cell_name),Config)
 		self.memory_cell = Memory_Cell
 		self.Y_step = Memory_Cell.height
 		self.layout = layout
@@ -138,7 +136,7 @@ class Array_Core:
 		self.layout = layout
 		self.Config = Config
 		self.bitline = Bitline
-		self.array_core_cell = My_Cell(layout.create_cell(self.cell_name) , Config)
+		self.array_core_cell = Module(layout.create_cell(self.cell_name) , Config)
 		self.memory_cell = Bitline.memory_cell
 		self.layer_map = self.layout.layer_dict
 
@@ -197,7 +195,10 @@ class Array_Core:
 
 
 
-	def add_sense_amp(self):
+	def add_side_module (self, module):
+		pass
+
+
 		'''
 		M1_pin = self.layer_map["M1_pin"]
 		bl_pinmap = self.array_core_cell.find_pin_map([M1_pin])
