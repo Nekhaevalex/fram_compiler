@@ -17,6 +17,7 @@ import technology
 #import sys
 
 
+
 class Fram():
 	"""Main class contain layout (My_Layout) and netlist (Netlist) olcts"""
 	def __init__(self, Config):
@@ -27,24 +28,34 @@ class Fram():
 		check_os_content("netlists")
 		
 
-		self.memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds("memory_cell"))
-		sense_amp_cells = ( self.fram_layout.read_cell_from_gds("sense_amp_gnd") , self.fram_layout.read_cell_from_gds("sense_amp_vdd") )
-		self.sense_amp = Sense_Amp(sense_amp_cells)
+		#self.memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds("memory_cell"))
+		self.memory_cell = self.read_memory_cell()
+
+		
+		#self.sense_amp = Sense_Amp(sense_amp_cells,Config)
+		self.sense_amp = self.read_sense_amp_cell()
 
 		self.create_bitline(self.memory_cell,Config) # Create bitline class
 		self.create_array_core(self.bitline , [self.sense_amp], Config) # Create array of bitlines
 
 
-		self.gds_output(Config) # Make output of gds
-
+		self.gds_output() # Make output of gds
 		
 
-	def read_memory_cell(self,name):
-		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name))
+	def read_memory_cell(self):
+		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name) , self.Config)
 		return memory_cell
 
-	def read_sense_amp_cell(self,name):
-		pass
+
+
+	def read_sense_amp_cell(self):
+		sense_name_1 = self.Config.sense_amp_gnd_name
+		sense_name_2 = self.Config.sense_amp_vdd_name
+		sense_amp_cells = ( self.fram_layout.read_cell_from_gds(sense_name_1) , self.fram_layout.read_cell_from_gds(sense_name_2) )
+		sense_amp = Sense_Amp(sense_amp_cells,self.Config)
+		return sense_amp
+
+
 
 	def create_bitline(self, Memory_Cell , Config ):
 		self.bitline = Bitline( self.fram_layout, Memory_Cell , Config )
@@ -55,10 +66,10 @@ class Fram():
 		Config.debug_message(0,f'Created array of cells!')
 
 
-	def gds_output(self,Config):
-		output_path = "./gds_files/"+ Config.output_name+".gds"
+	def gds_output(self):
+		output_path = "./gds_files/"+ self.Config.output_name+".gds"
 		self.fram_layout.write(output_path)
-		Config.debug_message(0,f'Wow! GDS output file is now created in "{output_path}" !')
+		self.Config.debug_message(0,f'Wow! GDS output file is now created in "{output_path}" !')
 		return output_path
 
 
@@ -74,7 +85,7 @@ class Bitline:
 
 	def __init__(self, layout ,Memory_Cell ,Config):
 		self.Config =Config
-		self.bitline_cell = My_Cell(layout.create_cell(self.cell_name))
+		self.bitline_cell = My_Cell(layout.create_cell(self.cell_name),Config)
 		self.memory_cell = Memory_Cell
 		self.Y_step = Memory_Cell.height
 		self.layout = layout
@@ -127,11 +138,12 @@ class Array_Core:
 		self.layout = layout
 		self.Config = Config
 		self.bitline = Bitline
-		self.array_core_cell = My_Cell(layout.create_cell(self.cell_name))
+		self.array_core_cell = My_Cell(layout.create_cell(self.cell_name) , Config)
 		self.memory_cell = Bitline.memory_cell
 		self.layer_map = self.layout.layer_dict
 
 		self.sense_amp = self.find_cell_in_cells("sense_amp",cells)
+
 
 		self.X_step = self.memory_cell.width
 		self.Y_step = self.memory_cell.height
@@ -139,15 +151,18 @@ class Array_Core:
 
 
 
-
 	def find_cell_in_cells(self,name,cells):
+		found = False
 		for cell in cells:
-			if (cell.cell_name == "name"):
+			if (cell.cell_name == name):
 				new_cell = cell
 				self.Config.debug_message(2,f'Cell  {name} added to core cells list.')
+				found = True
 				return new_cell
-		self.Config.debug_message(-1,f'===== WARNING! =====\n Fail to find a cell with name {name}.')
-		self.Config.warning(getframeinfo(currentframe()))
+		if (found == False):
+			self.Config.debug_message(-1,f'===== WARNING! =====\n Fail to find a cell with name {name}.')
+			self.Config.warning(getframeinfo(currentframe()))
+
 	def create_core_gds(self,layout,Bitline,Config):
 		xpos = 0
 
@@ -162,8 +177,8 @@ class Array_Core:
 		self.y_offset = Bitline.y_offset
 		self.add_markers()
 		self.write_line_routing()
-		Config.debug_message(0,f'Created core with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
-
+		Config.debug_message(0,f'Created core (only memory cells) with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
+		self.add_sense_amp()
 
 	def create_netlist():
 		pass
@@ -178,6 +193,14 @@ class Array_Core:
 			ypos = ypos + self.Y_step
 		if (self.Config.debug_level > 1 ):
 			print(f'Complited routing of bitline with end point as ({xpos} , {ypos})')
+
+
+
+
+	def add_sense_amp(self):
+		M1_pin = self.layer_map["M1_pin"]
+		bl_pinmap = self.array_core_cell.find_pin_map([M1_pin])
+		print_pins(bl_pinmap)
 
 
 	def add_markers(self):

@@ -75,7 +75,7 @@ class Config:
 
 	def warning(self,frameinfo):
 		#frameinfo = getframeinfo(currentframe())
-		print(f'This warning rised at file: {frameinfo.filename}, on line: {frameinfo.lineno}. Good luck finding it.')
+		print(f'This warning rised at file: "{frameinfo.filename}", on line: {frameinfo.lineno}.\nGood luck finding it.\n ===============')
 
 
 		

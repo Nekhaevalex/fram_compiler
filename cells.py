@@ -9,7 +9,7 @@ class My_Cell:
 	'''My_Cell class represents a physical device with two represetitives as My_Cell.cell = layout representation and My_Cell.netlist as a netlist '''
 	pin_map = {}
 	"""docstring for ClassName"""
-	def __init__(self, cell): #+ netlist
+	def __init__(self, cell , Config): #+ netlist
 		self.cell = cell
 		self.boundary_box = self.find_boundary()
 		self.height = self.find_dimensions()[0]
@@ -75,9 +75,10 @@ class Memory_Cell(My_Cell):
 class Sense_Amp():
 	cell_name = "sense_amp"
 	"""docstring for ClassName"""
-	def __init__(self,cells):
+	def __init__(self,cells,Config):
 		self.cells = cells
 		self.boundary_box = ()
+		Config.debug_message(2, f"Created Sense_Amp , with start cell {cells[0].name}")
 
 	def find_boundary(self,layer= None): #default layer is PR Bndry
 		k = 0

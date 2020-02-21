@@ -4,7 +4,7 @@ import os
 import pya
 
 def print_pins(pin_map):
-	for keys,val in pin_map:
+	for keys,val in pin_map.items():
 		print(f'{keys} = {val}')
 
 
