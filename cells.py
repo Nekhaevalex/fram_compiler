@@ -73,6 +73,7 @@ class Memory_Cell(My_Cell):
 
 
 class Sense_Amp():
+	cell_name = "sense_amp"
 	"""docstring for ClassName"""
 	def __init__(self,cells):
 		self.cells = cells

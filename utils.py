@@ -21,3 +21,7 @@ def simple_path(cell, layer, start, end , width):
 	pth = pya.Path([start,end] , width)
 	poly = pth.simple_polygon()
 	cell.shapes(layer).insert(poly)
+
+
+
+		

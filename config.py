@@ -3,10 +3,14 @@ import pya
 import os
 
 
+from inspect import currentframe, getframeinfo
+
+
+
 class Config:
 	
 	# Place for your parameters here.
-	debug_level = 1 # 1 for debug, 0 for no printout
+	debug_level = 3 # 1 for debug, 0 for no printout
 
 	#Horizontal size
 	word_size = 8
@@ -65,6 +69,13 @@ class Config:
 					word = line.split()
 					print(f"word = {word}")
 
+	def debug_message(self, debug_level,debug_message):
+		if (self.debug_level > debug_level ):
+			print(debug_message)
+
+	def warning(self,frameinfo):
+		#frameinfo = getframeinfo(currentframe())
+		print(f'This warning rised at file: {frameinfo.filename}, on line: {frameinfo.lineno}. Good luck finding it.')
 
 
 		
