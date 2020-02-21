@@ -1,6 +1,6 @@
 # FRAM gds and netlist compiler
 
-## This is a README file for MIPT lab fram memory compiler.
+This is a README file for MIPT lab fram memory compiler.
 
 ## Author: Solovyanov Mikhail
 
