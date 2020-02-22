@@ -57,7 +57,7 @@ class Config:
 
 
 
-
+	layers_with_pins = ["M1_pin","M2_pin","M3_pin"]
 	''' Create markers as: '''
 	marker_as_text = False
 	marker_as_point = True

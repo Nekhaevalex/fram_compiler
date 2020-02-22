@@ -10,7 +10,8 @@ class My_Layout(pya.Layout):
 	in my design. '''
 	layer_dict = {} # name layer and layers are reserved as methods of klayout
 	dbu = 1
-	def __init__(self):
+	def __init__(self,Config):
+		self.Config = Config
 		pya.Layout.__init__(self)
 		self.init_tec()
 		self.topcell = self.create_cell("TOP")
@@ -65,8 +66,10 @@ class My_Layout(pya.Layout):
 			from technology import Technology
 			self.technology = Technology()
 			for layer_key ,value in self.technology.layers.items():
-					self.layer_dict[layer_key] = self.layer(value[0],value[1])
-
+					self.layer_dict[layer_key] = self.layer(value[0],value[1]) 
+			self.pins_layers = []
+			for i in self.Config.layers_with_pins:
+				self.pins_layers.append(self.layer_dict[i])
 		except:
 			print("\n======Error in layout.py !======\n \"Technology\" file not found! Maybe you miss technology.py or error in  init_tec() method")
 			sys.exit("\n \n Termination due to error reported above!")

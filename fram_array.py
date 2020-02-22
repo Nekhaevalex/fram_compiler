@@ -22,7 +22,7 @@ class Fram():
 	def __init__(self, Config):
 		'''Main magic happens here!'''
 		self.Config = Config
-		self.fram_layout = My_Layout() # main layout!
+		self.create_layout()
 		check_os_content("gds_files")
 		check_os_content("netlists")
 		
@@ -45,6 +45,10 @@ class Fram():
 		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name) , self.Config)
 		return memory_cell
 
+
+	def create_layout(self):
+		self.fram_layout = My_Layout(Config)
+		self.pins_layers = self.fram_layout.pins_layers
 
 	def read_sense_amp_cell(self):
 		sense_name_1 = self.Config.sense_amp_gnd_name
@@ -176,7 +180,7 @@ class Array_Core:
 		self.add_markers()
 		self.write_line_routing()
 		Config.debug_message(0,f'Created core (only memory cells) with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
-		self.add_side_module(sense_amp)
+		self.add_side_module(self.sense_amp)
 
 	def create_netlist():
 		pass
@@ -196,7 +200,7 @@ class Array_Core:
 
 
 	def add_side_module (self, module):
-		add_module_layout(module)
+		self.add_module_layout(module)
 
 
 		'''
@@ -208,14 +212,22 @@ class Array_Core:
 		
 
 	def add_module_layout(self, module):
+		layer_pins = [ self.layer_map["M1_pin"] , self.layer_map["M2_pin"] ]
+		module.pin_map = module.find_pin_map(layer_pins)
+
+
 		if ( module.placement == "bottom" ):
 			n = 0
+			xpos = self.bl_end_markers[0].x - module.pin_map[n]["in"].text.x
+			print("in pin x = "+str(module.pin_map[n]["in"].text.x)+" ")
+			ypos = -1000
 			for i in  range(0, self.Config.word_size):
-					module.place(self.array_core_cell, t , n)
-					n = swich_mode(n)
-
-
-				pass
+				t = pya.Trans(xpos,ypos)
+				module.place(self.array_core_cell.cell, t , mode =n)
+				print(f"n = {n}")
+				n = swich_mode(n)
+				xpos = xpos + self.X_step
+				
 		else:
 			self.Config.debug_message(-1,f'========== WARNING ========= \n ')
 			self.Config.warning(getframeinfo(currentframe()))

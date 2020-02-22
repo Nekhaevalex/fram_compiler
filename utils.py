@@ -34,7 +34,9 @@ def find_pwr2(n,s):
 def swich_mode(n):
 	if (n == 0):
 		n = 1
+		return n
 	if (n == 1):
 		n = 0
-	return n
+		return n
+	
 		
