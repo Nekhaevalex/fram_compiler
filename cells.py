@@ -76,7 +76,7 @@ class Memory_Cell(Module):
 class Sense_Amp():
 	cell_name = "sense_amp"
 	placement = "bottom"
-
+	pin_map = ({},{})
 	connect_to = 'bl'
 	connect_with = 'in'
 	"""docstring for ClassName"""
@@ -98,9 +98,9 @@ class Sense_Amp():
 		'''create dictionary with text klayout.Text objects and its klayout.Point s'''
 		h = 0
 		pin_map = ({},{})
-		for cell in cells:
+		for cell in self.cells:
 			for layer in layers:
-				for i in self.cell[h].each_shape(layer):
+				for i in cell.each_shape(layer):
 				#print("===== + 1 =======")
 					if (i.is_text()):
 						pin_map[h][i.text_string] = i
