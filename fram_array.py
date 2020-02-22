@@ -218,16 +218,22 @@ class Array_Core:
 
 		if ( module.placement == "bottom" ):
 			n = 0
-			xpos = self.bl_end_markers[0].x - module.pin_map[n]["in"].text.x
+			xpos1 = self.bl_end_markers[0].x - module.pin_map[0]["in"].text.x
+			xpos2 = self.bl_end_markers[0].x - module.pin_map[1]["in"].text.x
 			print("in pin x = "+str(module.pin_map[n]["in"].text.x)+" ")
 			ypos = -1000
 			for i in  range(0, self.Config.word_size):
-				t = pya.Trans(xpos,ypos)
-				module.place(self.array_core_cell.cell, t , mode =n)
+				if (n == 0):
+					t = pya.Trans(xpos1,ypos)
+					module.place(self.array_core_cell.cell, t , mode =n)
+					
+				if (n == 1):
+					t = pya.Trans(xpos2,ypos)
+					module.place(self.array_core_cell.cell, t , mode =n)
 				print(f"n = {n}")
 				n = swich_mode(n)
-				xpos = xpos + self.X_step
-				
+				xpos1 = xpos1 + self.X_step
+				xpos2 = xpos2 + self.X_step
 		else:
 			self.Config.debug_message(-1,f'========== WARNING ========= \n ')
 			self.Config.warning(getframeinfo(currentframe()))
