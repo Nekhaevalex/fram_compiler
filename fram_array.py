@@ -176,7 +176,7 @@ class Array_Core:
 		self.add_markers()
 		self.write_line_routing()
 		Config.debug_message(0,f'Created core (only memory cells) with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
-		self.add_sense_amp()
+		self.add_side_module(sense_amp)
 
 	def create_netlist():
 		pass
@@ -196,7 +196,7 @@ class Array_Core:
 
 
 	def add_side_module (self, module):
-		pass
+		add_module_layout(module)
 
 
 		'''
@@ -207,7 +207,18 @@ class Array_Core:
 
 		
 
+	def add_module_layout(self, module):
+		if ( module.placement == "bottom" ):
+			n = 0
+			for i in  range(0, self.Config.word_size):
+					module.place(self.array_core_cell, t , n)
+					n = swich_mode(n)
 
+
+				pass
+		else:
+			self.Config.debug_message(-1,f'========== WARNING ========= \n ')
+			self.Config.warning(getframeinfo(currentframe()))
 
 
 
@@ -215,6 +226,7 @@ class Array_Core:
 	def add_markers(self):
 		''' ===  Add some text to the tips of the lines and bitlines  ===    '''
 		bl_end_markers = []
+		bl_begin_markers = []
 		xpos = self.bitline.line_coords[1][0]
 		ypos = self.bitline.line_coords[1][1]
 		for i in range(0, self.Config.word_size):
@@ -234,6 +246,8 @@ class Array_Core:
 				self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
 			bl_begin_markers.append(pya.Point(xpos,ypos))
 			xpos = xpos + self.X_step
+		self.bl_begin_markers = bl_begin_markers
+		self.bl_end_markers = bl_end_markers
 
 
 

@@ -76,6 +76,9 @@ class Memory_Cell(Module):
 class Sense_Amp():
 	cell_name = "sense_amp"
 	placement = "bottom"
+
+	connect_to = 'bl'
+	connect_with = 'in'
 	"""docstring for ClassName"""
 	def __init__(self,cells,Config):
 		self.cells = cells
