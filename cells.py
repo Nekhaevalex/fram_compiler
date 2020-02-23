@@ -2,6 +2,8 @@ import pya
 
 import os
 
+from utils import *
+
 
 
 
@@ -34,6 +36,10 @@ class Module:
 					#print(i.text) - text object
 					#print(i.text_string)# - text itself
 		self.pin_map = pin_map
+		if (self.Config.debug_level > 2):
+			for this_map in pin_map:
+				print("Pins of map is:")
+				print_pins(this_map)
 		return pin_map
 
 
@@ -81,6 +87,7 @@ class Sense_Amp():
 	connect_with = 'in'
 	"""docstring for ClassName"""
 	def __init__(self,cells,Config):
+		self.Config = Config
 		self.cells = cells
 		self.boundary_box = ()
 		Config.debug_message(2, f"Created Sense_Amp , with start cell {cells[0].name}")
@@ -101,12 +108,16 @@ class Sense_Amp():
 		for cell in self.cells:
 			for layer in layers:
 				for i in cell.each_shape(layer):
-				#print("===== + 1 =======")
 					if (i.is_text()):
 						pin_map[h][i.text_string] = i
 						#pin_map[i.text_string+'_layer'] 
 						#print(i.text) - text object
 						#print(i.text_string)# - text itself
+			h = h + 1
+		if (self.Config.debug_level > 2):
+			for this_map in pin_map:
+				print("Pins of map is:")
+				print_pins(this_map)
 		self.pin_map = pin_map
 		return pin_map
 

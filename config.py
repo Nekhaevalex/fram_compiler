@@ -10,7 +10,7 @@ from inspect import currentframe, getframeinfo
 class Config:
 	
 	# Place for your parameters here.
-	debug_level = 3 # 1 for debug, 0 for no printout
+	debug_level = 4 # 1 for debug, 0 for no printout
 
 	#Horizontal size
 	word_size = 8
