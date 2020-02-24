@@ -76,6 +76,15 @@ class Fram():
 
 
 
+	def define_X_step(self,modules):
+		for module in range(modules):
+			for i in range(module.cells_in_cell):
+				pass
+
+
+	def define_Y_step(self,modules):
+		pass
+
 
 
 

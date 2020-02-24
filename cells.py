@@ -11,8 +11,10 @@ class Module:
 	'''Module class represents a physical device with two represetitives as Module.cell = layout representation and Module.netlist as a netlist '''
 	pin_map = {}
 	placement = "core"
+	cells_in_cell = 1
 	"""docstring for ClassName"""
 	def __init__(self, cell , Config): #+ netlist
+		self.Config = Config
 		self.cell = cell
 		self.boundary_box = self.find_boundary()
 		self.height = self.find_dimensions()[0]
@@ -37,9 +39,8 @@ class Module:
 					#print(i.text_string)# - text itself
 		self.pin_map = pin_map
 		if (self.Config.debug_level > 2):
-			for this_map in pin_map:
-				print("Pins of map is:")
-				print_pins(this_map)
+			print("Pins of map is:")
+			print_pins(pin_map)
 		return pin_map
 
 
@@ -50,6 +51,14 @@ class Module:
 			return boundary
 		if (layer != None):
 			boundary = self.cell.bbox_per_layer(layer)
+			return boundary
+
+	def find_cell_boundary(self , cell , layer = None):
+		if (layer == None):
+			boundary = cell.bbox()
+			return boundary
+		if (layer != None):
+			boundary = cell.bbox_per_layer(layer)
 			return boundary
 
 			
@@ -81,6 +90,7 @@ class Memory_Cell(Module):
 
 class Sense_Amp():
 	cell_name = "sense_amp"
+	cells_in_cell = 2
 	placement = "bottom"
 	pin_map = ({},{})
 	connect_to = 'bl'
@@ -92,13 +102,12 @@ class Sense_Amp():
 		self.boundary_box = ()
 		Config.debug_message(2, f"Created Sense_Amp , with start cell {cells[0].name}")
 
-	def find_boundary(self,layer= None): #default layer is PR Bndry
+	def find_cell_boundary(self, cell ,layer= None): #default layer is PR Bndry
 		k = 0
-		for cell in cells:
-			if (layer == None):
-				boundary[k] = self.cell.bbox()
-			if (layer != None):
-				boundary[k] = self.cell.bbox_per_layer(layer)
+		if (layer == None):
+			boundary = cell.bbox()
+		if (layer != None):
+			boundary = cell.bbox_per_layer(layer)
 		return boundary
 
 	def find_pin_map(self, layers): ## -------------- FIX!----------
