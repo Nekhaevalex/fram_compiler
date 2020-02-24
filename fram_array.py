@@ -166,8 +166,10 @@ class Array_Core:
 		for module in modules:
 			for cell in module.cells:
 				boundary = module.find_cell_boundary(cell)
-				dx.append(boundary.height())
+				dx.append(boundary.width())
+				self.Config.debug_message(4,f'dx size of cell {cell.name} is {boundary.width()}')
 		X_step = max(dx)
+		self.Config.debug_message(3,f'Defines X - size  of {X_step}. By comparing of list {dx}')
 		return X_step
 				
 

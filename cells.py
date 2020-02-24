@@ -21,6 +21,8 @@ class Module:
 		self.boundary_box = self.find_boundary()
 		self.height = self.find_dimensions()[0]
 		self.width = self.find_dimensions()[1]
+		self.cell_name = self.cell.name
+		
 		#self.netlist = netlist
 
 	def place(self,target,t):
