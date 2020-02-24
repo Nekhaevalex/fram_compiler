@@ -35,7 +35,7 @@ class Fram():
 		self.sense_amp = self.read_sense_amp_cell()
 
 		self.create_bitline(self.memory_cell,Config) # Create bitline class
-		self.create_array_core(self.bitline , [self.sense_amp], Config) # Create array of bitlines
+		self.create_array_core(self.bitline , [self.memory_cell , self.sense_amp ], Config) # Create array of bitlines
 
 
 		self.gds_output() # Make output of gds
@@ -76,14 +76,6 @@ class Fram():
 
 
 
-	def define_X_step(self,modules):
-		for module in range(modules):
-			for i in range(module.cells_in_cell):
-				pass
-
-
-	def define_Y_step(self,modules):
-		pass
 
 
 
@@ -148,18 +140,46 @@ class Array_Core:
 	def __init__(self, layout, Bitline, cells , Config):
 		self.layout = layout
 		self.Config = Config
+		self.cells = cells
+		self.X_step = self.define_X_step(cells)
+		self.Y_step = self.define_Y_step(cells)
+
 		self.bitline = Bitline
 		self.array_core_cell = Module(layout.create_cell(self.cell_name) , Config)
 		self.memory_cell = Bitline.memory_cell
 		self.layer_map = self.layout.layer_dict
 
 		self.sense_amp = self.find_cell_in_cells("sense_amp",cells)
+		
 
-
-		self.X_step = self.memory_cell.width
-		self.Y_step = self.memory_cell.height
+		#self.X_step = self.memory_cell.width
+		#self.Y_step = self.memory_cell.height
 		self.create_core_gds(layout,Bitline,Config)
 
+
+
+
+
+
+	def define_X_step(self,modules):
+		dx = []
+		for module in modules:
+			for cell in module.cells:
+				boundary = module.find_cell_boundary(cell)
+				dx.append(boundary.height())
+		X_step = max(dx)
+		return X_step
+				
+
+
+	def define_Y_step(self,modules):
+		dy = []
+		for module in modules:
+			for cell in module.cells:
+				boundary = module.find_cell_boundary(cell)
+				dy.append(boundary.width())
+		Y_step = max(dy)
+		return Y_step
 
 
 	def find_cell_in_cells(self,name,cells):
@@ -175,6 +195,10 @@ class Array_Core:
 			self.Config.warning(getframeinfo(currentframe()))
 
 	def create_core_gds(self,layout,Bitline,Config):
+
+
+
+
 		xpos = 0
 
 		ypos = 0
@@ -183,6 +207,9 @@ class Array_Core:
 			t = pya.Trans(xpos,ypos)
 			Bitline.bitline_cell.place(self.array_core_cell.cell,t)
 			xpos += self.X_step
+
+
+
 
 		self.x_offset = xpos
 		self.y_offset = Bitline.y_offset
