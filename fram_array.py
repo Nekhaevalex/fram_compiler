@@ -141,8 +141,11 @@ class Array_Core:
 		self.layout = layout
 		self.Config = Config
 		self.cells = cells
+		self.memory_cell = Bitline.memory_cell
 		self.X_step = self.define_X_step(cells)
-		self.Y_step = self.define_Y_step(cells)
+		#self.Y_step = self.define_Y_step(cells)
+		self.Y_step = self.memory_cell.height
+
 
 		self.bitline = Bitline
 		self.array_core_cell = Module(layout.create_cell(self.cell_name) , Config)
@@ -153,7 +156,7 @@ class Array_Core:
 		
 
 		#self.X_step = self.memory_cell.width
-		#self.Y_step = self.memory_cell.height
+		
 		self.create_core_gds(layout,Bitline,Config)
 
 
