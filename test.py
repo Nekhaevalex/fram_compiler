@@ -46,18 +46,6 @@ def read_cell_from_gds(self,name):
 '''
 
 
-layout = My_Layout()
-
-layout.dbu = 1
-
-
-
-s = Module(layout.read_cell_from_gds("sense_amp"))
-
-pinmap = s.find_pin_map([layout.layer_dict["M1_pin"]])
-
-print(f' Type of pinmap is {type(pinmap)}')
-
 
 
 
@@ -97,15 +85,3 @@ print("=====")
 
 '''
 
-print("=====")
-
-for key,value in layout.layer_dict.items():
-	print(f"{key} = {value}")
-print("==========")
-
-
-m = Module(layout.read_cell_from_gds("memory_cell"))
-pinmap = m.find_pin_map([layout.layer_dict["M1_pin"],layout.layer_dict["M2_pin"]])
-
-for key,value in pinmap.items():
-	print(f"{key} = {value}")

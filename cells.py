@@ -22,7 +22,7 @@ class Module:
 		self.height = self.find_dimensions()[0]
 		self.width = self.find_dimensions()[1]
 		self.cell_name = self.cell.name
-		
+
 		#self.netlist = netlist
 
 	def place(self,target,t):
@@ -85,6 +85,10 @@ class Module:
 		pass
 
 
+	def init_netlist_device():
+		pass
+
+
 class Memory_Cell(Module):
 	pass
 
@@ -139,3 +143,6 @@ class Sense_Amp():
 		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
 		target.insert(istance)
+
+	def init_netlist_device():
+		pass

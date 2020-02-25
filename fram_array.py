@@ -18,11 +18,14 @@ import technology
 
 
 class Fram():
-	"""Main class contain layout (My_Layout) and netlist (Netlist) olcts"""
+	"""Main class contain layout (My_Layout) and netlist (Netlist) objcts. Fram itself 
+	consists of modules, module is a layout_cell and netlist curciut representation and 
+	it's methods"""
 	def __init__(self, Config):
 		'''Main magic happens here!'''
 		self.Config = Config
 		self.create_layout()
+		self.init_netlist()
 		check_os_content("gds_files")
 		check_os_content("netlists")
 		
@@ -60,10 +63,10 @@ class Fram():
 
 
 	def create_bitline(self, Memory_Cell , Config ):
-		self.bitline = Bitline( self.fram_layout, Memory_Cell , Config )
+		self.bitline = Bitline( self.fram_layout, self.fram_netlist ,  Memory_Cell , Config )
 
 	def create_array_core(self,Bitline,cells,Config):
-		self.array_core = Array_Core( self.fram_layout, Bitline, cells ,  Config)
+		self.array_core = Array_Core( self.fram_layout, self.fram_netlist , Bitline, cells ,  Config)
 		self.core_offset = (self.array_core.x_offset,self.array_core.y_offset)
 		Config.debug_message(0,f'Created array of cells!')
 
@@ -74,6 +77,12 @@ class Fram():
 		self.Config.debug_message(0,f'Wow! GDS output file is now created in "{output_path}" !')
 		return output_path
 
+	def init_netlist(self):
+		self.fram_netlist = pya.Netlist()
+		self.top_netlist_circuit = pya.Circuit()
+		self.fram_netlist.add(self.top_netlist_circuit)
+		self.Config.debug_message(2,f'Initialize Netlist')
+
 
 
 
@@ -81,12 +90,12 @@ class Fram():
 
 
 class Bitline:
-	"""Vertical memory  cells array"""
+	"""Vertical memory  cells array module"""
 	cell_name = "bitline"
 
 
 
-	def __init__(self, layout ,Memory_Cell ,Config):
+	def __init__(self, layout, netlist ,Memory_Cell ,Config):
 		self.Config =Config
 		self.bitline_cell = Module(layout.create_cell(self.cell_name),Config)
 		self.memory_cell = Memory_Cell
@@ -133,14 +142,18 @@ class Bitline:
 
 
 
+	def create_subskct():
+		pass
+
 
 class Array_Core:
 	"""Multiplying bitlines class"""
 	cell_name = "core"
-	def __init__(self, layout, Bitline, cells , Config):
+	def __init__(self, layout, netlist , Bitline, cells , Config):
 		self.layout = layout
 		self.Config = Config
 		self.cells = cells
+		self.netlist = netlist
 		self.memory_cell = Bitline.memory_cell
 		self.X_step = self.define_X_step(cells)
 		#self.Y_step = self.define_Y_step(cells)
