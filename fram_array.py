@@ -85,9 +85,10 @@ class Fram():
 
 
 
-
-
-
+	def write_netlist(self):
+		fram_netlist_writer = pya.NetlistSpiceWriter()
+		self.fram_netlist.write(f"./netlists/{self.Config.output_name}.sp",fram_netlist_writer)
+		self.Config.debug_message(1,f"Extracted netlist to ./netlists/{self.Config.output_name}.sp")
 
 class Bitline:
 	"""Vertical memory  cells array module"""
