@@ -8,7 +8,7 @@ from cells import *
 
 from layout import My_Layout
 from config import Config
-
+from netlist import *
 # Debug
 from inspect import currentframe, getframeinfo
 
@@ -78,17 +78,12 @@ class Fram():
 		return output_path
 
 	def init_netlist(self):
-		self.fram_netlist = pya.Netlist()
-		self.top_netlist_circuit = pya.Circuit()
-		self.fram_netlist.add(self.top_netlist_circuit)
-		self.Config.debug_message(2,f'Initialize Netlist')
+		self.fram_netlist = Fram_Netlist(self.Config)
 
 
 
 	def write_netlist(self):
-		fram_netlist_writer = pya.NetlistSpiceWriter()
-		self.fram_netlist.write(f"./netlists/{self.Config.output_name}.sp",fram_netlist_writer)
-		self.Config.debug_message(1,f"Extracted netlist to ./netlists/{self.Config.output_name}.sp")
+		self.fram_netlist.write_netlist()
 
 class Bitline:
 	"""Vertical memory  cells array module"""
