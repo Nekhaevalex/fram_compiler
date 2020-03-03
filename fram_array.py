@@ -40,7 +40,7 @@ class Fram():
 		self.create_bitline(self.memory_cell,Config) # Create bitline class
 		self.create_array_core(self.bitline , [self.memory_cell , self.sense_amp ], Config) # Create array of bitlines
 
-
+		self.fram_netlist.write_netlist()
 		self.gds_output() # Make output of gds
 		
 

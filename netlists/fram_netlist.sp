@@ -1,0 +1,4 @@
+
+* cell 
+.SUBCKT 
+.ENDS 
