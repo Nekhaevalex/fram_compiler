@@ -43,7 +43,7 @@ class Fram_Netlist():
 		if (terminals != None ):
 			terminals_def = []
 			for terminal in terminals:
-				new_terminal = pya.DeviceTerminalDefinition()
+				new_terminal = pya.DeviceClassTerminalDefinition()
 				new_terminal.name = terminal
 				terminals_def.append(new_terminal)
 				device_class.terminal_definition(new_terminal.id())
