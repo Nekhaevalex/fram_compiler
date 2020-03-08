@@ -24,6 +24,7 @@ class Netlist_Device():
 	def __init__(self, name  , Config):
 		self.name = name
 		self.Config = Config
+		self.read_netlist_init_from_file(name)
 
 	def read_netlist_init_from_file(self):
 		with open(f'./netlists/{self.name}.sp','r') as source:
@@ -32,6 +33,7 @@ class Netlist_Device():
 
 	def add_to_netlist(self)
 		pass
+
 
 
 
