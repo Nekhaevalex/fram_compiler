@@ -24,6 +24,7 @@ class Fram_Netlist():
 	def add_sub(self, sub , terminals ):
 		source = source + sub.add_to_netlist( terminals )
 
+
 class Netlist_Device():
 	params = []
 	"""docstring for ClassName"""
