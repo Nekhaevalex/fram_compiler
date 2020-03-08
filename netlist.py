@@ -11,11 +11,18 @@ class Fram_Netlist():
 	"""docstring for Fram_Netlist"""
 	def __init__(self, Config):
 		self.Config = Config
-		
+		self.source = ""
+
+
 	def write_netlist(self):
 		with open(f'./netlists/{self.Config.output_name}.sp','w') as output:
 			output.write(self.source)
 
+	def init_sub(self, module ):
+		sub = Netlist_Device(self, module.cell_name , self.Config)
+
+	def add_sub(self, sub , terminals ):
+		source = source + sub.add_to_netlist( terminals )
 
 
 class Netlist_Device():
@@ -24,14 +31,16 @@ class Netlist_Device():
 	def __init__(self, name  , Config):
 		self.name = name
 		self.Config = Config
-		self.read_netlist_init_from_file(name)
+
+		self.read_netlist_init_from_file()
+
 
 	def read_netlist_init_from_file(self):
 		with open(f'./netlists/{self.name}.sp','r') as source:
 			self.init = source.read()
 			print(f"Added netlist: {self.init}")
 
-	def add_to_netlist(self)
+	def add_to_netlist(self,terminals)
 		pass
 
 
