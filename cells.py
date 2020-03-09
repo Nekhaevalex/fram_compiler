@@ -3,6 +3,7 @@ import pya
 import os
 
 from utils import *
+from netlist import *
 
 
 
@@ -22,6 +23,7 @@ class Module:
 		self.height = self.find_dimensions()[0]
 		self.width = self.find_dimensions()[1]
 		self.cell_name = self.cell.name
+		self.netlist_device = Netlist_Device(self.cell_name,self.Config)
 
 		#self.netlist = netlist
 
@@ -96,7 +98,7 @@ class Memory_Cell(Module):
 
 
 
-class Sense_Amp():
+class Side_Module():
 	cell_name = "sense_amp"
 	cells_in_cell = 2
 	placement = "bottom"
@@ -108,6 +110,7 @@ class Sense_Amp():
 		self.Config = Config
 		self.cells = cells
 		self.boundary_box = ()
+		self.netlist_device = Netlist_Device(self.cell_name,self.Config)
 		Config.debug_message(2, f"Created Sense_Amp , with start cell {cells[0].name}")
 
 	def find_cell_boundary(self, cell ,layer= None): #default layer is PR Bndry

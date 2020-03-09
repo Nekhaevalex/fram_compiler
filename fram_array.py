@@ -57,7 +57,7 @@ class Fram():
 		sense_name_1 = self.Config.sense_amp_gnd_name
 		sense_name_2 = self.Config.sense_amp_vdd_name
 		sense_amp_cells = ( self.fram_layout.read_cell_from_gds(sense_name_1) , self.fram_layout.read_cell_from_gds(sense_name_2) )
-		sense_amp = Sense_Amp(sense_amp_cells,self.Config)
+		sense_amp = Side_Module(sense_amp_cells,self.Config)
 		return sense_amp
 
 
@@ -154,7 +154,6 @@ class Array_Core:
 		self.X_step = self.define_X_step(cells)
 		#self.Y_step = self.define_Y_step(cells)
 		self.Y_step = self.memory_cell.height
-
 
 		self.bitline = Bitline
 		self.array_core_cell = Module(layout.create_cell(self.cell_name) , Config)

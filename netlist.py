@@ -29,7 +29,7 @@ class Netlist_Device():
 	params = []
 	pins = []
 	"""docstring for ClassName"""
-	def __init__(self, name  , Config):
+	def __init__(self, name , Config):
 		self.name = name
 		self.Config = Config
 
@@ -39,22 +39,27 @@ class Netlist_Device():
 
 
 	def read_netlist_init_from_file(self):
+		pins = []
 		with open(f'./netlists/{self.name}.sp','r') as source:
 			self.init = source.read()
 			source.seek(0)
 			lines = source.readlines()
 			for  line in lines:
-				if (line[0] != "#"):
+				print(line)
+				if ( (line[0] != "#") or  (line[0] != "*") or ( (line[0] != "/") and line[1] != "/" ) ):
 					words = line.split()
-					if words[0].lower() == ".subckt":
-						i = 1
-						while (i < len(words)):
-							pins.append(words[i])
-							i += 1
+					if ( len(words[0]) > 0 ):
+						if ( words[0] == ".SUBCKT") and (len(words)>0) :
+							print(words[0])
+							i = 1
+							while (i < len(words)):
+								pins.append(words[i])
+								i += 1
 
 			print(f"Added netlist: {self.init}")
 			print(f"with pins:")
 			print(pins)
+			self.pins = pins
 
 	def add_to_netlist(self,n,pins):
 		"""
