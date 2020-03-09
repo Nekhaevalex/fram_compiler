@@ -27,6 +27,7 @@ class Fram_Netlist():
 
 class Netlist_Device():
 	params = []
+	pins = []
 	"""docstring for ClassName"""
 	def __init__(self, name  , Config):
 		self.name = name
@@ -35,23 +36,39 @@ class Netlist_Device():
 		self.read_netlist_init_from_file()
 
 
+
+
 	def read_netlist_init_from_file(self):
 		with open(f'./netlists/{self.name}.sp','r') as source:
 			self.init = source.read()
+			source.seek(0)
+			lines = source.readlines()
+			for  line in lines:
+				if (line[0] != "#"):
+					words = line.split()
+					if words[0].lower() == ".subckt":
+						i = 1
+						while (i < len(words)):
+							pins.append(words[i])
+							i += 1
+
 			print(f"Added netlist: {self.init}")
+			print(f"with pins:")
+			print(pins)
 
-	def add_to_netlist(self,terminals)
+	def add_to_netlist(self,n,pins):
+		"""
+		f"I{n} ("
+		for i in range(len(pins)):
+			s = s+" "+pins[i]
+		s = s+") "+self.name+'\n'
+		return s
+		"""
 		pass
-
-
-
 
 class Curcuit(object):
 	"""docstring for ClassName"""
 	def __init__(self, arg):
 		self.arg = arg
-		
-		
-		
 
 
