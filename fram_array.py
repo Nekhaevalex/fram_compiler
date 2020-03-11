@@ -3,6 +3,7 @@ import os
 import sys
 import datetime
 import random
+import time
 from utils import *
 from cells import *
 
@@ -322,9 +323,14 @@ class Array_Core:
 
 # ===================== CODE HERE! ============
 
+start_time = time.perf_counter()
 
 config = Config()
 fram = Fram(config)
+
+end_time = time.perf_counter()
+
+print(f"Compiling time is {round(end_time - start_time , 2 )}")
 
 
 		
