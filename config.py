@@ -10,7 +10,7 @@ from inspect import currentframe, getframeinfo
 class Config:
 	
 	# Place for your parameters here.
-	debug_level = 5# 1 for debug, 0 for no printout
+	debug_level = 4	# 1 for debug, 0 for no printout
 
 	#Horizontal size
 	word_size = 8
@@ -57,7 +57,7 @@ class Config:
 
 
 
-	layers_with_pins = ["M1_pin","M2_pin","M3_pin"]
+	layers_with_pins = ["M1_pin","M2_pin","M3_pin"]	
 	''' Create markers as: '''
 	marker_as_text = False
 	marker_as_point = True

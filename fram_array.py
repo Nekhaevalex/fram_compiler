@@ -25,30 +25,27 @@ class Fram():
 	def __init__(self, Config):
 		'''Main magic happens here!'''
 		self.Config = Config
+		self.Config.debug_message(0,f"Starting generating of FRAM array which consists of {Config.num_words} x {Config.word_size} cells. Time is 'add_time'.")
 		self.create_layout()
 		self.init_netlist()
+		self.Config.debug_message(1,f'Starting to check modules source files')
 		check_os_content("gds_files")
 		check_os_content("netlists")
-		
-
 		#self.memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds("memory_cell"))
 		self.memory_cell = self.read_memory_cell()
-
-		
 		#self.sense_amp = Sense_Amp(sense_amp_cells,Config)
 		self.sense_amp = self.read_sense_amp_cell()
 
-		self.create_bitline(self.memory_cell,Config) # Create bitline class
+		self.create_bitline(self.memory_cell , self.Config) # Create bitline class
 		self.create_array_core(self.bitline , [self.memory_cell , self.sense_amp ], Config) # Create array of bitlines
 
 		self.fram_netlist.write_netlist()
 		self.gds_output() # Make output of gds
-		
+		self.sp_output()
 
 	def read_memory_cell(self):
-		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name) , self.Config)
+		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name) , self.Config , is_basic_cell = True)
 		return memory_cell
-
 
 	def create_layout(self):
 		self.fram_layout = My_Layout(Config)
@@ -61,16 +58,15 @@ class Fram():
 		sense_amp = Side_Module(sense_amp_cells,self.Config)
 		return sense_amp
 
-
-
 	def create_bitline(self, Memory_Cell , Config ):
 		self.bitline = Bitline( self.fram_layout, self.fram_netlist ,  Memory_Cell , Config )
+		self.fram_netlist = self.bitline.fram_netlist
 
 	def create_array_core(self,Bitline,cells,Config):
 		self.array_core = Array_Core( self.fram_layout, self.fram_netlist , Bitline, cells ,  Config)
+		self.fram_netlist = self.array_core.fram_netlist
 		self.core_offset = (self.array_core.x_offset,self.array_core.y_offset)
 		Config.debug_message(0,f'Created array of cells!')
-
 
 	def gds_output(self):
 		output_path = "./gds_files/"+ self.Config.output_name+".gds"
@@ -78,10 +74,11 @@ class Fram():
 		self.Config.debug_message(0,f'Wow! GDS output file is now created in "{output_path}" !')
 		return output_path
 
+	def sp_output(self):
+		self.fram_netlist.write_netlist()
+
 	def init_netlist(self):
 		self.fram_netlist = Fram_Netlist(self.Config)
-
-
 
 	def write_netlist(self):
 		self.fram_netlist.write_netlist()
@@ -91,41 +88,54 @@ class Bitline:
 	cell_name = "bitline"
 
 
-
-	def __init__(self, layout, netlist ,Memory_Cell ,Config):
+	# self.fram_layout, self.fram_netlist ,  Memory_Cell , Config 
+	def __init__(self , layout, netlist , Memory_Cell ,Config):
 		self.Config =Config
+		self.fram_netlist = netlist
 		self.bitline_cell = Module(layout.create_cell(self.cell_name),Config)
 		self.memory_cell = Memory_Cell
 		self.Y_step = Memory_Cell.height
 		self.layout = layout
 		self.layer_map = layout.layer_dict
+		self.init_netlist()
+		self.create_gds()
 
-		self.create_gds(layout,Memory_Cell,Config)
-
-
-
-
-
-	def create_gds(self,layout,Memory_Cell,Config):
+	def create_gds(self):
 		xpos = 0
 
 		ypos = 0
 
-		for i in range(0,Config.num_words):
+		for i in range(0,self.Config.num_words):
 			t = pya.Trans(xpos,ypos)
-			Memory_Cell.place(self.bitline_cell.cell, t)
+			self.memory_cell.place(self.bitline_cell.cell, t)
 			#ypos += Memory_Cell.height
 			#text = pya.Text(f"here is the connection# {i}", xpos , ypos)
 			ypos += self.Y_step
 
 			#self.bitline_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
-
-
-		
 		self.y_offset = ypos
 		self.bitline_routing()
-	def create_netlist(self):
-		pass
+
+
+	def init_netlist(self):
+		self.fram_netlist.add_device(self.memory_cell.netlist_device)
+
+
+	def create_netlist(self , bl_n):
+		bitline_out_terminals = [f"bl{bl_n}"]
+		for i in range(0,self.Config.num_words):
+			bitline_out_terminals.append(f"wl{i}")
+			bitline_out_terminals.append(f"pl{i}")
+		bitline_out_terminals.append("gnd")
+		bitline_netlist = Curcuit(self.cell_name , self.Config , bitline_out_terminals, self.memory_cell.netlist_device)
+		bl_net=f"bl{bl_n}"
+		wl_nets = []
+		pl_nets = []
+		for i in range(0,self.Config.num_words):
+			bl_nets.append("wl"+str(i))
+			pl_nets.append("pl"+str(i))
+			self.fram_netlist.add_inst(self.Memory_Cell.netlist_device , [bl_net, wl_nets[i] , pl_nets[i] ,"gnd"])
+
 	def add_bitline_instance(self,t):
 		self.bitline_cell.place(t)
 
@@ -137,8 +147,6 @@ class Bitline:
 		self.line_coords = ((xpos,ypos) , (xpos, self.y_offset) )
 		simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
 
-
-
 	def create_subskct():
 		pass
 
@@ -146,11 +154,11 @@ class Bitline:
 class Array_Core:
 	"""Multiplying bitlines class"""
 	cell_name = "core"
-	def __init__(self, layout, netlist , Bitline, cells , Config):
+	def __init__(self, layout, 	netlist , Bitline, cells , Config):
 		self.layout = layout
 		self.Config = Config
 		self.cells = cells
-		self.netlist = netlist
+		self.fram_netlist = netlist
 		self.memory_cell = Bitline.memory_cell
 		self.X_step = self.define_X_step(cells)
 		#self.Y_step = self.define_Y_step(cells)
@@ -168,11 +176,6 @@ class Array_Core:
 		
 		self.create_core_gds(layout,Bitline,Config)
 
-
-
-
-
-
 	def define_X_step(self,modules):
 		dx = []
 		for module in modules:
@@ -184,8 +187,6 @@ class Array_Core:
 		self.Config.debug_message(3,f'Defines X - size  of {X_step}. By comparing of list {dx}')
 		return X_step
 				
-
-
 	def define_Y_step(self,modules):
 		dy = []
 		for module in modules:
@@ -194,7 +195,6 @@ class Array_Core:
 				dy.append(boundary.width())
 		Y_step = max(dy)
 		return Y_step
-
 
 	def find_cell_in_cells(self,name,cells):
 		found = False
@@ -210,9 +210,6 @@ class Array_Core:
 
 	def create_core_gds(self,layout,Bitline,Config):
 
-
-
-
 		xpos = 0
 
 		ypos = 0
@@ -222,9 +219,6 @@ class Array_Core:
 			Bitline.bitline_cell.place(self.array_core_cell.cell,t)
 			xpos += self.X_step
 
-
-
-
 		self.x_offset = xpos
 		self.y_offset = Bitline.y_offset
 		self.add_markers()
@@ -232,8 +226,13 @@ class Array_Core:
 		Config.debug_message(0,f'Created core (only memory cells) with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
 		self.add_side_module(self.sense_amp)
 
-	def create_netlist():
-		pass
+	def update_netlist(self , src):
+		self.fram_netlist = src.fram_netlist
+
+	def create_netlist(self):
+		for i in range(self.Config.word_size):
+			self.Bitline.create_netlist(i)
+		self.update_netlist(Bitline)
 		
 	def write_line_routing(self):
 		self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
@@ -246,9 +245,6 @@ class Array_Core:
 		if (self.Config.debug_level > 1 ):
 			print(f'Complited routing of bitline with end point as ({xpos} , {ypos})')
 
-
-
-
 	def add_side_module (self, module):
 		self.add_module_layout(module)
 
@@ -259,8 +255,6 @@ class Array_Core:
 		print_pins(bl_pinmap) # remove
 		'''
 
-		
-
 	def add_module_layout(self, module):
 		layer_pins = [ self.layer_map["M1_pin"] , self.layer_map["M2_pin"] ]
 		module.pin_map = module.find_pin_map(layer_pins)
@@ -270,7 +264,6 @@ class Array_Core:
 			n = 0
 			xpos1 = self.bl_end_markers[0].x - module.pin_map[0]["in"].text.x
 			xpos2 = self.bl_end_markers[0].x - module.pin_map[1]["in"].text.x
-			print("in pin x = "+str(module.pin_map[n]["in"].text.x)+" ")
 			ypos = -1000
 			for i in  range(0, self.Config.word_size):
 				if (n == 0):
@@ -280,16 +273,13 @@ class Array_Core:
 				if (n == 1):
 					t = pya.Trans(xpos2,ypos)
 					module.place(self.array_core_cell.cell, t , mode =n)
-				print(f"n = {n}")
+				#print(f"n = {n}")
 				n = swich_mode(n)
 				xpos1 = xpos1 + self.X_step
 				xpos2 = xpos2 + self.X_step
 		else:
 			self.Config.debug_message(-1,f'========== WARNING ========= \n ')
 			self.Config.warning(getframeinfo(currentframe()))
-
-
-
 
 	def add_markers(self):
 		''' ===  Add some text to the tips of the lines and bitlines  ===    '''
@@ -320,7 +310,7 @@ class Array_Core:
 
 
 
-
+		
 # ===================== CODE HERE! ============
 
 start_time = time.perf_counter()

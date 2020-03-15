@@ -17,6 +17,18 @@ def check_os_content(name):
 		sys.exit("\n \n Termination due to error reported above.")
 
 
+def exit_on_false(state):
+	if (state != True ):
+		print("\n======Error!======\n")
+		sys.exit("\n \n Termination due to error reported above.")
+
+def sys_error():
+		print("\n======Error!======\n")
+		sys.exit("\n \n Termination due to error reported above.")
+
+
+
+
 def simple_path(cell, layer, start, end , width):
 	pth = pya.Path([start,end] , width)
 	poly = pth.simple_polygon()
