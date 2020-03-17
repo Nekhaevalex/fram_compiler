@@ -14,16 +14,18 @@ class Module:
 	placement = "core"
 	cells_in_cell = 1
 	"""docstring for ClassName"""
-	def __init__(self, cell , Config): #+ netlist
+	def __init__(self, cell , Config, is_basic_cell = False): #+ netlist
 		self.Config = Config
 		self.cell = cell
+		self.cell_name = cell.name
 		self.cells = []
 		self.cells.append(cell)
 		self.boundary_box = self.find_boundary()
 		self.height = self.find_dimensions()[0]
 		self.width = self.find_dimensions()[1]
 		self.cell_name = self.cell.name
-		self.netlist_device = Netlist_Device(self.cell_name,self.Config)
+		if is_basic_cell:
+			self.netlist_device = Netlist_Device(self.cell_name,self.Config)
 
 		#self.netlist = netlist
 
@@ -87,8 +89,6 @@ class Module:
 		pass
 
 
-	def init_netlist_device():
-		pass
 
 
 class Memory_Cell(Module):
@@ -147,5 +147,3 @@ class Side_Module():
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
 		target.insert(istance)
 
-	def init_netlist_device():
-		pass
