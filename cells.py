@@ -17,6 +17,7 @@ class Module:
 	def __init__(self, cell , Config, is_basic_cell = False): #+ netlist
 		self.Config = Config
 		self.cell = cell
+		self.cell_name = cell.name
 		self.cells = []
 		self.cells.append(cell)
 		self.boundary_box = self.find_boundary()

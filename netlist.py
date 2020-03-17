@@ -8,6 +8,7 @@ from utils import *
 
 
 class Fram_Netlist():
+	''' Main netlist class. The same as layout class. But netlist.'''
 	devices = []
 	subs = []
 	lines = []
@@ -25,6 +26,9 @@ class Fram_Netlist():
 			output.write("* Declare subcurcuits\n")
 			for sub in self.subs:
 				output.write(sub.init)
+			output.write("* Declare instances\n")
+			for line in self.lines:
+				output.write(line)
 
 	def init_sub(self, module ):
 		sub = Netlist_Device(self, module.cell_name , self.Config)
@@ -47,9 +51,10 @@ class Fram_Netlist():
 
 
 class Netlist_Device():
+	"""Netlist cuircuit which is read from .sp file initialy gived by user"""
 	params = []
 	pins = []
-	"""docstring for ClassName"""
+
 	def __init__(self, name , Config , default_params = None):
 		self.name = name
 		self.Config = Config
@@ -88,7 +93,9 @@ class Netlist_Device():
 			#print(f"Added netlist:\n {self.init}")
 			#print(f"\nwith pins:")
 			#print(pins)
+
 			self.pins = pins
+
 
 	def state_presents(self,state, lines , name , mode = "0_pos"):
 		if ( mode == "0_pos" ):
@@ -116,6 +123,7 @@ class Netlist_Device():
 		src = f"I{n}"
 		for terminal in terminals:
 			src = f"{src} {terminal}"
+		src = f"{src} {self.name}"
 		src = f"{src}\n"
 		return src
 
@@ -130,27 +138,30 @@ class Curcuit():
 		self.Config = Config
 		self.out_terminals = out_terminals
 		self.devices = devices
-		self.init = self.init_sub()
+		self.init = self.init_sub(self.devices)
 
 	def init_sub(self, devices):
 		init_netlist = f".SUBCKT {self.name} "
 		for terminal in self.out_terminals:
 			init_netlist = f"{init_netlist} {terminal}"
 		init_netlist = f"{init_netlist}\n"
-		'''
-		for device in devices:
-			init_netlist = f"{init_netlist} {device}"
+		init_netlist = f"{init_netlist}\n.ENDS {self.name}\n"
 		return init_netlist
-		'''
 
-	"""
-	def add_seq(seq):
-		init_netlist = f"{init_netlist}\n"
-		for device in devices:
-			init_netlist = f"{init_netlist} {device}"
-	"""
+	def place_inst(self, n ,terminals ):
+		""" Place an instance of device in format ( 
+		mossfet.place_device([("d","net1"),("g","net2"),("s","net3"),("b",gnd)],[(L = 0.27),(W = 1)]]))"""
+		src = f"I{n}"
+		for terminal in terminals:
+			src = f"{src} {terminal}"
+		src = f"{src} {self.name}"
+		src = f"{src}\n"
+		return src
 	
 	def add_sub():
+		pass
+
+	def add_device():
 		pass
 
 
