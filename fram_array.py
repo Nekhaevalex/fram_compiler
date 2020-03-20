@@ -270,6 +270,10 @@ class Array_Core:
 		
 	def create_bitline_netlist(self):
 		bitline_out_terminals = [f"bl"]
+		bl_nets = []
+		for i in range(0, self.Config.word_size):
+			bl_nets.append(f"bl{i}")
+		self.bl_nets = bl_nets
 		for i in range(0,self.Config.num_words):
 			bitline_out_terminals.append(f"wl{i}")
 			bitline_out_terminals.append(f"pl{i}")
@@ -288,10 +292,11 @@ class Array_Core:
 		wl_nets = []
 		pl_nets = []
 		for i in range(0,self.Config.num_words):
-			wl_nets.append("wl"+str(i))
+			wl_nets.append("wl"+str(i))	
 			pl_nets.append("pl"+str(i))	
 			self.fram_netlist.add_inst(self.memory_cell.netlist_device , [bl_net, wl_nets[i] , pl_nets[i] ,"gnd"])
-
+		self.wl_nets = wl_nets
+		self.pl_nets = pl_nets
 	def write_line_routing(self):
 		self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
 		
@@ -340,8 +345,17 @@ class Array_Core:
 
 	def add_module_netlist(self, module):
 		
-		for i in range():
-			pass
+		self.fram_netlist.add_device(module.netlist_device)
+
+		terminal_pos = find_iterator(module.netlist_device.pins, module.connect_with)
+
+		if (module.placement == "bottom") or (module.placement == "top") :
+			for i in range(0,self.Config.word_size):
+				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
+	
+		if ( module.placement == "left" ) or ( module.placement == "right" )  :
+			for i in range(0,self.Config.num_words):	
+				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
 
 
 	def add_markers(self):

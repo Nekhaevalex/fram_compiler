@@ -66,6 +66,7 @@ class Netlist_Device():
 		self.Config.debug_message( 3 , f"Created netlist device: {self.name}")
 
 	def read_netlist_init_from_file(self):
+		'''Initial read of file netlist and find it's terminals to self.pins '''
 		pins = []
 		
 		with open(f'./netlists/{self.name}.sp','r') as source:
@@ -88,6 +89,7 @@ class Netlist_Device():
 							i = 2
 							while (i < len(words)):
 								pins.append(words[i])
+								#print(f"Append pin {words[i]}")
 								i += 1
 
 			#print(f"Added netlist:\n {self.init}")
@@ -126,6 +128,9 @@ class Netlist_Device():
 		src = f"{src} {self.name}"
 		src = f"{src}\n"
 		return src
+
+	def find_terminal(self,name):
+		pass
 
 	
 

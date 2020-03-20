@@ -51,4 +51,12 @@ def swich_mode(n):
 		n = 0
 		return n
 	
-		
+def find_iterator(list, obj):
+	iterator = None
+	for i in range(len(list)):
+		if list[i] ==  obj:
+			iterator = i
+	if (iterator == None ):
+		print("No object found in list in  method find_iterator(list, obj).\nreturn None")
+	return iterator
+	
