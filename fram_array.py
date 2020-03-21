@@ -219,6 +219,7 @@ class Array_Core:
 			self.Config.warning(getframeinfo(currentframe()))
 
 	def create_core_gds(self,):
+		self.init_markers()
 		self.create_bitline_gds()
 		xpos = 0
 
@@ -230,7 +231,7 @@ class Array_Core:
 			xpos += self.X_step
 
 		self.x_offset = xpos
-		self.add_markers()
+		self.add_markers('bl',self.bitline_coords) # !!!
 		self.write_line_routing()
 		self.Config.debug_message(0,f'Created core (only memory cells) with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
 		self.add_side_module(self.sense_amp)
@@ -319,13 +320,15 @@ class Array_Core:
 		'''
 
 	def add_module_layout(self, module):
+
+		''' Placement  of a module by pin coords '''
 		layer_pins = [ self.layer_map["M1_pin"] , self.layer_map["M2_pin"] ]
 		module.pin_map = module.find_pin_map(layer_pins)
 
 		if ( module.placement == "bottom" ):
 			n = 0
-			xpos1 = self.bl_end_markers[0].x - module.pin_map[0]["in"].text.x
-			xpos2 = self.bl_end_markers[0].x - module.pin_map[1]["in"].text.x
+			xpos1 = self.end_markers[module.connect_to][0].x - module.pin_map[0][module.connect_with].text.x
+			xpos2 = self.end_markers[module.connect_to][0].x - module.pin_map[1][module.connect_with].text.x
 			ypos = -1000
 			for i in  range(0, self.Config.word_size):
 				if (n == 0):
@@ -339,6 +342,25 @@ class Array_Core:
 				n = swich_mode(n)
 				xpos1 = xpos1 + self.X_step
 				xpos2 = xpos2 + self.X_step
+
+			''' Routing of a module '''
+
+			xpos1 = self.end_markers[module.connect_to][0].x 
+
+
+
+			''' example from bitline:
+
+
+			self.bitline_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
+			xpos = self.bitline_pinmap["bl"].text.x 
+			ypos = self.bitline_pinmap["bl"].text.y
+			self.bitline_coords = ((xpos,ypos) , (xpos, self.y_offset) )
+			simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
+
+			'''
+
+
 		else:
 			self.Config.debug_message(-1,f'========== WARNING ========= \n ')
 			self.Config.warning(getframeinfo(currentframe()))
@@ -358,31 +380,39 @@ class Array_Core:
 				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
 
 
-	def add_markers(self):
+
+	def init_markers(self):
+		self.end_markers = {}
+		self.begin_markers = {}
+		#for name in names:
+		#	end_markers
+
+	def add_markers(self,name , coords):
 		''' ===  Add some text to the tips of the lines and bitlines  ===    '''
-		bl_end_markers = []
-		bl_begin_markers = []
-		xpos = self.bitline_coords[1][0]
-		ypos = self.bitline_coords[1][1]
+		self.end_markers[name] = []
+		self.begin_markers[name] = []
+
+		xpos = coords[1][0]
+		ypos = coords[1][1]
 		for i in range(0, self.Config.word_size):
 			if ( self.Config.marker_as_text == True ):
-				text = pya.Text(f"end_of_BL{i}", xpos , ypos)
+				text = pya.Text(f"end_of_{name}{i}", xpos , ypos)
 				#print(f'x = {xpos} , y = {ypos}') #Debug
 				self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
-			bl_end_markers.append(pya.Point(xpos,ypos))
+			self.end_markers[name].append(pya.Point(xpos,ypos))
 			xpos = xpos + self.X_step
 
-		xpos = self.bitline_coords[0][0]
-		ypos = self.bitline_coords[0][1]
+		xpos = coords[0][0]
+		ypos = coords[0][1]
 		for i in range(0, self.Config.word_size):
 			if ( self.Config.marker_as_text ):
-				text = pya.Text(f"begin_of_BL{i}", xpos , ypos)
+				text = pya.Text(f"begin_of_{name}{i}", xpos , ypos)
 				#print(f'x = {xpos} , y = {ypos}') #Debug
 				self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
-			bl_begin_markers.append(pya.Point(xpos,ypos))
+			self.begin_markers[name].append(pya.Point(xpos,ypos))
 			xpos = xpos + self.X_step
-		self.bl_begin_markers = bl_begin_markers
-		self.bl_end_markers = bl_end_markers
+		#self.bl_begin_markers = bl_begin_markers
+		#self.bl_end_markers = bl_end_markers
 
 
 
