@@ -427,7 +427,7 @@ fram = Fram(config)
 
 end_time = time.perf_counter()
 
-print(f"Compiling time is {round(end_time - start_time , 2 )}")
+print(f"Compiling in {round(end_time - start_time , 2 )}s")
 
 
 		
