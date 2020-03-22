@@ -239,6 +239,8 @@ class Array_Core:
 		self.add_markers('bl',self.bitline_coords) # !!!
 		self.write_line_routing()
 		self.core_line_routing("pl","M3","x")
+		self.core_line_routing("gnd","M2","x")
+
 		self.Config.debug_message(0,f'Created core (only memory cells) with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
 		self.add_side_module(self.sense_amp)
 
