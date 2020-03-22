@@ -267,6 +267,21 @@ class Array_Core:
 		self.bitline_coords = ((xpos,ypos) , (xpos, self.y_offset) )
 		simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
 
+
+
+	def write_line_routing(self):
+		self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
+		
+		xpos = self.memory_cell_pinmap["wn"].text.x
+		ypos = self.memory_cell_pinmap["wn"].text.y
+		for i in range (0,self.Config.word_size):
+			simple_path(self.array_core_cell.cell, self.layer_map["M2"], pya.Point(xpos,ypos), pya.Point(self.x_offset,ypos) , self.Config.bl_width)
+			ypos = ypos + self.Y_step
+		if (self.Config.debug_level > 1 ):
+			print(f'Complited routing of bitline with end point as ({xpos} , {ypos})')
+
+
+
 	def core_line_routing(self, line_name , layer , orient):
 		self.cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
 
@@ -274,10 +289,14 @@ class Array_Core:
 		ypos = self.bitline_pinmap[line_name].text.y
 		if (orient == "y") :
 			self.coords[line_name] = ((xpos,ypos) , (xpos, self.y_offset) )
-			simple_path(self.array_core_cell.cell, self.layer_map[layer], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.width[line_name])
+			for i in range(self.Config.word_size) :
+				simple_path(self.array_core_cell.cell, self.layer_map[layer], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.width[line_name])
+				xpos = xpos + self.X_step
 		elif ( orient == "x" ):
 			self.coords[line_name] = ((xpos,ypos) , (self.x_offset, ypos) )
-			simple_path(self.array_core_cell.cell, self.layer_map[layer], pya.Point(xpos,ypos), pya.Point(self.x_offset, ypos) , self.Config.width[line_name])
+			for i in range(self.Config.word_size) :
+				simple_path(self.array_core_cell.cell, self.layer_map[layer], pya.Point(xpos,ypos), pya.Point(self.x_offset, ypos) , self.Config.width[line_name])
+				ypos = ypos + self.Y_step
 		else: 
 			print("ERROR in orientation of {line_name}. Fix me")
 		
@@ -321,16 +340,8 @@ class Array_Core:
 			self.fram_netlist.add_inst(self.memory_cell.netlist_device , [bl_net, wl_nets[i] , pl_nets[i] ,"gnd"])
 		self.wl_nets = wl_nets
 		self.pl_nets = pl_nets
-	def write_line_routing(self):
-		self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
-		
-		xpos = self.memory_cell_pinmap["wn"].text.x
-		ypos = self.memory_cell_pinmap["wn"].text.y
-		for i in range (0,self.Config.word_size):
-			simple_path(self.array_core_cell.cell, self.layer_map["M2"], pya.Point(xpos,ypos), pya.Point(self.x_offset,ypos) , self.Config.bl_width)
-			ypos = ypos + self.Y_step
-		if (self.Config.debug_level > 1 ):
-			print(f'Complited routing of bitline with end point as ({xpos} , {ypos})')
+
+
 
 	def add_side_module (self, module):
 		self.add_module_layout(module)
