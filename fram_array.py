@@ -238,6 +238,7 @@ class Array_Core:
 		self.x_offset = xpos
 		self.add_markers('bl',self.bitline_coords) # !!!
 		self.write_line_routing()
+		self.core_line_routing("pl","M3","x")
 		self.Config.debug_message(0,f'Created core (only memory cells) with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
 		self.add_side_module(self.sense_amp)
 
@@ -258,8 +259,9 @@ class Array_Core:
 		self.bitline_routing()
 
 
+
 	def bitline_routing(self):
-		self.bitline_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
+		self.bitline_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"], self.layer_map["M3_pin"] ,])
 		xpos = self.bitline_pinmap["bl"].text.x 
 		ypos = self.bitline_pinmap["bl"].text.y
 		self.bitline_coords = ((xpos,ypos) , (xpos, self.y_offset) )
@@ -272,11 +274,13 @@ class Array_Core:
 		ypos = self.bitline_pinmap[line_name].text.y
 		if (orient == "y") :
 			self.coords[line_name] = ((xpos,ypos) , (xpos, self.y_offset) )
+			simple_path(self.array_core_cell.cell, self.layer_map[layer], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.width[line_name])
 		elif ( orient == "x" ):
 			self.coords[line_name] = ((xpos,ypos) , (self.x_offset, ypos) )
+			simple_path(self.array_core_cell.cell, self.layer_map[layer], pya.Point(xpos,ypos), pya.Point(self.x_offset, ypos) , self.Config.width[line_name])
 		else: 
 			print("ERROR in orientation of {line_name}. Fix me")
-		simple_path(self.array_core_cell.cell, self.layer_map[layer], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.width[line_name])
+		
 
 
 
