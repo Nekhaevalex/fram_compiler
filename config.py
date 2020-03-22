@@ -54,8 +54,14 @@ class Config:
 
 	bl_width = 150
 
+	# Width settings
 
+	width = {}
 
+	width['bl'] = 150
+	width['pl'] = 150
+	width['wl'] = 150
+	width['gnd'] = 150
 
 	layers_with_pins = ["M1_pin","M2_pin","M3_pin"]	
 	''' Create markers as: '''

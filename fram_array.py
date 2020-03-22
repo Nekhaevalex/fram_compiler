@@ -115,6 +115,7 @@ class Bitline:
 			#self.bitline_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
 		self.y_offset = ypos
 		self.bitline_routing()
+		#self.pl_routing()
 
 
 	def init_netlist(self):
@@ -147,6 +148,9 @@ class Bitline:
 		self.line_coords = ((xpos,ypos) , (xpos, self.y_offset) )
 		simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
 
+
+
+
 	def create_subskct():
 		pass
 
@@ -154,6 +158,7 @@ class Bitline:
 class Array_Core:
 	"""Multiplying bitlines class"""
 	cell_name = "core"
+	coords = {} # temp coords dict for gds creation
 	def __init__(self, layout, 	netlist , cells , Config):
 		self.layout = layout
 		self.Config = Config
@@ -259,6 +264,20 @@ class Array_Core:
 		ypos = self.bitline_pinmap["bl"].text.y
 		self.bitline_coords = ((xpos,ypos) , (xpos, self.y_offset) )
 		simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
+
+	def core_line_routing(self, line_name , layer , orient):
+		self.cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
+
+		xpos = self.bitline_pinmap[line_name].text.x 
+		ypos = self.bitline_pinmap[line_name].text.y
+		if (orient == "y") :
+			self.coords[line_name] = ((xpos,ypos) , (xpos, self.y_offset) )
+		elif ( orient == "x" ):
+			self.coords[line_name] = ((xpos,ypos) , (self.x_offset, ypos) )
+		else: 
+			print("ERROR in orientation of {line_name}. Fix me")
+		simple_path(self.array_core_cell.cell, self.layer_map[layer], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.width[line_name])
+
 
 
 	def update_netlist(self , src):
