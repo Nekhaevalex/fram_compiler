@@ -226,6 +226,8 @@ class Array_Core:
 	def create_core_gds(self,):
 		self.init_markers()
 		self.create_bitline_gds()
+
+
 		xpos = 0
 
 		ypos = 0
@@ -263,7 +265,8 @@ class Array_Core:
 
 
 	def bitline_routing(self):
-		self.bitline_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"], self.layer_map["M3_pin"] ,])
+		self.bitline_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"], self.layer_map["M3_pin"] ])
+		
 		xpos = self.bitline_pinmap["bl"].text.x 
 		ypos = self.bitline_pinmap["bl"].text.y
 		self.bitline_coords = ((xpos,ypos) , (xpos, self.y_offset) )
@@ -272,7 +275,7 @@ class Array_Core:
 
 
 	def write_line_routing(self):
-		self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
+		#self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
 		
 		xpos = self.memory_cell_pinmap["wn"].text.x
 		ypos = self.memory_cell_pinmap["wn"].text.y
@@ -285,7 +288,7 @@ class Array_Core:
 
 
 	def core_line_routing(self, line_name , layer , orient):
-		self.cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
+		
 
 		xpos = self.bitline_pinmap[line_name].text.x 
 		ypos = self.bitline_pinmap[line_name].text.y
@@ -366,6 +369,7 @@ class Array_Core:
 			xpos1 = self.end_markers[module.connect_to][0].x - module.pin_map[0][module.connect_with].text.x
 			xpos2 = self.end_markers[module.connect_to][0].x - module.pin_map[1][module.connect_with].text.x
 			ypos = -1000
+			y_shift = ypos
 			for i in  range(0, self.Config.word_size):
 				if (n == 0):
 					t = pya.Trans(xpos1,ypos)
@@ -380,26 +384,37 @@ class Array_Core:
 				xpos2 = xpos2 + self.X_step
 
 			''' Routing of a module '''
+			xpos1 = []
+			ypos1 = []
+			xpos1[0] = self.end_markers[module.connect_to][0].x
+			xpos1[1] = xpos1 + self.X_step 
+			ypos1[0] =  y_shift
+			ypos2[0] = self.memory_cell_pinmap[module.connect_to].text.y
 
-			xpos1 = self.end_markers[module.connect_to][0].x 
+			for i in range(self.Config.word_size):
+				simple_path(self.array_core_cell.cell, self.layer_map["M1"], pya.Point(xpos1,ypos1), pya.Point(, ypos) , self.Config.width[line_name])
+
 
 
 
 			''' example from bitline:
-
 
 			self.bitline_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
 			xpos = self.bitline_pinmap["bl"].text.x 
 			ypos = self.bitline_pinmap["bl"].text.y
 			self.bitline_coords = ((xpos,ypos) , (xpos, self.y_offset) )
 			simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
-
 			'''
-
-
 		else:
 			self.Config.debug_message(-1,f'========== WARNING ========= \n ')
 			self.Config.warning(getframeinfo(currentframe()))
+
+
+	def add_extra_routing(self, module):
+		if (module.placement == "bottom"):
+			for i in range(0,self.Config.word_size):
+				pass
+
 
 	def add_module_netlist(self, module):
 		
@@ -410,10 +425,15 @@ class Array_Core:
 		if (module.placement == "bottom") or (module.placement == "top") :
 			for i in range(0,self.Config.word_size):
 				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
+			
 	
 		if ( module.placement == "left" ) or ( module.placement == "right" )  :
 			for i in range(0,self.Config.num_words):	
 				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
+
+	
+
+
 
 
 
@@ -422,6 +442,7 @@ class Array_Core:
 		self.begin_markers = {}
 		#for name in names:
 		#	end_markers
+		self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"], self.layer_map["M3_pin"] ])
 
 	def add_markers(self,name , coords):
 		''' ===  Add some text to the tips of the lines and bitlines  ===    '''
