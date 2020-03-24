@@ -368,7 +368,7 @@ class Array_Core:
 			n = 0
 			xpos1 = self.end_markers[module.connect_to][0].x - module.pin_map[0][module.connect_with].text.x
 			xpos2 = self.end_markers[module.connect_to][0].x - module.pin_map[1][module.connect_with].text.x
-			ypos = -1000
+			ypos = -2000
 			y_shift = ypos
 			for i in  range(0, self.Config.word_size):
 				if (n == 0):
@@ -383,18 +383,30 @@ class Array_Core:
 				xpos1 = xpos1 + self.X_step
 				xpos2 = xpos2 + self.X_step
 
+
+
 			''' Routing of a module '''
-			xpos1 = []
-			ypos1 = []
+			xpos1 = [0,0]
+			ypos1 = [0,0]
+			xpos2 = [0,0]
+			ypos2 = [0,0]
 			xpos1[0] = self.end_markers[module.connect_to][0].x
-			xpos1[1] = xpos1 + self.X_step 
-			ypos1[0] =  y_shift
+			xpos1[1] = xpos1[0] + self.X_step 
+			xpos2 = xpos1
+			ypos1[0] = y_shift
 			ypos2[0] = self.memory_cell_pinmap[module.connect_to].text.y
-
-			for i in range(self.Config.word_size):
-				simple_path(self.array_core_cell.cell, self.layer_map["M1"], pya.Point(xpos1,ypos1), pya.Point(, ypos) , self.Config.width[line_name])
-
-
+			ypos1[1] = y_shift
+			ypos2[1] = self.memory_cell_pinmap[module.connect_to].text.y
+			print(f"self.X_step = {self.X_step}")
+			for i in range(self.Config.word_size//2):
+				print(f"({xpos1[0]},{ypos1[0]}) to ({xpos1[0]},{xpos2[0]})")
+				for i in range(len(xpos1)):
+					simple_path(self.array_core_cell.cell, self.layer_map["M1"], pya.Point(xpos1[i],ypos1[i]), pya.Point( xpos2[i], ypos2[i]) , self.Config.width[module.connect_to])
+				xpos1[0] += self.X_step
+				xpos1[1] += self.X_step
+				xpos2[0] += self.X_step
+				xpos2[1] += self.X_step
+ 
 
 
 			''' example from bitline:
