@@ -20,14 +20,14 @@ M4 net29 nt nb vdd psvt25 w=0.4 l=0.28
 .ENDS
 * Declare subcurcuits
 * Declare instances
-I0 in ref seb nb nt vdd gnd sense_amp
-I1 in ref seb nb nt vdd gnd sense_amp
-I2 in ref seb nb nt vdd gnd sense_amp
-I3 in ref seb nb nt vdd gnd sense_amp
-I4 in ref seb nb nt vdd gnd sense_amp
-I5 in ref seb nb nt vdd gnd sense_amp
-I6 in ref seb nb nt vdd gnd sense_amp
-I7 in ref seb nb nt vdd gnd sense_amp
+I0 bl0 ref seb nb nt vdd gnd sense_amp
+I1 bl1 ref seb nb nt vdd gnd sense_amp
+I2 bl2 ref seb nb nt vdd gnd sense_amp
+I3 bl3 ref seb nb nt vdd gnd sense_amp
+I4 bl4 ref seb nb nt vdd gnd sense_amp
+I5 bl5 ref seb nb nt vdd gnd sense_amp
+I6 bl6 ref seb nb nt vdd gnd sense_amp
+I7 bl7 ref seb nb nt vdd gnd sense_amp
 I8 bl0 wl0 pl0 gnd memory_cell
 I9 bl0 wl1 pl1 gnd memory_cell
 I10 bl0 wl2 pl2 gnd memory_cell

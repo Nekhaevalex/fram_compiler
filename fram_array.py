@@ -407,6 +407,8 @@ class Array_Core:
 				xpos2[0] += self.X_step
 				xpos2[1] += self.X_step
  
+ 			#if (module.cell_name == "sense_amp"):
+ 			#	pass
 
 
 			''' example from bitline:
@@ -434,13 +436,29 @@ class Array_Core:
 
 		terminal_pos = find_iterator(module.netlist_device.pins, module.connect_with)
 
+		raw_pins = module.netlist_device.pins
+
+		connect_to_pin_n = None
+
+		for i in range(len(raw_pins)):
+			if raw_pins[i] == module.connect_with :
+				connect_to_pin_n = i		
+		if connect_to_pin_n == None:
+			print(f"ERROR in add_module_netlist(self, module): (pins)")
+
+
+
 		if (module.placement == "bottom") or (module.placement == "top") :
 			for i in range(0,self.Config.word_size):
+				new_pins = module.netlist_device.pins
+				new_pins[connect_to_pin_n] = f"{module.connect_to}{i}"
 				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
 			
 	
 		if ( module.placement == "left" ) or ( module.placement == "right" )  :
-			for i in range(0,self.Config.num_words):	
+			for i in range(0,self.Config.num_words):
+				new_pins = module.netlist_device.pins
+				new_pins[connect_to_pin_n] = f"{module.connect_to}{i}"	
 				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
 
 	
