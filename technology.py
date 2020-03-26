@@ -27,6 +27,7 @@ class Technology:
 	layers["M2_pin"] = (132 ,0)
 	layers["M3_pin"] = (133 ,0)
 	layers["M4_pin"] = (134 ,0)
+	layers["prBnd"] =  (108,0)
 
 
 

@@ -165,8 +165,9 @@ class Array_Core:
 		self.cells = cells
 		self.memory_cell = self.find_cell_in_cells("memory_cell",self.cells)
 		self.fram_netlist = netlist
+		self.layer_map = self.layout.layer_dict
 		#self.memory_cell = Bitline.memory_cell
-		self.X_step = self.define_X_step(cells)
+		self.X_step = self.define_X_step(cells,self.layer_map["prBnd"])
 		#self.Y_step = self.define_Y_step(cells)
 		self.Y_step = self.memory_cell.height
 
@@ -191,11 +192,14 @@ class Array_Core:
 			if (Cell.cell_name == self.Config.sense_amp_name):
 				self.sense_amp = cell
 
-	def define_X_step(self,modules):
+	def define_X_step(self,modules,layer = None):
 		dx = []
 		for module in modules:
 			for cell in module.cells:
-				boundary = module.find_cell_boundary(cell)
+				if (layer == None):
+					boundary = module.find_cell_boundary(cell)
+				else:
+					boundary = module.find_cell_boundary(cell,layer)
 				dx.append(boundary.width())
 				self.Config.debug_message(4,f'dx size of cell {cell.name} is {boundary.width()}')
 		X_step = max(dx)

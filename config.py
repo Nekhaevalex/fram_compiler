@@ -13,9 +13,9 @@ class Config:
 	debug_level = 4	# 1 for debug, 0 for no printout
 
 	#Horizontal size
-	word_size = 8
+	word_size = 4
 	#Vertical size
-	num_words = 8
+	num_words = 4
 
 	# Ferroelectric params
 
