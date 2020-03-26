@@ -20,8 +20,6 @@ report_summary -erc "report.sum" -replace;
 max_results -erc 1000;
 results_db -erc "/home/solovyanov_m/work_shell/lvs_terminal/import/results_db/.erc_errors.ascii" -ascii;
 keep_layers -none;
-schematic_format spi;
-schematic_path "/home/solovyanov_m/work_shell/lvs_terminal/import/fram_sample.sp";
 abort_on_layout_error yes;
 layout_format gdsii;
 layout_path "/home/solovyanov_m/work_shell/lvs_terminal/import/fram_sample.gds";
