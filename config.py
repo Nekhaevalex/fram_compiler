@@ -12,6 +12,8 @@ class Config:
 	# Place for your parameters here.
 	debug_level = 4	# 1 for debug, 0 for no printout
 
+	lvs = True
+
 	#Horizontal size
 	word_size = 2
 	#Vertical size

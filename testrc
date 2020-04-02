@@ -1,0 +1,9 @@
+
+
+echo "Hello from testrc"
+
+pwd=$(pwd)
+
+export LVS_DIR=$pwd/lvs
+
+cat $LVS_DIR/.bashrc
