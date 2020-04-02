@@ -1,41 +1,3 @@
-#--------------------------------------------------------------------------------------------------
-#  User's Guide
-#
-#  Copy this .bashrc environment setting file to the working (design project) directory, e.g.
-#  /home/johndoe/project1, /home/johndoe/project2, ...., etc.
-#
-#  On terminal, cd to the working directory and then source the .bashrc file by typing the
-#  following at the shell prompt $:
-#  . .bashrc
-#  Note:  a space is required between "." and ".bashrc" in the above command.
-#
-#  Now all the environment variables in .bashrc file have been loaded into the current shell
-#  terminal and commands can be issued at the shell prompt $ to launch various Cadence
-#  tools, for instance, "virtuoso &" (without the quotes).  Some frequently used commands are
-#  listed in this file together with corresponding environment settings.
-#
-#  You may finish the Cadence session at any time by closing the running Cadence tool.  To
-#  start up another Cadence session, just issue another Cadence command at the shell
-#  prompt $, e.g. "innovus &" (without the quotes), etc. To exit the entire Cadence
-#  environment, close the terminal.  By closing the terminal, all loaded Cadence and Calibre
-#  environment variables are terminated since all of these variables are loaded and
-#  contained in the terminated shell terminal.  The benefit of sourcing .bashrc to a local shell
-#  terminal instead of setting them in the $HOME/.bashrc is that all of the loaded Cadence &
-#  Calibre environment variables don't globally affect system environment settings and
-#  therefore you can run other programs on the system normally and won't disturb the
-#  Cadence session or vice versa.
-#
-#  If you're setting up a multiuser server, create a client copy of this .bashrc file and make
-#  necessary changes accordingly, e.g. point CDS_LIC_FILE to the server's license directory
-#  as port@hostname.  Instruct users to download it to the working directory on the client
-#  machine and source the client copy before starting up any Cadence tool.
-#--------------------------------------------------------------------------------------------------
-
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# For proper distributed processing execution using Cadence PVS software, it requires
-# that the following is set as the first line in .bashrc
-# Note: the space between the ! and $prompt is required!
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 if (! $prompt); then
   exit
 fi
@@ -45,8 +7,7 @@ fi
 #
 # Master IC CAD flow including schematic capture, simulation, layout, and verification.
 ##############################################################
-export CADHOME=/home/mik/cadence
-export AMSHOME=$CADHOME/IC617
+export CADHOME=/home/toolkit/cadence/installs
 
 # Requied for Cadence on Linux
 export LANG=C
@@ -98,7 +59,6 @@ export CDSROOT=$CDS
 # contains FEATURE lines only.  DO NOT START UP LICENSE SERVER DAEMON!!!
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 export CDS_LIC_FILE=$CADHOME/license/license.dat
-
 export CDS_LIC_ONLY=1
 
 # Support for 64-bit executables (this should be set for 64-bit hosts - IMPORTANT!!!)
@@ -158,15 +118,15 @@ export QRC_MOS_LW_PRECISION=Y
 #
 # These executables should be on the PATH after DFII executables
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-export ASSURAHOME=$CADHOME/ASSURA41
-export PATH=$PATH:$ASSURAHOME/tools/bin:$ASSURAHOME/tools/assura/bin
+#export ASSURAHOME=$CADHOME/ASSURA41
+#export PATH=$PATH:$ASSURAHOME/tools/bin:$ASSURAHOME/tools/assura/bin
 
 # Setting this variable enables Assura to work with PVS licenses only without
 # attempts to check-out Assura licenses first and thus speeds up execution.
-export ASSURA_USE_PVS_LICENSE=1
+#export ASSURA_USE_PVS_LICENSE=1
 
 # Set up foundry DFM PATH for Assura - CRNxxG/CRNxxLP process for current project
-export TSMC_ASU_DFM_PATH=$CADHOME/PDK/TSMC2/Assura/lvs_rcx/DFM
+export TSMC_ASU_DFM_PATH=/opt/PDKs/tsmc/CRNxxG/Assura/lvs_rcx/DFM
 #export TSMC_ASU_DFM_PATH=/opt/PDKs/tsmc/CRNxxLP/Assura/lvs_rcx/DFM
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -359,7 +319,7 @@ export PATH=$PATH:$CADHOME/MVS152/tools/bin
 # instead for production projects by including foundry PDKs in cds.lib
 # in the working directory.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#export CDK_DIR=/opt/PDKs/ncsu-cdk-1.6.0.beta
+export CDK_DIR=/opt/PDKs/ncsu-cdk-1.6.0.beta
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Mentor Graphics Calibre
@@ -372,7 +332,7 @@ export PATH=$PATH:$CADHOME/MVS152/tools/bin
 # .cdsinit in the working directory should be modified for Calibre to
 # be integrated into Virtuoso menu bar.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-export MGC_HOME=/home/mik/mentor
+export MGC_HOME=/opt/mentor
 export CALIBRE_HOME=$MGC_HOME/Calibre2015/aoi_cal_2015.2_36.27
 export MGLS_LICENSE_FILE=$MGC_HOME/license/license.dat
 export PATH=$PATH:$CALIBRE_HOME/bin
@@ -387,10 +347,10 @@ export MGC_LIB_PATH=$CALIBRE_HOME/lib
 #***********************************************************************
 # Enable Calibre RealTime with Cadence Virtuoso
 #***********************************************************************
-export MGC_CALIBRE_REALTIME_VIRTUOSO_ENABLED=1
-export OA_PLUGIN_PATH=$CALIBRE_HOME/shared/pkgs/icv/tools/queryskl
-export LD_LIBRARY_PATH=$CALIBRE_HOME/shared/pkgs/icv/tools/calibre_client/lib/64:${LD_LIBRARY_PATH}
-export MGC_CALIBRE_REALTIME_VIRTUOSO_SAVE_MESSENGER_CELL=1
+#export MGC_CALIBRE_REALTIME_VIRTUOSO_ENABLED=1
+#export OA_PLUGIN_PATH=$CALIBRE_HOME/shared/pkgs/icv/tools/queryskl
+#export LD_LIBRARY_PATH=$CALIBRE_HOME/shared/pkgs/icv/tools/calibre_client/lib/64:${LD_LIBRARY_PATH}
+#export MGC_CALIBRE_REALTIME_VIRTUOSO_SAVE_MESSENGER_CELL=1
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # This variable enables Calibre Interactive to save all GUI settings including default
@@ -402,13 +362,13 @@ export MGC_CALIBRE_SAVE_ALL_RUNSET_VALUES=1
 # Set up socket connection with Virtuoso schematic or layout viewer (using default ports
 # 9199 for schematic and 9189 for layout) in the form of host:port
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-export MGC_CALIBRE_SCHEMATIC_SERVER=mik.home:9199
-export MGC_CALIBRE_LAYOUT_SERVER=mik.home:9189
+export MGC_CALIBRE_SCHEMATIC_SERVER=ThinkPad-T510:9199
+export MGC_CALIBRE_LAYOUT_SERVER=ThinkPad-T510:9189
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Set up foundry DFM PATH for Calibre - CRNxxG/CRNxxLP process for current project
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-export TSMC_CAL_DFM_PATH=/home/mik/cadence/prg/compiler/Calibre/lvs/DFM
+export TSMC_CAL_DFM_PATH=/opt/PDKs/tsmc/CRNxxG/Calibre/lvs/DFM
 #export TSMC_CAL_DFM_PATH=/opt/PDKs/tsmc/CRNxxLP/Calibre/lvs/DFM
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -425,26 +385,11 @@ export TSMC_CAL_DFM_PATH=/home/mik/cadence/prg/compiler/Calibre/lvs/DFM
 #***********************************************************************
 export MGC_PDF_READER=evince
 
-# PDK
-
-# PDK TSMC
-
-export TSMC_HOME=$CADHOME/PDK/TSMC2
 
 
-# PyCell for PDK
+export DKHCMOS10LP=/home/dk/Mikron/HCMOS10_LP/PDK_v1.0_oa
+export DKITROOT=/home/dk/Mikron/HCMOS10_LP/PDK_v1.0_oa
 
-
-#export CNI_ROOT=$TSMC_HOME/PycellStudio/lnx_64
-#export PATH=$PATH:$CNI_ROOT/bin
-
-
-export PYTHONPATH=$PYTHONPATH:/home/mik/cadence/gdsmill/
-
-#PDK MICRON
-
-#export DKHCMOS10LP=/home/mik/Documents/PDK/PDK_v1.0_oa
-#source $DKHCMOS10LP/env/setup.bash
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Command on terminal to launch Cadence Virtuoso tools
@@ -454,3 +399,5 @@ export PYTHONPATH=$PYTHONPATH:/home/mik/cadence/gdsmill/
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #virtuoso &
 
+#PS1="cad_shell > \W$ "
+#export PS1;
