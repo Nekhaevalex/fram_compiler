@@ -122,7 +122,7 @@ class Netlist_Device():
 	def place_inst(self, n ,terminals ):
 		""" Place an instance of device in format ( 
 		mossfet.place_device([("d","net1"),("g","net2"),("s","net3"),("b",gnd)],[(L = 0.27),(W = 1)]]))"""
-		src = f"I{n}"
+		src = f"X{n}"
 		for terminal in terminals:
 			src = f"{src} {terminal}"
 		src = f"{src} {self.name}"
@@ -156,7 +156,7 @@ class Curcuit():
 	def place_inst(self, n ,terminals ):
 		""" Place an instance of device in format ( 
 		mossfet.place_device([("d","net1"),("g","net2"),("s","net3"),("b",gnd)],[(L = 0.27),(W = 1)]]))"""
-		src = f"I{n}"
+		src = f"X{n}"
 		for terminal in terminals:
 			src = f"{src} {terminal}"
 		src = f"{src} {self.name}"
