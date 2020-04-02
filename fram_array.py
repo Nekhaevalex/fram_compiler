@@ -6,6 +6,7 @@ import random
 import time
 from utils import *
 from cells import *
+from lvs import *
 
 from layout import My_Layout
 from config import Config
@@ -42,6 +43,9 @@ class Fram():
 		self.fram_netlist.write_netlist()
 		self.gds_output() # Make output of gds
 		self.sp_output()
+
+
+		self.lvs = LVS(self.Config)
 
 	def read_memory_cell(self):
 		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name) , self.Config , is_basic_cell = True)

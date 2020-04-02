@@ -59,6 +59,10 @@ def read_cell_from_gds(self,name):
 
 print("=====")
 
+
+os.system("uname -a")
+
+
 #print(layout.layer_dict["M1"])
 '''
 print("    NW: ")
