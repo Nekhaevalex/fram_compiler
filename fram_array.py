@@ -78,7 +78,7 @@ class Fram():
 		top_driver = Side_Module(cells,self.Config, cell_name = name , placement = "top", connect_to = "bl", connect_with = "out" )
 		self.core_cells.append(top_driver)
 		return top_driver
-
+create_core_gds
 	def create_array_core(self,cells):
 		self.array_core = Array_Core( self.fram_layout, self.fram_netlist , cells ,  self.Config)
 		self.fram_netlist = self.array_core.fram_netlist
@@ -146,6 +146,7 @@ class Array_Core:
 		self.create_netlist()
 
 		for module in self.modules:
+			self.Config.debug_message(4,f"Add side module {module.cell_name}")
 			self.add_side_module(module)
 
 
@@ -174,7 +175,7 @@ class Array_Core:
 		dy = []
 		for module in modules:
 			for cell in module.cells:
-				boundary = module.find_cell_boundary(cell)
+				boundary = module.find_cell_boundary(cell)	
 				dy.append(boundary.width())
 		Y_step = max(dy)
 		return Y_step

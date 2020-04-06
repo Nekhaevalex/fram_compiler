@@ -13,7 +13,7 @@ class Config:
 	debug_level = 5	# 1 for debug, 0 for no printout
 	lvs = False
 	#Horizontal size
-	word_size = 64
+	word_size = 4
 	#Vertical size
 	num_words = 4
 
