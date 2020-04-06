@@ -11,9 +11,7 @@ class Config:
 	
 	# Place for your parameters here.
 	debug_level = 4	# 1 for debug, 0 for no printout
-
-	lvs = True
-
+	lvs = False
 	#Horizontal size
 	word_size = 2
 	#Vertical size
@@ -25,7 +23,6 @@ class Config:
 
 
 	pdf_output = False # Nor working yet
-
 
 	output_name = "fram_sample"
 
@@ -91,6 +88,3 @@ class Config:
 	def warning(self,frameinfo):
 		#frameinfo = getframeinfo(currentframe())
 		print(f'This warning rised at file: "{frameinfo.filename}", on line: {frameinfo.lineno}.\nGood luck finding it.\n ===============')
-
-
-		
