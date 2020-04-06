@@ -106,9 +106,10 @@ class Side_Module():
 	connect_to = 'bl'
 	connect_with = 'in'
 	"""docstring for ClassName"""
-	def __init__(self,cells,Config):
+	def __init__(self,cells , Config, cell_name = "sense_amp" , placement = "bottom", connect_to = "bl", connect_with = "in" ):
 		self.Config = Config
 		self.cells = cells
+		self.cells_in_cell = len(cells)
 		self.boundary_box = ()
 		self.netlist_device = Netlist_Device(self.cell_name,self.Config)
 		Config.debug_message(2, f"Created Sense_Amp , with start cell {cells[0].name}")
