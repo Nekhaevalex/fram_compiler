@@ -37,7 +37,6 @@ class Fram():
 		#self.sense_amp = Sense_Amp(sense_amp_cells,Config)
 		self.sense_amp = self.read_sense_amp_cell()
 
-		self.create_bitline(self.memory_cell , self.Config) # Create bitline class
 		self.create_array_core( [self.memory_cell , self.sense_amp ] ) # Create array of bitlines
 
 		self.fram_netlist.write_netlist()
@@ -62,9 +61,6 @@ class Fram():
 		sense_amp = Side_Module(sense_amp_cells,self.Config)
 		return sense_amp
 
-	def create_bitline(self, Memory_Cell , Config ):
-		self.bitline = Bitline( self.fram_layout, self.fram_netlist ,  Memory_Cell , Config )
-		self.fram_netlist = self.bitline.fram_netlist
 
 	def create_array_core(self,cells):
 		self.array_core = Array_Core( self.fram_layout, self.fram_netlist , cells ,  self.Config)
@@ -87,76 +83,6 @@ class Fram():
 	def write_netlist(self):
 		self.fram_netlist.write_netlist()
 
-class Bitline:
-	"""Vertical memory  cells array module"""
-	cell_name = "bitline"
-
-
-	# self.fram_layout, self.fram_netlist ,  Memory_Cell , Config 
-	def __init__(self , layout, netlist , Memory_Cell ,Config):
-		self.Config =Config
-		self.fram_netlist = netlist
-		self.bitline_cell = Module(layout.create_cell(self.cell_name),Config)
-		self.memory_cell = Memory_Cell
-		self.Y_step = Memory_Cell.height
-		self.layout = layout
-		self.layer_map = layout.layer_dict
-		self.init_netlist()
-		self.create_gds()
-
-	def create_gds(self):
-		xpos = 0
-
-		ypos = 0
-
-		for i in range(0,self.Config.num_words):
-			t = pya.Trans(xpos,ypos)
-			self.memory_cell.place(self.bitline_cell.cell, t)
-			#ypos += Memory_Cell.height
-			#text = pya.Text(f"here is the connection# {i}", xpos , ypos)
-			ypos += self.Y_step
-
-			#self.bitline_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
-		self.y_offset = ypos
-		self.bitline_routing()
-		#self.pl_routing()
-
-
-	def init_netlist(self):
-		self.fram_netlist.add_device(self.memory_cell.netlist_device)
-
-
-	def create_netlist(self , bl_n):
-		bitline_out_terminals = [f"bl{bl_n}"]
-		for i in range(0,self.Config.num_words):
-			bitline_out_terminals.append(f"wl{i}")
-			bitline_out_terminals.append(f"pl{i}")
-		bitline_out_terminals.append("gnd")
-		bitline_netlist = Curcuit(self.cell_name , self.Config , bitline_out_terminals, self.memory_cell.netlist_device)
-		bl_net=f"bl{bl_n}"
-		wl_nets = []
-		pl_nets = []
-		for i in range(0,self.Config.num_words):
-			bl_nets.append("wl"+str(i))
-			pl_nets.append("pl"+str(i))
-			self.fram_netlist.add_inst(self.Memory_Cell.netlist_device , [bl_net, wl_nets[i] , pl_nets[i] ,"gnd"])
-
-	def add_bitline_instance(self,t):
-		self.bitline_cell.place(t)
-
-	def bitline_routing(self):
-		self.bitline_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
-
-		xpos = self.bitline_pinmap["bl"].text.x 
-		ypos = self.bitline_pinmap["bl"].text.y
-		self.line_coords = ((xpos,ypos) , (xpos, self.y_offset) )
-		simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
-
-
-
-
-	def create_subskct():
-		pass
 
 
 class Array_Core:

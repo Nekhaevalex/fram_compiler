@@ -1,10 +1,4 @@
 * Declare basic devices
-* Memory cell subcuircuit
-.SUBCKT memory_cell bl wl pl gnd
-MM0 net6 wn bl gnd nsvt25 w=0.4 l=0.28
-X0 pl net6 conder Ec=1.9 dT=1e-09 l=5e-07 w=5e-07 p00=0.25
-.ENDS memory_cell
-
 * sense_amp subcuircuit
 .SUBCKT sense_amp in ref seb nb nt vdd gnd
 M3 nb seb gnd gnd nsvt25 w=0.4 l=0.28
