@@ -92,7 +92,7 @@ class Module:
 
 
 class Memory_Cell(Module):
-	pass
+	cell_name = "memory_cell"
 
 
 

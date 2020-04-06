@@ -10,12 +10,12 @@ from inspect import currentframe, getframeinfo
 class Config:
 	
 	# Place for your parameters here.
-	debug_level = 4	# 1 for debug, 0 for no printout
+	debug_level = 5	# 1 for debug, 0 for no printout
 	lvs = False
 	#Horizontal size
-	word_size = 2
+	word_size = 64
 	#Vertical size
-	num_words = 2
+	num_words = 4
 
 	# Ferroelectric params
 
@@ -48,6 +48,8 @@ class Config:
 	top_driver_vdd_name = "driver_vdd"
 	top_driver_gnd_name = "driver_gnd"
 
+
+
 	boundary_layer = "None" #Main boundary layer used to find boundary of cells. If left "None" boundary determins automatically
 
 
@@ -67,6 +69,10 @@ class Config:
 	marker_as_text = False
 	marker_as_point = True
 
+
+	cells_list = ["memory_cell","sense_amp","top_driver"]
+
+	top_driver = ( top_driver_vdd_name , top_driver_gnd_name )
 
 	def __init__(self):
 		pass

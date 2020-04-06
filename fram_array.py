@@ -20,6 +20,7 @@ import technology
 
 
 class Fram():
+	core_cells = []
 	"""Main class contain layout (My_Layout) and netlist (Netlist) objcts. Fram itself 
 	consists of modules, module is a layout_cell and netlist curciut representation and 
 	it's methods"""
@@ -36,8 +37,9 @@ class Fram():
 		self.memory_cell = self.read_memory_cell()
 		#self.sense_amp = Sense_Amp(sense_amp_cells,Config)
 		self.sense_amp = self.read_sense_amp_cell()
-
-		self.create_array_core( [self.memory_cell , self.sense_amp ] ) # Create array of bitlines
+		self.top_driver = self.read_top_driver()
+		self.Config.debug_message(3,f'All cells ready.. Creating core.')
+		self.create_array_core(self.core_cells) # Create array of bitlines
 
 		self.fram_netlist.write_netlist()
 		self.gds_output() # Make output of gds
@@ -48,6 +50,7 @@ class Fram():
 
 	def read_memory_cell(self):
 		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name) , self.Config , is_basic_cell = True)
+		self.core_cells.append(memory_cell)
 		return memory_cell
 
 	def create_layout(self):
@@ -59,8 +62,22 @@ class Fram():
 		sense_name_2 = self.Config.sense_amp_vdd_name
 		sense_amp_cells = ( self.fram_layout.read_cell_from_gds(sense_name_1) , self.fram_layout.read_cell_from_gds(sense_name_2) )
 		sense_amp = Side_Module(sense_amp_cells,self.Config)
+		self.core_cells.append(sense_amp)
 		return sense_amp
 
+	def read_module_gds(self,names):
+		cells = []
+		for name in names:
+			cells.append(self.fram_layout.read_cell_from_gds(name))
+		return cells
+
+	def read_top_driver(self):
+
+		name = "top_driver"
+		cells = self.read_module_gds(self.Config.top_driver)
+		top_driver = Side_Module(cells,self.Config, cell_name = name , placement = "top", connect_to = "bl", connect_with = "out" )
+		self.core_cells.append(top_driver)
+		return top_driver
 
 	def create_array_core(self,cells):
 		self.array_core = Array_Core( self.fram_layout, self.fram_netlist , cells ,  self.Config)
@@ -76,6 +93,7 @@ class Fram():
 
 	def sp_output(self):
 		self.fram_netlist.write_netlist()
+
 
 	def init_netlist(self):
 		self.fram_netlist = Fram_Netlist(self.Config)
@@ -93,7 +111,19 @@ class Array_Core:
 		self.layout = layout
 		self.Config = Config
 		self.cells = cells
+
+
+		''' FIX THIS SHIT! '''
+
 		self.memory_cell = self.find_cell_in_cells("memory_cell",self.cells)
+		#self.sense_amp = self.find_cell_in_cells("sense_amp",self.cells)
+		'''   !!!!!!!!!    '''
+		self.modules = []
+		for module in cells:
+			if module.cell_name != "memory_cell":
+				self.modules.append(module)
+
+
 		self.fram_netlist = netlist
 		self.layer_map = self.layout.layer_dict
 		#self.memory_cell = Bitline.memory_cell
@@ -107,13 +137,17 @@ class Array_Core:
 		#self.memory_cell = Bitline.memory_cell
 		self.layer_map = self.layout.layer_dict
 
-		self.sense_amp = self.find_cell_in_cells("sense_amp",cells)
+		
 		
 
 		#self.X_step = self.memory_cell.width
 		
 		self.create_core_gds()
 		self.create_netlist()
+
+		for module in self.modules:
+			self.add_side_module(module)
+
 
 	def find_cells(self, cells):
 		for cell in cells:
@@ -157,7 +191,7 @@ class Array_Core:
 			self.Config.debug_message(-1,f'===== WARNING! =====\n Fail to find a cell with name {name}.')
 			self.Config.warning(getframeinfo(currentframe()))
 
-	def create_core_gds(self,):
+	def create_core_gds(self):
 		self.init_markers()
 		self.create_bitline_gds()
 
@@ -178,7 +212,6 @@ class Array_Core:
 		self.core_line_routing("gnd","M2","x")
 
 		self.Config.debug_message(0,f'Created core (only memory cells) with coordinates as box (0,0) to ({self.x_offset},{self.y_offset})')
-		self.add_side_module(self.sense_amp)
 
 	def create_bitline_gds(self):
 		xpos = 0
@@ -249,6 +282,7 @@ class Array_Core:
 		self.create_bitline_netlist()
 		for i in range(self.Config.word_size):
 			self.add_bitline_netlist(i)
+		self.Config.debug_message(2,f"Created netlist!\n")
 		
 	def create_bitline_netlist(self):
 		bitline_out_terminals = [f"bl"]
@@ -426,7 +460,7 @@ class Array_Core:
 		xpos = coords[0][0]
 		ypos = coords[0][1]
 		for i in range(0, self.Config.word_size):
-			if ( self.Config.marker_as_text ):
+			if (self.Config.marker_as_text):
 				text = pya.Text(f"begin_of_{name}{i}", xpos , ypos)
 				#print(f'x = {xpos} , y = {ypos}') #Debug
 				self.array_core_cell.cell.shapes(self.layer_map["M1_pin"]).insert(text)
