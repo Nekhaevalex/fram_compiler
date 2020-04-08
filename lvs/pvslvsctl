@@ -1,0 +1,29 @@
+ 
+			text_depth -primary;
+			virtual_connect -colon no;
+			virtual_connect -semicolon_as_colon yes;
+			virtual_connect -noname;
+			virtual_connect -report no;
+			virtual_connect -depth -primary;
+			lvs_ignore_ports no;
+			lvs_compare_port_names no;
+			lvs_recognize_gates -all;
+			lvs_break_ambig_max 32;
+			lvs_abort -softchk no;
+			lvs_abort -supply_error no;
+			lvs_find_shorts no;
+			sconnect_upper_shape_count no;
+			lvs_report_file "/home/miksolo/work/nvram-gen/lvs/report.rep";
+			lvs_report_max 50 -mismatched_net_limit 100;
+			lvs_run_erc_checks yes;
+			lvs_report_opt -none;
+			report_summary -erc "/home/miksolo/work/nvram-gen/lvs/results/report.sum" -replace;
+			max_results -erc 1000;
+			results_db -erc "/home/miksolo/work/nvram-gen/lvs/results/.erc_errors.ascii" -ascii;
+			keep_layers -none;
+			abort_on_layout_error yes;
+			layout_format gdsii;
+			layout_path "./gds_files/fram_sample.gds";
+			schematic_format spice;
+			schematic_path "./netlists/fram_sample.sp";
+			

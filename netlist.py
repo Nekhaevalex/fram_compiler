@@ -19,7 +19,8 @@ class Fram_Netlist():
 		self.source = ""
 
 	def write_netlist(self):
-		with open(f'./netlists/{self.Config.output_name}.sp','w') as output:
+		path = f'./netlists/{self.Config.output_name}.sp'
+		with open(path ,'w') as output:
 			output.write("* Declare basic devices\n")
 			for device in self.devices:
 				output.write(device.init)
@@ -29,6 +30,7 @@ class Fram_Netlist():
 			output.write("* Declare instances\n")
 			for line in self.lines:
 				output.write(line)
+		self.Config.debug_message(0,f'Spice netlist output created in "{path}" !')
 
 	def init_sub(self, module ):
 		sub = Netlist_Device(self, module.cell_name , self.Config)
