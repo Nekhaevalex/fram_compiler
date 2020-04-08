@@ -45,8 +45,8 @@ class Config:
 
 	top_driver_name = "driver"
 
-	top_driver_vdd_name = "driver_vdd"
-	top_driver_gnd_name = "driver_gnd"
+	top_driver_vdd_name = "top_driver_vdd"
+	top_driver_gnd_name = "top_driver_gnd"
 
 	boundary_layer = "None" #Main boundary layer used to find boundary of cells. If left "None" boundary determins automatically
 
