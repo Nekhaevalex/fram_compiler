@@ -59,4 +59,11 @@ def find_iterator(list, obj):
 	if (iterator == None ):
 		print("No object found in list in  method find_iterator(list, obj).\nreturn None")
 	return iterator
+
+def view_gds(Config):
+	if Config.view_gds == True:
+		Config.debug_message(1,f"Opening klayout to check the result.")
+		os.system(f"klayout ./gds_files/{Config.output_name}.gds")
+
+	
 	

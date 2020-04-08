@@ -24,6 +24,8 @@ class Config:
 
 	pdf_output = False # Nor working yet
 
+	view_gds = False
+
 	output_name = "fram_sample"
 
 	#Files to look out. No extention needed. Generator will look for example:
@@ -54,6 +56,8 @@ class Config:
 
 
 	bl_width = 150
+
+	module_clearence = 1000 
 
 	# Width settings
 

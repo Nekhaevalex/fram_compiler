@@ -1,26 +1,28 @@
-import pya
+import pya #Klayout 
 import os
 import sys
 import datetime
 import random
 import time
-from utils import *
-from cells import *
-from lvs import *
+from utils import * # Тут хранятся полезные функции которые я иногда юзаю во всех функциях
+from cells import * # 
+from lvs import * # Запуск LVS сравнения топологии и нетлиста
 
-from layout import My_Layout
-from config import Config
-from netlist import *
-# Debug
+from layout import My_Layout # Модуль наследованный от klayout.layout с некоторыми полезными плюшками.
+from config import Config # Main Config are used by compiler through all of the functions.
+from netlist import * # My Netlist class
+
+#  For Debug
 from inspect import currentframe, getframeinfo
 
 
-import technology
+import technology #Тут храниться специфическая для технологии информация чтобы ее можно было корректировать не трогая код. Думаю это только дебаг фича и нужно придумать что то более классное.
 #import sys
 
 
 class Fram():
 	core_cells = []
+
 	"""Main class contain layout (My_Layout) and netlist (Netlist) objcts. Fram itself 
 	consists of modules, module is a layout_cell and netlist curciut representation and 
 	it's methods"""
@@ -105,11 +107,15 @@ class Fram():
 class Array_Core:
 	"""Multiplying bitlines class"""
 	cell_name = "core"
+	cells_placements = {}
 	coords = {} # temp coords dict for gds creation
 	def __init__(self, layout, 	netlist , cells , Config):
 		self.layout = layout
 		self.Config = Config
 		self.cells = cells
+		'''В начале ячеек нет, поэтому помечаю все позиции как вакантные.'''
+		for placement in ["top","bottom","left","right"]:
+			self.cells_placements[placement] = False
 
 
 		''' FIX THIS SHIT! '''
@@ -157,6 +163,8 @@ class Array_Core:
 				self.sense_amp = cell
 
 	def define_X_step(self,modules,layer = None):
+		'''Определяем сетку по оси Х, меньше которой нельзя размещать ячейки. Определяем путем перебора по всем прямоугольникам в слое layer.
+		Можно менять слой в зависимости от того какой слой специфицирован в качестве boundary, так же можно оставить пустым для просмотра по всей ячейке в целом.'''
 		dx = []
 		for module in modules:
 			for cell in module.cells:
@@ -171,6 +179,8 @@ class Array_Core:
 		return X_step
 				
 	def define_Y_step(self,modules):
+		'''Определяем сетку по оси Y, меньше которой нельзя размещать ячейки. Определяем путем перебора по всем прямоугольникам в слое layer.
+		Можно менять слой в зависимости от того какой слой специфицирован в качестве boundary, так же можно оставить пустым для просмотра по всей ячейке в целом.'''
 		dy = []
 		for module in modules:
 			for cell in module.cells:
@@ -192,6 +202,7 @@ class Array_Core:
 			self.Config.warning(getframeinfo(currentframe()))
 
 	def create_core_gds(self):
+		''' Отдельная функция для создания топологии ядра'''
 		self.init_markers()
 		self.create_bitline_gds()
 
@@ -331,12 +342,25 @@ class Array_Core:
 		''' Placement  of a module by pin coords '''
 		layer_pins = [ self.layer_map["M1_pin"] , self.layer_map["M2_pin"] ]
 		module.pin_map = module.find_pin_map(layer_pins)
+		print (f"placement of {module.cell_name} = {module.placement}")
 
-		if ( module.placement == "bottom" ):
+		# Проверяю на совпадения с такими же расположениями (чтобы предупредить если два разных модуля будут втыкаться один поверх другого.)
+
+		if (self.cells_placements[module.placement] == True):
+			self.Config.debug_message(-1,f'========== WARNING ========= \n \n ')
+			self.Config.debug_message(-1,f'''No placement repeat found for "{module.cell_name}" cell. Check that no other sells are placed With the same "module.placement". Parameter. Check output gds for errors.''')
+
+
+		if (module.placement == "top") or (module.placement == "bottom"):
+
+			if ( module.placement == "bottom" ):
+				ypos = - self.Config.module_clearence
+			if (module.placement == "top"):
+				ypos = self.y_offset + self.Config.module_clearence
 			n = 0
 			xpos1 = self.end_markers[module.connect_to][0].x - module.pin_map[0][module.connect_with].text.x
 			xpos2 = self.end_markers[module.connect_to][0].x - module.pin_map[1][module.connect_with].text.x
-			ypos = -2000
+			
 			y_shift = ypos
 			for i in  range(0, self.Config.word_size):
 				if (n == 0):
@@ -374,6 +398,10 @@ class Array_Core:
 				xpos1[1] += self.X_step
 				xpos2[0] += self.X_step
 				xpos2[1] += self.X_step
+
+			# Добавляю указаное положение в добавленные, чтобы если что не городить ячейку на ячейку.
+
+			self.cells_placements[module.placement] = True
  
  			#if (module.cell_name == "sense_amp"):
  			#	pass
@@ -387,8 +415,11 @@ class Array_Core:
 			self.bitline_coords = ((xpos,ypos) , (xpos, self.y_offset) )
 			simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
 			'''
+		
 		else:
 			self.Config.debug_message(-1,f'========== WARNING ========= \n ')
+			self.Config.debug_message(-1,f'''No placement found for "{module.cell_name}" cell. Check cell settings/ Placement should be a parameter (cell.placement) = ["top","bottom","left" etc].
+				Skipping "{module.cell_name}" module''')
 			self.Config.warning(getframeinfo(currentframe()))
 
 
@@ -479,6 +510,8 @@ start_time = time.perf_counter()
 
 config = Config()
 fram = Fram(config)
+
+view_gds(config)
 
 end_time = time.perf_counter()
 

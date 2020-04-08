@@ -109,6 +109,10 @@ class Side_Module():
 	def __init__(self,cells , Config, cell_name = "sense_amp" , placement = "bottom", connect_to = "bl", connect_with = "in" ):
 		self.Config = Config
 		self.cells = cells
+		self.cell_name = cell_name
+		self.placement = placement
+		self.connect_to = connect_to
+		self.connect_with = connect_with
 		self.cells_in_cell = len(cells)
 		self.boundary_box = ()
 		self.netlist_device = Netlist_Device(self.cell_name,self.Config)
