@@ -72,13 +72,12 @@ class Fram():
 		return cells
 
 	def read_top_driver(self):
-
 		name = "top_driver"
 		cells = self.read_module_gds(self.Config.top_driver)
 		top_driver = Side_Module(cells,self.Config, cell_name = name , placement = "top", connect_to = "bl", connect_with = "out" )
 		self.core_cells.append(top_driver)
 		return top_driver
-create_core_gds
+
 	def create_array_core(self,cells):
 		self.array_core = Array_Core( self.fram_layout, self.fram_netlist , cells ,  self.Config)
 		self.fram_netlist = self.array_core.fram_netlist

@@ -149,4 +149,13 @@ class Side_Module():
 		target.insert(istance)
 
 
+class decoder:
+	"""docstring for decoders"""
+	def __init__(self, Config):
+		self.Config = Config
+
+		
+		
+
+
 
