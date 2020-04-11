@@ -99,13 +99,15 @@ class Memory_Cell(Module):
 
 
 class Side_Module():
+	''' Любые боковые боковые модули кроме декодеров (усилители чтения, драйверы) пока размещаются по одному 
+	с каждой стороны. Так же на данный момент по умолчанию размещаются зеркальные копии для экономии места.
+	Netlist содержиться отельно как переменная класса Netlist_Device (файл netlist.py) '''
 	cell_name = "sense_amp"
 	cells_in_cell = 2
 	placement = "bottom"
 	pin_map = ({},{})
 	connect_to = 'bl'
 	connect_with = 'in'
-	"""docstring for ClassName"""
 	def __init__(self,cells , Config, cell_name = "sense_amp" , placement = "bottom", connect_to = "bl", connect_with = "in" ):
 		self.Config = Config
 		self.cells = cells
@@ -153,10 +155,28 @@ class Side_Module():
 		target.insert(istance)
 
 
-class decoder:
+
+class Mosfet(object):
+	"""docstring for ClassName"""
+	def __init__(self, arg):
+		super(ClassName, self).__init__()
+		self.arg = arg
+		
+
+
+
+
+class Decoder:
 	"""docstring for decoders"""
-	def __init__(self, Config):
+	def __init__(self, mosfets , Config):
 		self.Config = Config
+		self.mosfets = mosfets
+
+
+
+	def define_mosfets(self,mosfets):
+		''' Get mosfets modules to work with '''
+		pass
 
 		
 		
