@@ -171,12 +171,14 @@ class Decoder:
 	def __init__(self, mosfets , Config):
 		self.Config = Config
 		self.mosfets = mosfets
+		self.addr_n = find_pwr2(self.Config.num_words ,0)
 
 
 
 	def define_mosfets(self,mosfets):
 		''' Get mosfets modules to work with '''
-		pass
+		
+
 
 		
 		

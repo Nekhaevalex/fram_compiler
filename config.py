@@ -51,6 +51,9 @@ class Config:
 	top_driver_gnd_name = "top_driver_gnd"
 
 
+	nmos_name = "nsvt25"
+	pmos_name = "psvt25"
+
 
 	boundary_layer = "None" #Main boundary layer used to find boundary of cells. If left "None" boundary determins automatically
 
