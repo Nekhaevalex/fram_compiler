@@ -154,9 +154,16 @@ class Side_Module():
 
 
 class decoder:
+	pin_map = ({},{})
+	out_pin_map = {}
+	placement = "left"
+	connect_to = 'wl'
+	connect_with = 'W'
+	cells_in_cell = 2
 	"""docstring for decoders"""
 	def __init__(self, Config):
 		self.Config = Config
+
 
 		
 		

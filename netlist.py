@@ -20,6 +20,11 @@ class Fram_Netlist():
 
 	def write_netlist(self):
 		path = f'./netlists/{self.Config.output_name}.sp'
+		'''
+		print("-----------------")
+		for device in self.devices:
+			print(device.name)
+		'''
 		with open(path ,'w') as output:
 			output.write("* Declare basic devices\n")
 			for device in self.devices:
@@ -87,7 +92,7 @@ class Netlist_Device():
 				if ( (line[0] != "#") or  (line[0] != "*") or ( (line[0] != "/") and line[1] != "/" ) ):
 					words = line.split()
 					if ( len(words) > 0 ):
-						if ( words[0].upper() == ".SUBCKT") and (len(words)>0) :
+						if ( words[0].upper() == ".SUBCKT") and (len(words)>0) and words[1] == self.name :
 							i = 2
 							while (i < len(words)):
 								pins.append(words[i])
@@ -97,7 +102,6 @@ class Netlist_Device():
 			#print(f"Added netlist:\n {self.init}")
 			#print(f"\nwith pins:")
 			#print(pins)
-
 			self.pins = pins
 
 
