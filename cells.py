@@ -180,8 +180,6 @@ class Decoder:
 		self.mosfets = mosfets
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
 
-
-
 	def define_mosfets(self,mosfets):
 		''' Get mosfets modules to work with '''
 		pass
