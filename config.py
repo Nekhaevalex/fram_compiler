@@ -8,9 +8,11 @@ from inspect import currentframe, getframeinfo
 
 
 class Config:
-	
 	# Place for your parameters here.
+
 	debug_level = 5	# 1 for debug, 0 for no printout
+
+
 	lvs = False
 	#Horizontal size
 	word_size = 4
@@ -19,7 +21,7 @@ class Config:
 
 	# Ferroelectric params
 
-	p00 = 1e-14 # Polarization
+	p00 = 1e-14 # Polarization (not working yet)
 
 
 	pdf_output = False # Nor working yet
