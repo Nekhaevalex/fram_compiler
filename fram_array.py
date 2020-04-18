@@ -285,7 +285,6 @@ class Array_Core:
 		
 
 
-
 	def update_netlist(self , src):
 		self.fram_netlist = src.fram_netlist
 
