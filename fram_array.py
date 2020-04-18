@@ -43,7 +43,7 @@ class Fram():
 		self.Config.debug_message(3,f'All cells ready.. Creating core.')
 		self.create_array_core(self.core_cells) # Create array of bitlines
 
-		self.fram_netlist.write_netlist()
+		#self.fram_netlist.write_netlist()
 		self.gds_output() # Make output of gds
 		self.sp_output()
 
@@ -283,7 +283,6 @@ class Array_Core:
 		else: 
 			print("ERROR in orientation of {line_name}. Fix me")
 		
-
 
 
 	def update_netlist(self , src):

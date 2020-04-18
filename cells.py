@@ -155,6 +155,7 @@ class Side_Module():
 		target.insert(istance)
 
 
+<<<<<<< HEAD
 
 class Mosfet(object):
 	"""docstring for ClassName"""
@@ -167,6 +168,12 @@ class Mosfet(object):
 
 
 class Decoder:
+	pin_map = ({},{})
+	out_pin_map = {}
+	placement = "left"
+	connect_to = 'wl'
+	connect_with = 'W'
+	cells_in_cell = 2
 	"""docstring for decoders"""
 	def __init__(self, mosfets , Config):
 		self.Config = Config
@@ -177,7 +184,9 @@ class Decoder:
 
 	def define_mosfets(self,mosfets):
 		''' Get mosfets modules to work with '''
+		pass
 		
+
 
 
 		

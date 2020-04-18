@@ -8,9 +8,11 @@ from inspect import currentframe, getframeinfo
 
 
 class Config:
-	
 	# Place for your parameters here.
+
 	debug_level = 5	# 1 for debug, 0 for no printout
+
+
 	lvs = False
 	#Horizontal size
 	word_size = 4
@@ -19,7 +21,7 @@ class Config:
 
 	# Ferroelectric params
 
-	p00 = 1e-14 # Polarization
+	p00 = 1e-14 # Polarization (not working yet)
 
 
 	pdf_output = False # Nor working yet
@@ -80,6 +82,13 @@ class Config:
 	cells_list = ["memory_cell","sense_amp","top_driver"]
 
 	top_driver = ( top_driver_vdd_name , top_driver_gnd_name )
+
+
+	pre_decoder_vdd_name = "decoder_stage_vdd.gds"
+	pre_decoder_gnd_name = "decoder_stage_gnd.gds"
+	pre_decoder = ( pre_decoder_vdd_name , pre_decoder_gnd_name)
+
+
 
 	def __init__(self):
 		pass
