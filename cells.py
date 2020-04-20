@@ -74,7 +74,7 @@ class Module:
 
 	def find_dimensions(self, layer = None):
 		if (layer == None):
-			boundary = self.find_boundary()
+			boundary = self.find_boundary()n
 			dy = boundary.width()
 			dx = boundary.height()
 			return(dx,dy)
@@ -164,23 +164,77 @@ class Mosfet(object):
 
 
 
-
 class Decoder:
 	pin_map = ({},{})
 	out_pin_map = {}
 	placement = "left"
 	connect_to = 'wl'
-	connect_with = 'W'
+	connect_with = 'WL'
 	cells_in_cell = 2
+	cells = []
 	"""docstring for decoders"""
-	def __init__(self, mosfets , Config):
+	def __init__(self, mosfets, pre_decoder_cells , Config):
 		self.Config = Config
 		self.mosfets = mosfets
+		self.define_mosfets(mosfets)
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
+		self.pre_decoder_name = self.Config.pre_decoder_name
+
+
+
+	def y_size_check(self, y_size_array):
+		
+
+
 
 	def define_mosfets(self,mosfets):
 		''' Get mosfets modules to work with '''
-		pass
+		self.nmos == None
+		self.pmos == None
+		for mosfet in mosfets:
+			if mosfet.name == self.Config.nmos_name :
+				self.nmos = mosfet
+			elif mosfet.name == self.Config.pmos_name :
+				self.pmos = mosfet
+		if (self.nmos == None ) or (self.pmos == None ):
+
+			self.Config.warning(getframeinfo(currentframe()))
+			self.Config.debug_message(-1,"WRNG_MSG: No pmos or nmos defined in define_mosfets in decoder class.")
+
+
+	def find_cell_boundary(self, cell ,layer= None): #default layer is PR Bndry
+		k = 0
+		if (layer == None):
+			boundary = cell.bbox()
+		if (layer != None):
+			boundary = cell.bbox_per_layer(layer)
+		return boundary
+
+	def find_pin_map(self, layers): ## -------------- FIX!----------
+		'''create dictionary with text klayout.Text objects and its klayout.Point s'''
+		h = 0
+		pin_map = ({},{})
+		for cell in self.cells:
+			for layer in layers:
+				for i in cell.each_shape(layer):
+					if (i.is_text()):
+						pin_map[h][i.text_string] = i
+						#pin_map[i.text_string+'_layer'] 
+						#print(i.text) - text object
+						#print(i.text_string)# - text itself
+			h = h + 1
+		if (self.Config.debug_level > 2):
+			for this_map in pin_map:
+				print("Pins of map is:")
+				print_pins(this_map)
+		self.pin_map = pin_map
+		return pin_map
+
+
+	def place(self,target,t,mode = 0):
+		'''Add copy of this cell to {target} cell'''
+		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
+		target.insert(istance)
 		
 
 
