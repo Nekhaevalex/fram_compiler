@@ -155,8 +155,6 @@ class Side_Module():
 		target.insert(istance)
 
 
-<<<<<<< HEAD
-
 class Mosfet(object):
 	"""docstring for ClassName"""
 	def __init__(self, arg):

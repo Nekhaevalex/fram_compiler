@@ -113,14 +113,17 @@ class Array_Core:
 		self.layout = layout
 		self.Config = Config
 		self.cells = cells
+		self.fram_netlist = netlist
 		'''В начале ячеек нет, поэтому помечаю все позиции как вакантные.'''
 		for placement in ["top","bottom","left","right"]:
 			self.cells_placements[placement] = False
 
+		
 
 		''' FIX THIS SHIT! '''
 
 		self.memory_cell = self.find_cell_in_cells("memory_cell",self.cells)
+		self.fram_netlist.add_device(self.memory_cell.netlist_device)
 		#self.sense_amp = self.find_cell_in_cells("sense_amp",self.cells)
 		'''   !!!!!!!!!    '''
 		self.modules = []
@@ -129,7 +132,7 @@ class Array_Core:
 				self.modules.append(module)
 
 
-		self.fram_netlist = netlist
+		
 		self.layer_map = self.layout.layer_dict
 		#self.memory_cell = Bitline.memory_cell
 		self.X_step = self.define_X_step(cells,self.layer_map["prBnd"])
@@ -425,7 +428,7 @@ class Array_Core:
 	def add_extra_routing(self, module):
 		if (module.placement == "bottom"):
 			for i in range(0,self.Config.word_size):
-				pass
+				a
 
 
 	def add_module_netlist(self, module):
