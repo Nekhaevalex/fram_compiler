@@ -74,7 +74,7 @@ class Module:
 
 	def find_dimensions(self, layer = None):
 		if (layer == None):
-			boundary = self.find_boundary()n
+			boundary = self.find_boundary()
 			dy = boundary.width()
 			dx = boundary.height()
 			return(dx,dy)
@@ -120,6 +120,7 @@ class Side_Module():
 		self.netlist_device = Netlist_Device(self.cell_name,self.Config)
 		Config.debug_message(2, f"Created Sense_Amp , with start cell {cells[0].name}")
 
+
 	def find_cell_boundary(self, cell ,layer= None): #default layer is PR Bndry
 		k = 0
 		if (layer == None):
@@ -127,6 +128,7 @@ class Side_Module():
 		if (layer != None):
 			boundary = cell.bbox_per_layer(layer)
 		return boundary
+
 
 	def find_pin_map(self, layers): ## -------------- FIX!----------
 		'''create dictionary with text klayout.Text objects and its klayout.Point s'''
@@ -183,6 +185,7 @@ class Decoder:
 
 
 	def y_size_check(self, y_size_array):
+		pass
 		
 
 
