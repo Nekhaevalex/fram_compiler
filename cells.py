@@ -184,7 +184,7 @@ class Decoder:
 
 	def y_size_check(self, y_size_array):
 		
-
+		
 
 
 	def define_mosfets(self,mosfets):
