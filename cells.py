@@ -74,7 +74,7 @@ class Module:
 
 	def find_dimensions(self, layer = None):
 		if (layer == None):
-			boundary = self.find_boundary()n
+			boundary = self.find_boundary()
 			dy = boundary.width()
 			dx = boundary.height()
 			return(dx,dy)
@@ -120,6 +120,7 @@ class Side_Module():
 		self.netlist_device = Netlist_Device(self.cell_name,self.Config)
 		Config.debug_message(2, f"Created Sense_Amp , with start cell {cells[0].name}")
 
+
 	def find_cell_boundary(self, cell ,layer= None): #default layer is PR Bndry
 		k = 0
 		if (layer == None):
@@ -127,6 +128,7 @@ class Side_Module():
 		if (layer != None):
 			boundary = cell.bbox_per_layer(layer)
 		return boundary
+
 
 	def find_pin_map(self, layers): ## -------------- FIX!----------
 		'''create dictionary with text klayout.Text objects and its klayout.Point s'''
@@ -169,20 +171,30 @@ class Decoder:
 	out_pin_map = {}
 	placement = "left"
 	connect_to = 'wl'
-	connect_with = 'WL'
+	connect_with = ('WL0','WL1')
 	cells_in_cell = 2
 	cells = []
 	"""docstring for decoders"""
 	def __init__(self, mosfets, pre_decoder_cells , Config):
 		self.Config = Config
 		self.mosfets = mosfets
+		self.pre_decoder_cells = pre_decoder_cells
 		self.define_mosfets(mosfets)
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
-		self.pre_decoder_name = self.Config.pre_decoder_name
+		
+		self.cells_in_cell = len(cells)
+		
+		
 
+
+
+	def init_pre_decoder(self):
+		self.pre_decoder_name = self.Config.pre_decoder_name
+		self.Pre_Decoder = Pre_Decoder(self.pre_decoder_cells , self.Config)
 
 
 	def y_size_check(self, y_size_array):
+		pass
 		
 		
 
@@ -235,7 +247,22 @@ class Decoder:
 		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
 		target.insert(istance)
-		
+
+
+class Pre_Decoder(object):
+	"""docstring for ClassName"""
+	def __init__(self, pre_decoder_cells , Config):
+		self.Config = Config
+		self.name = self.Config.pre_decoder_name
+		self.netlist_device = Netlist_Device(self.pre_decoder_name,self.Config)
+		self.cells = pre_decoder_cells
+		self.cells_in_cell = len(self.cells)
+
+	def place(self,target,t,mode = 0):
+		'''Add copy of this cell to {target} cell'''
+		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
+		target.insert(istance)
+
 
 
 
