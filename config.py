@@ -90,6 +90,10 @@ class Config:
 
 
 
+
+	design_units = ["layout", "netlist"]
+
+
 	def __init__(self):
 		pass
 

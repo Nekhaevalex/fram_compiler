@@ -12,6 +12,9 @@ from layout import My_Layout # Модуль наследованный от klay
 from config import Config # Main Config are used by compiler through all of the functions.
 from netlist import * # My Netlist class
 
+
+from design import Design
+
 #  For Debug
 from inspect import currentframe, getframeinfo
 
@@ -30,8 +33,8 @@ class Fram():
 		'''Main magic happens here!'''
 		self.Config = Config
 		self.Config.debug_message(0,f"Starting generating of FRAM array which consists of {Config.num_words} x {Config.word_size} cells. Time is 'add_time'.")
-		self.create_layout()
-		self.init_netlist()
+		self.create_design(	self.create_layout() ,	self.init_netlist())
+		#self.design = (self.fram_layout , self.fram_netlist)
 		self.Config.debug_message(1,f'Starting to check modules source files')
 		check_os_content("gds_files")
 		check_os_content("netlists")
@@ -50,19 +53,29 @@ class Fram():
 
 		self.lvs = LVS(self.Config)
 
+
+
+
+
 	def read_memory_cell(self):
 		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name) , self.Config , is_basic_cell = True)
 		self.core_cells.append(memory_cell)
 		return memory_cell
 
+
+
 	def create_layout(self):
 		self.fram_layout = My_Layout(Config)
 		self.pins_layers = self.fram_layout.pins_layers
+		return self.fram_layout
+
+	def create_design(self,*args):
+		self.design = Design(self.Config, *args)
 
 	def read_sense_amp_cell(self):
 		sense_name_1 = self.Config.sense_amp_gnd_name
 		sense_name_2 = self.Config.sense_amp_vdd_name
-		sense_amp_cells = ( self.fram_layout.read_cell_from_gds(sense_name_1) , self.fram_layout.read_cell_from_gds(sense_name_2) )
+		sense_amp_cells = (self.fram_layout.read_cell_from_gds(sense_name_1) , self.fram_layout.read_cell_from_gds(sense_name_2) )
 		sense_amp = Side_Module(sense_amp_cells,self.Config)
 		self.core_cells.append(sense_amp)
 		return sense_amp
@@ -81,7 +94,8 @@ class Fram():
 		return top_driver
 
 	def create_array_core(self,cells):
-		self.array_core = Array_Core( self.fram_layout, self.fram_netlist , cells ,  self.Config)
+		self.array_core = Array_Core( self.design , cells ,  self.Config)
+		# TODO !! Fix design instead
 		self.fram_netlist = self.array_core.fram_netlist
 		self.core_offset = (self.array_core.x_offset,self.array_core.y_offset)
 		self.Config.debug_message(0,f'Created array of cells!')
@@ -98,6 +112,7 @@ class Fram():
 
 	def init_netlist(self):
 		self.fram_netlist = Fram_Netlist(self.Config)
+		return self.fram_netlist
 
 	def write_netlist(self):
 		self.fram_netlist.write_netlist()
@@ -109,11 +124,13 @@ class Array_Core:
 	cell_name = "core"
 	cells_placements = {}
 	coords = {} # temp coords dict for gds creation
-	def __init__(self, layout, 	netlist , cells , Config):
-		self.layout = layout
+	def __init__(self, design , cells , Config):
+		self.design = design
+		self.layout = self.design.dict_units["layout"]
+		self.fram_netlist = self.design.dict_units["netlist"]
 		self.Config = Config
 		self.cells = cells
-		self.fram_netlist = netlist
+		
 		'''В начале ячеек нет, поэтому помечаю все позиции как вакантные.'''
 		for placement in ["top","bottom","left","right"]:
 			self.cells_placements[placement] = False
@@ -140,8 +157,8 @@ class Array_Core:
 		self.Y_step = self.memory_cell.height
 
 		#self.bitline = Bitline
-		self.bitline_cell = Module(layout.create_cell("bitline"),Config)
-		self.array_core_cell = Module(layout.create_cell(self.cell_name) , Config)
+		self.bitline_cell = Module(self.layout.create_cell("bitline"),Config)
+		self.array_core_cell = Module(self.layout.create_cell(self.cell_name) , Config)
 		#self.memory_cell = Bitline.memory_cell
 		self.layer_map = self.layout.layer_dict
 
@@ -156,6 +173,9 @@ class Array_Core:
 		for module in self.modules:
 			self.Config.debug_message(4,f"Add side module {module.cell_name}")
 			self.add_side_module(module)
+
+		self.design.update_design(self.layout , self.fram_netlist)
+
 
 
 	def find_cells(self, cells):

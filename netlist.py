@@ -12,6 +12,7 @@ class Fram_Netlist():
 	devices = []
 	subs = []
 	lines = []
+	type_name = "netlist"
 	"""docstring for Fram_Netlist"""
 	def __init__(self, Config):
 		self.inst_n = 0

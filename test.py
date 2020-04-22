@@ -18,6 +18,28 @@ import utils
 
 
 
+class A:
+	"""docstring for A"""
+	def __init__(self, arg):
+		self.arg = arg
+		t = (self.arg , self)
+		b = B(t)
+		print(self.arg)
+
+	def function(self, t ):
+		pass
+
+class B:
+	"""docstring for B"""
+	def __init__(self, t):
+		self.t = t
+		print(t[1].arg)
+
+
+def F(*args):
+	print(args)
+		
+
 '''
 def print_pins(pin_map):
 	for keys,val in pin_map.items():
@@ -45,8 +67,11 @@ def read_cell_from_gds(self,name):
 		return pin_map
 '''
 
+A(5)
 
+t = (1,2,3,4,5)
 
+F(*t)
 
 
 

@@ -10,6 +10,7 @@ class My_Layout(pya.Layout):
 	in my design. '''
 	layer_dict = {} # name layer and layers are reserved as methods of klayout
 	dbu = 1
+	type_name = "layout"
 	def __init__(self,Config):
 		self.Config = Config
 		pya.Layout.__init__(self)

@@ -182,9 +182,11 @@ class Decoder:
 		self.define_mosfets(mosfets)
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
 		
+
 		self.cells_in_cell = len(cells)
 		
-		
+
+
 
 
 
