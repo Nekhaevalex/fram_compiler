@@ -167,6 +167,7 @@ class Mosfet(object):
 
 
 class Decoder:
+	"""docstring for decoders"""
 	pin_map = ({},{})
 	out_pin_map = {}
 	placement = "left"
@@ -174,7 +175,7 @@ class Decoder:
 	connect_with = ('WL0','WL1')
 	cells_in_cell = 2
 	cells = []
-	"""docstring for decoders"""
+	
 	def __init__(self, mosfets, pre_decoder_cells , Config):
 		self.Config = Config
 		self.mosfets = mosfets
@@ -186,7 +187,8 @@ class Decoder:
 		self.cells_in_cell = len(cells)
 		
 
-
+	def create_decoder_cells():
+		pass
 
 
 
