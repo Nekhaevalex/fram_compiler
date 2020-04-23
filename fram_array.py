@@ -482,7 +482,7 @@ class Array_Core:
 				new_pins[connect_to_pin_n] = f"{module.connect_to}{i}"	
 				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
 
-	
+
 	def init_markers(self):
 		self.end_markers = {}
 		self.begin_markers = {}
