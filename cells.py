@@ -14,7 +14,7 @@ class Module:
 	placement = "core"
 	cells_in_cell = 1
 	"""docstring for ClassName"""
-	def __init__(self, cell , Config, is_basic_cell = False): #+ netlist
+	def __init__(self, cell , Config, is_basic_cell = False , name = None): #+ netlist
 		self.Config = Config
 		self.cell = cell
 		self.cell_name = cell.name
@@ -101,7 +101,7 @@ class Memory_Cell(Module):
 class Side_Module():
 	''' Любые боковые боковые модули кроме декодеров (усилители чтения, драйверы) пока размещаются по одному 
 	с каждой стороны. Так же на данный момент по умолчанию размещаются зеркальные копии для экономии места.
-	Netlist содержиться отельно как переменная класса Netlist_Device (файл netlist.py) '''
+	Netlist содержиться отельно как переменная класса Netlist_Device (иницируется тут, но написан не тут) (файл netlist.py) '''
 	cell_name = "sense_amp"
 	cells_in_cell = 2
 	placement = "bottom"
@@ -182,17 +182,14 @@ class Decoder:
 		self.mosfets = mosfets
 		self.design = design
 		self.unpack_design()
-		self.pre_decoder_cells = self.import_predecoder_cells()
+		
+		self.import_mos_pair() # Import view of p-mos and n-mos merged cell to build a NAND - gate out of them.
 		self.define_mosfets(mosfets)
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
-		
-
 		self.cells_in_cell = len(cells)
 
 
 		''' User init code starts here '''
-
-
 
 
 		''' User init code ends here '''
@@ -210,16 +207,23 @@ class Decoder:
 		return cells
 
 
-
-
-
-
 	def init_pre_decoder(self):
+		self.pre_decoder_cells = self.import_predecoder_cells()
 		self.pre_decoder_name = self.Config.pre_decoder_name
-		self.Pre_Decoder = Pre_Decoder(self.pre_decoder_cells , self.Config)
+		self.Pre_Decoder = Pre_Decoder(self.pre_decoder_cells , self.Config) # Старый варик с отдельным классом, пошел в корзину
 
 	def y_size_check(self, y_size_array):
+		""" Если ты это читаешь: знай, я бы хотел бы сделать код и понятнее,
+		но к сожалению не уверен что его кто-то когда то будет читать (*((((
+		Так что уж лучше написать побыстрее!!!"""
 		pass
+
+	def import_mos_pair():
+		mos_pair_name = self.Config.mos_pair_name
+		mos_pair_cell = self.fram_layout.read_cell_from_gds(mos_pair_name)
+		#self.mos_pair_netlist = Netlist_Device(mos_pair_name,self.Config)
+		self.mos_pair = Module(mos_pair_cell, self.Config ,is_basic_cell = True )
+		self.fram_netlist.add(self.mos_pair.netlist_device)
 		
 	def define_mosfets(self,mosfets):
 		''' Get mosfets modules to work with '''
@@ -264,7 +268,6 @@ class Decoder:
 		self.pin_map = pin_map
 		return pin_map
 
-
 	def place(self,target,t,mode = 0):
 		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
@@ -286,12 +289,14 @@ class Decoder:
 		self.design = new_source.design
 		self.unpack_design()
 
+
+
 class Pre_Decoder:
 	"""Часть пре декодера с усилителями и двумя  NAND gates. Решил вынести в отлельный класс по соображениям компактности кода."""
 	def __init__(self, pre_decoder_cells , Config):
 		self.Config = Config
 		self.name = self.Config.pre_decoder_name
-		self.netlist_device = Netlist_Device(self.pre_decoder_name,self.Config)
+		self.netlist_device = Netlist_Device(self.pre_decoder_name , self.Config)
 		self.cells = pre_decoder_cells
 		self.cells_in_cell = len(self.cells)
 
