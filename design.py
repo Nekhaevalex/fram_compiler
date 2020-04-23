@@ -31,11 +31,23 @@ class Design():
 
 
 
-	def update_design(self,*args):
-		self.design_units = args
-		self.update_dict()
+	def update_design(self,*args, **kwargs):
+		""" Запихнуть измененные вьюшки обратно в дизайн. Порядок важен! """
+		if (args):
+			self.design_units = args
+			self.update_dict()
+		if (kwargs):
+			for word in kwargs :
+				self.dict_units[word] = kwargs[word]
+
 
 	def update_dict(self):
 		for i in range(self.array_lenth):
 			self.dict_units[self.key_words[i]] = self.design_units[i]
 			#Check if needed :: print(f"{self.design_units[i].type_name} is  {self.dict_units[self.key_words[i]]}")
+
+	def return_layout(self):
+		return self.dict_units["layout"]
+
+	def return_netlist(self):
+		return self.dict_units["netlist"]	

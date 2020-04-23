@@ -175,20 +175,24 @@ class Decoder:
 	cells_in_cell = 2
 	cells = []
 	"""docstring for decoders"""
-	def __init__(self, mosfets, pre_decoder_cells , Config):
+	def __init__(self, Config , design, pre_decoder_cells):
 		self.Config = Config
 		self.mosfets = mosfets
+		self.design = design
 		self.pre_decoder_cells = pre_decoder_cells
 		self.define_mosfets(mosfets)
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
 		
 
 		self.cells_in_cell = len(cells)
-		
+		self.fram_layout = 	self.design.return_layout()
+		self.fram_netlist = self.design.return_netlist()
+
+		''' User init code starts here '''
 
 
-
-
+		''' User init code ends here '''
+		self.design.update_dict("layout":self.fram_layout , "netlist" : self.fram_netlist )
 
 	def init_pre_decoder(self):
 		self.pre_decoder_name = self.Config.pre_decoder_name
