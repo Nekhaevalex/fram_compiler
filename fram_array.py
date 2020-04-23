@@ -126,9 +126,9 @@ class Array_Core:
 	coords = {} # temp coords dict for gds creation
 	def __init__(self, design , cells , Config):
 		self.design = design
-		self.layout = self.design.dict_units["layout"]
-		self.fram_netlist = self.design.dict_units["netlist"]
-		self.Config = Config
+		self.layout = self.design.return_layout()
+		self.fram_netlist = self.design.return_netlist()
+		self.Config = Configsudo
 		self.cells = cells
 		
 		'''В начале ячеек нет, поэтому помечаю все позиции как вакантные.'''
