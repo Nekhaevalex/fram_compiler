@@ -25,7 +25,6 @@ import technology #Тут храниться специфическая для �
 
 class Fram():
 	core_cells = []
-
 	"""Main class contain layout (My_Layout) and netlist (Netlist) objcts. Fram itself 
 	consists of modules, module is a layout_cell and netlist curciut representation and 
 	it's methods"""
@@ -53,16 +52,10 @@ class Fram():
 
 		self.lvs = LVS(self.Config)
 
-
-
-
-
 	def read_memory_cell(self):
 		memory_cell = Memory_Cell(self.fram_layout.read_cell_from_gds(self.Config.fram_bitcell_name) , self.Config , is_basic_cell = True)
 		self.core_cells.append(memory_cell)
 		return memory_cell
-
-
 
 	def create_layout(self):
 		self.fram_layout = My_Layout(Config)
@@ -96,8 +89,9 @@ class Fram():
 	def create_array_core(self,cells):
 		self.array_core = Array_Core( self.design , cells ,  self.Config)
 		# TODO !! Fix design instead
-		self.fram_netlist = self.array_core.fram_netlist
+		#self.fram_netlist = self.array_core.fram_netlist
 		self.core_offset = (self.array_core.x_offset,self.array_core.y_offset)
+		self.update_design_from(self.array_core)
 		self.Config.debug_message(0,f'Created array of cells!')
 
 	def gds_output(self):
@@ -108,7 +102,6 @@ class Fram():
 
 	def sp_output(self):
 		self.fram_netlist.write_netlist()
-
 
 	def init_netlist(self):
 		self.fram_netlist = Fram_Netlist(self.Config)
@@ -124,6 +117,10 @@ class Fram():
 		else:
 			self.fram_layout = design.return_layout()
 			self.fram_netlist = design.return_netlist()
+
+	def update_design_from(self, new_source):
+		self.design = new_source.design
+		self.unpack_design()
 
 class Array_Core:
 	"""Multiplying bitlines class"""
@@ -167,9 +164,6 @@ class Array_Core:
 		#self.memory_cell = Bitline.memory_cell
 		self.layer_map = self.layout.layer_dict
 
-		
-		
-
 		#self.X_step = self.memory_cell.width
 		
 		self.create_core_gds()
@@ -190,6 +184,9 @@ class Array_Core:
 			self.layout = design.return_layout()
 			self.fram_netlist = design.return_netlist()
 
+	def update_design_from(self, design_new):
+		self.design = design_new
+		self.unpack_design()
 
 	def find_cells(self, cells):
 		for cell in cells:
@@ -241,7 +238,6 @@ class Array_Core:
 		''' Отдельная функция для создания топологии ядра'''
 		self.init_markers()
 		self.create_bitline_gds()
-
 
 		xpos = 0
 
@@ -299,8 +295,6 @@ class Array_Core:
 		if (self.Config.debug_level > 1 ):
 			print(f'Complited routing of bitline with end point as ({xpos} , {ypos})')
 
-
-
 	def core_line_routing(self, line_name , layer , orient):
 		
 
@@ -343,8 +337,6 @@ class Array_Core:
 		self.bitline_netlist = Curcuit("bitline" , self.Config , bitline_out_terminals, self.memory_cell.netlist_device)
 		#self.fram_netlist.add_sub(bitline_netlist)
 		#self.bitline_netlist = bitline_netlist
-
-
 
 
 	def add_bitline_netlist(self, bl_n):
@@ -479,9 +471,7 @@ class Array_Core:
 		if connect_to_pin_n == None:
 			print(f"ERROR in add_module_netlist(self, module): (pins)")
 
-
-
-		if (module.placement == "bottom") or (module.placement == "top") :
+		if ( module.placement == "bottom" ) or ( module.placement == "top" ) :
 			for i in range(0,self.Config.word_size):
 				new_pins = module.netlist_device.pins
 				new_pins[connect_to_pin_n] = f"{module.connect_to}{i}"
@@ -495,11 +485,6 @@ class Array_Core:
 				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
 
 	
-
-
-
-
-
 	def init_markers(self):
 		self.end_markers = {}
 		self.begin_markers = {}
@@ -534,10 +519,6 @@ class Array_Core:
 		#self.bl_begin_markers = bl_begin_markers
 		#self.bl_end_markers = bl_end_markers
 
-
-
-
-		
 # ===================== CODE HERE! ============
 
 start_time = time.perf_counter()

@@ -176,12 +176,13 @@ class Decoder:
 	cells_in_cell = 2
 	cells = []
 
-	def __init__(self, Config , design, pre_decoder_cells):
+	def __init__(self, Config , design):
 
 		self.Config = Config
 		self.mosfets = mosfets
 		self.design = design
-		self.pre_decoder_cells = pre_decoder_cells
+		self.unpack_design()
+		self.pre_decoder_cells = self.import_predecoder_cells()
 		self.define_mosfets(mosfets)
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
 		
@@ -189,28 +190,29 @@ class Decoder:
 		self.cells_in_cell = len(cells)
 
 
-	def unpack_design(self, design = None):
-		if (design == None ):
-			self.fram_layout = 	self.design.return_layout()
-			self.fram_netlist = self.design.return_netlist()
-		else:
-			self.fram_layout = design.return_layout()
-			self.fram_netlist = design.return_netlist()
-			
-	def create_decoder_cells(self):
-		pass
-
-
-
 		''' User init code starts here '''
+
+
 
 
 		''' User init code ends here '''
 		self.update_design()
 
-	def update_design():
-		design_dict = {"layout" : self.fram_layout , "netlist" : self.fram_netlist }
-		self.design.update_dict(**design_dict)
+
+	def create_decoder_cells(self):
+		pass
+	def import_predecoder_cells(self):
+		#def read_module_gds(self,names):
+		names = self.Config.pre_decoder
+		cells = []
+		for name in names:
+			cells.append(self.fram_layout.read_cell_from_gds(name))
+		return cells
+
+
+
+
+
 
 	def init_pre_decoder(self):
 		self.pre_decoder_name = self.Config.pre_decoder_name
@@ -268,6 +270,21 @@ class Decoder:
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
 		target.insert(istance)
 
+	def unpack_design(self, design = None):
+		if (design == None ):
+			self.fram_layout = 	self.design.return_layout()
+			self.fram_netlist = self.design.return_netlist()
+		else:
+			self.fram_layout = design.return_layout()
+			self.fram_netlist = design.return_netlist()
+
+	def update_design():
+		design_dict = {"layout" : self.fram_layout , "netlist" : self.fram_netlist }
+		self.design.update_dict(**design_dict)
+
+	def update_design_from(self, new_source):
+		self.design = new_source.design
+		self.unpack_design()
 
 class Pre_Decoder:
 	"""Часть пре декодера с усилителями и двумя  NAND gates. Решил вынести в отлельный класс по соображениям компактности кода."""
