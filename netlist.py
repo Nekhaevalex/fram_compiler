@@ -36,6 +36,7 @@ class Fram_Netlist():
 			output.write("* Declare instances\n")
 			for line in self.lines:
 				output.write(line)
+			output.write(f"* End of netlist. Compiled by NCS Memory compiler.")
 		self.Config.debug_message(0,f'Spice netlist output created in "{path}" !')
 
 	def init_sub(self, module ):

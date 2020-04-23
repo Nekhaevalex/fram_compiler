@@ -188,31 +188,37 @@ class Decoder:
 
 		self.cells_in_cell = len(cells)
 
-		
 
-	def create_decoder_cells():
+	def unpack_design(self, design = None):
+		if (design == None ):
+			self.fram_layout = 	self.design.return_layout()
+			self.fram_netlist = self.design.return_netlist()
+		else:
+			self.fram_layout = design.return_layout()
+			self.fram_netlist = design.return_netlist()
+			
+	def create_decoder_cells(self):
 		pass
 
-		self.fram_layout = 	self.design.return_layout()
-		self.fram_netlist = self.design.return_netlist()
+
 
 		''' User init code starts here '''
 
 
 		''' User init code ends here '''
-		self.design.update_dict("layout":self.fram_layout , "netlist" : self.fram_netlist )
+		self.update_design()
+
+	def update_design():
+		design_dict = {"layout" : self.fram_layout , "netlist" : self.fram_netlist }
+		self.design.update_dict(**design_dict)
 
 	def init_pre_decoder(self):
 		self.pre_decoder_name = self.Config.pre_decoder_name
 		self.Pre_Decoder = Pre_Decoder(self.pre_decoder_cells , self.Config)
 
-
 	def y_size_check(self, y_size_array):
 		pass
 		
-		
-
-
 	def define_mosfets(self,mosfets):
 		''' Get mosfets modules to work with '''
 		self.nmos == None
@@ -263,8 +269,8 @@ class Decoder:
 		target.insert(istance)
 
 
-class Pre_Decoder(object):
-	"""docstring for ClassName"""
+class Pre_Decoder:
+	"""Часть пре декодера с усилителями и двумя  NAND gates. Решил вынести в отлельный класс по соображениям компактности кода."""
 	def __init__(self, pre_decoder_cells , Config):
 		self.Config = Config
 		self.name = self.Config.pre_decoder_name
@@ -276,12 +282,4 @@ class Pre_Decoder(object):
 		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
 		target.insert(istance)
-
-
-
-
-		
-		
-
-
 

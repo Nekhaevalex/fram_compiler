@@ -51,3 +51,4 @@ X20 bl0 in bl_gnd vdd gnd top_driver
 X21 bl1 in bl_gnd vdd gnd top_driver
 X22 bl2 in bl_gnd vdd gnd top_driver
 X23 bl3 in bl_gnd vdd gnd top_driver
+* End of netlist. Compiled by NCS Memory compiler.

@@ -117,7 +117,13 @@ class Fram():
 	def write_netlist(self):
 		self.fram_netlist.write_netlist()
 
-
+	def unpack_design(self, design = None):
+		if (design == None ):
+			self.fram_layout = 	self.design.return_layout()
+			self.fram_netlist = self.design.return_netlist()
+		else:
+			self.fram_layout = design.return_layout()
+			self.fram_netlist = design.return_netlist()
 
 class Array_Core:
 	"""Multiplying bitlines class"""
@@ -126,9 +132,8 @@ class Array_Core:
 	coords = {} # temp coords dict for gds creation
 	def __init__(self, design , cells , Config):
 		self.design = design
-		self.layout = self.design.return_layout()
-		self.fram_netlist = self.design.return_netlist()
-		self.Config = Configsudo
+		self.unpack_design()
+		self.Config = Config
 		self.cells = cells
 		
 		'''В начале ячеек нет, поэтому помечаю все позиции как вакантные.'''
@@ -177,6 +182,14 @@ class Array_Core:
 		self.design.update_design(self.layout , self.fram_netlist)
 
 
+	def unpack_design(self, design = None):
+		if (design == None ):
+			self.layout = 	self.design.return_layout()
+			self.fram_netlist = self.design.return_netlist()
+		else:
+			self.layout = design.return_layout()
+			self.fram_netlist = design.return_netlist()
+
 
 	def find_cells(self, cells):
 		for cell in cells:
@@ -185,7 +198,7 @@ class Array_Core:
 			if (Cell.cell_name == self.Config.sense_amp_name):
 				self.sense_amp = cell
 
-	def define_X_step(self,modules,layer = None):
+	def define_X_step(self , modules , layer = None):
 		'''Определяем сетку по оси Х, меньше которой нельзя размещать ячейки. Определяем путем перебора по всем прямоугольникам в слое layer.
 		Можно менять слой в зависимости от того какой слой специфицирован в качестве boundary, так же можно оставить пустым для просмотра по всей ячейке в целом.'''
 		dx = []
@@ -331,9 +344,8 @@ class Array_Core:
 		#self.fram_netlist.add_sub(bitline_netlist)
 		#self.bitline_netlist = bitline_netlist
 
-		
-		
-		
+
+
 
 	def add_bitline_netlist(self, bl_n):
 		#self.fram_netlist.add_inst(self.bitline_netlist, [])

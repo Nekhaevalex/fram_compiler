@@ -91,7 +91,7 @@ class Config:
 
 
 
-	design_units = ["layout", "netlist"]
+	design_views = ["layout", "netlist"]
 
 
 	def __init__(self):
