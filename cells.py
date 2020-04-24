@@ -276,6 +276,7 @@ class Decoder:
 		self.pin_map = pin_map
 		return pin_map
 
+
 	def place(self,target,t,mode = 0):
 		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
