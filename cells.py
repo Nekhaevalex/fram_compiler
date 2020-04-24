@@ -177,27 +177,37 @@ class Decoder:
 	cells = []
 
 	def __init__(self, Config , design):
-
 		self.Config = Config
 		self.mosfets = mosfets
 		self.design = design
 		self.unpack_design()
-		
 		self.import_mos_pair() # Import view of p-mos and n-mos merged cell to build a NAND - gate out of them.
 		self.define_mosfets(mosfets)
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
 		self.cells_in_cell = len(cells)
-
-
 		''' User init code starts here '''
+		self.init_pre_decoder()
+		self.create_decoder_cells()
+
 
 
 		''' User init code ends here '''
 		self.update_design()
 
 
+
+
 	def create_decoder_cells(self):
-		pass
+		self.vdd_cell = self.fram_layout.create_cell("decoder_vdd")
+		self.gnd_cell = self.fram_layout.create_cell("decoder_gnd")
+
+
+
+
+
+		self.cells.append(self.vdd_cell)
+		self.cells.append(self.gnd_cell)
+
 	def import_predecoder_cells(self):
 		#def read_module_gds(self,names):
 		names = self.Config.pre_decoder
@@ -205,7 +215,6 @@ class Decoder:
 		for name in names:
 			cells.append(self.fram_layout.read_cell_from_gds(name))
 		return cells
-
 
 	def init_pre_decoder(self):
 		self.pre_decoder_cells = self.import_predecoder_cells()
@@ -238,7 +247,6 @@ class Decoder:
 
 			self.Config.warning(getframeinfo(currentframe()))
 			self.Config.debug_message(-1,"WRNG_MSG: No pmos or nmos defined in define_mosfets in decoder class.")
-
 
 	def find_cell_boundary(self, cell ,layer= None): #default layer is PR Bndry
 		k = 0
@@ -290,18 +298,31 @@ class Decoder:
 		self.unpack_design()
 
 
-
 class Pre_Decoder:
+	vdd_strap = 0
+	gnd_strap = 1
 	"""Часть пре декодера с усилителями и двумя  NAND gates. Решил вынести в отлельный класс по соображениям компактности кода."""
 	def __init__(self, pre_decoder_cells , Config):
 		self.Config = Config
 		self.name = self.Config.pre_decoder_name
-		self.netlist_device = Netlist_Device(self.pre_decoder_name , self.Config)
+		self.netlist_device = Netlist_Device(self.name , self.Config)
 		self.cells = pre_decoder_cells
 		self.cells_in_cell = len(self.cells)
+
+	def get_strap_info(self):
+		if ( self.cells[0].name == f"{self.name}_vdd" ) and ( self.cells[1].name == f"{self.name}_gnd" ):
+			vdd_strap = 0
+			gnd_strap = 1
+		elif ( self.cells[1].name == f"{self.name}_vdd" ) and ( self.cells[0].name == f"{self.name}_gnd" ):
+			vdd_strap = 1
+			gnd_strap = 0
+		else:
+			self.Config.debug_message(-1," ===== > Could not get strap info! < =====\n")
+			self.Config.warning(getframeinfo(currentframe()))
 
 	def place(self,target,t,mode = 0):
 		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
 		target.insert(istance)
+
 
