@@ -183,7 +183,6 @@ class Decoder:
 		self.design = design
 		self.unpack_design()
 		self.pre_decoder_cells = self.import_predecoder_cells()
-		self.define_mosfets(mosfets)
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
 		
 
