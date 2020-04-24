@@ -171,12 +171,18 @@ class Array_Core:
 		self.create_core_gds()
 		self.create_netlist()
 
+
+
+		''' Adding side modules here! '''
 		for module in self.modules:
 			self.Config.debug_message(4,f"Add side module {module.cell_name}")
 			self.add_side_module(module)
 
+		''' Design update '''
 		self.design.update_design(self.layout , self.fram_netlist)
 
+		''' Now add decoders'''
+		self.add_decoders()
 
 	def unpack_design(self, design = None):
 		if (design == None ):
@@ -189,6 +195,17 @@ class Array_Core:
 	def update_design_from(self, design_new):
 		self.design = design_new
 		self.unpack_design()
+
+
+
+	def add_decoders(self):
+		self.design.update_design(self.layout , self.fram_netlist)
+		self.decoder = Decoder(self.Config , self.design)
+		self.update_design_from(self.decoder.design)
+		self.unpack_design()
+
+
+
 
 	def find_cells(self, cells):
 		for cell in cells:

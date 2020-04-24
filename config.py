@@ -80,8 +80,8 @@ class Config:
 	top_driver = ( top_driver_vdd_name , top_driver_gnd_name )
 
 	pre_decoder_name = "decoder_stage"  # Default  = "decoder_stage"
-	pre_decoder_vdd_name = "decoder_stage_vdd.gds"
-	pre_decoder_gnd_name = "decoder_stage_gnd.gds"
+	pre_decoder_vdd_name = "decoder_stage_vdd"
+	pre_decoder_gnd_name = "decoder_stage_gnd"
 	pre_decoder = ( pre_decoder_vdd_name , pre_decoder_gnd_name)
 
 	mos_pair_name = "mos_pair"
