@@ -154,7 +154,9 @@ class Array_Core:
 		
 		self.layer_map = self.layout.layer_dict
 		#self.memory_cell = Bitline.memory_cell
-		self.X_step = self.define_X_step(cells,self.layer_map["prBnd"])
+
+		# \/   \/   You may define step from 2 sources: any boundary layer you want (specify layer). Or all cell polygon by default.
+		self.X_step = self.define_X_step(cells,self.layer_map[self.Config.boundary_layer]) 
 		#self.Y_step = self.define_Y_step(cells)
 		self.Y_step = self.memory_cell.height
 
@@ -169,12 +171,18 @@ class Array_Core:
 		self.create_core_gds()
 		self.create_netlist()
 
+
+
+		''' Adding side modules here! '''
 		for module in self.modules:
 			self.Config.debug_message(4,f"Add side module {module.cell_name}")
 			self.add_side_module(module)
 
+		''' Design update '''
 		self.design.update_design(self.layout , self.fram_netlist)
 
+		''' Now add decoders'''
+		self.add_decoders()
 
 	def unpack_design(self, design = None):
 		if (design == None ):
@@ -187,6 +195,17 @@ class Array_Core:
 	def update_design_from(self, design_new):
 		self.design = design_new
 		self.unpack_design()
+
+
+
+	def add_decoders(self):
+		self.design.update_design(self.layout , self.fram_netlist)
+		self.decoder = Decoder(self.Config , self.design)
+		self.update_design_from(self.decoder.design)
+		self.unpack_design()
+
+
+
 
 	def find_cells(self, cells):
 		for cell in cells:
@@ -282,8 +301,6 @@ class Array_Core:
 		self.bitline_coords = ((xpos,ypos) , (xpos, self.y_offset) )
 		simple_path(self.bitline_cell.cell, self.layer_map["M1"], pya.Point(xpos,ypos), pya.Point(xpos,self.y_offset) , self.Config.bl_width)
 
-
-
 	def write_line_routing(self):
 		#self.memory_cell_pinmap = self.memory_cell.find_pin_map([self.layer_map["M1_pin"],self.layer_map["M2_pin"]])
 		
@@ -313,8 +330,6 @@ class Array_Core:
 		else: 
 			print("ERROR in orientation of {line_name}. Fix me")
 		
-
-
 	def update_netlist(self , src):
 		self.fram_netlist = src.fram_netlist
 
@@ -337,7 +352,6 @@ class Array_Core:
 		self.bitline_netlist = Curcuit("bitline" , self.Config , bitline_out_terminals, self.memory_cell.netlist_device)
 		#self.fram_netlist.add_sub(bitline_netlist)
 		#self.bitline_netlist = bitline_netlist
-
 
 	def add_bitline_netlist(self, bl_n):
 		#self.fram_netlist.add_inst(self.bitline_netlist, [])
@@ -452,7 +466,8 @@ class Array_Core:
 	def add_extra_routing(self, module):
 		if (module.placement == "bottom"):
 			for i in range(0,self.Config.word_size):
-				a
+				#a
+				pass
 
 
 	def add_module_netlist(self, module):
@@ -484,7 +499,7 @@ class Array_Core:
 				new_pins[connect_to_pin_n] = f"{module.connect_to}{i}"	
 				self.fram_netlist.add_inst(module.netlist_device , module.netlist_device.pins)
 
-	
+
 	def init_markers(self):
 		self.end_markers = {}
 		self.begin_markers = {}
@@ -531,13 +546,3 @@ view_gds(config)
 end_time = time.perf_counter()
 
 print(f"Compiling in {round(end_time - start_time , 2 )}s")
-
-
-		
-
-
-	
-
-
-
-	

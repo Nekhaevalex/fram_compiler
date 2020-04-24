@@ -83,10 +83,10 @@ class Netlist_Device():
 			source.seek(0)
 			lines = source.readlines()
 
-			if ( not self.state_presents(".ENDS", lines , self.name , mode = "0_pos")):
+			if ( not self.state_presents(".ENDS", lines , self.name , mode = "0_pos") and  ( not self.state_presents("ENDS", lines , self.name , mode = "0_pos") )  ):
 				print(f"Error. No '.ENDS' presented in file '{self.name}'")
 				sys_error()
-			if ( not self.state_presents(".SUBCKT", lines , self.name , mode = "0_pos")):
+			if ( not self.state_presents(".SUBCKT", lines , self.name , mode = "0_pos") and (not self.state_presents("SUBCKT", lines , self.name , mode = "0_pos")) ):
 				print(f"Error. No '.ENDS' presented in file '{self.name}'")
 				sys_error()	
 
