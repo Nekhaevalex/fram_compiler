@@ -80,7 +80,6 @@ class Module:
 			return(dx,dy)
 		else:
 			boundary = self.find_boundary(layer)
-			boundary = self.find_boundary()
 			dx = boundary.width()
 			dy = boundary.height()
 			return(dx,dy)
@@ -194,23 +193,16 @@ class Decoder:
 		self.init_pre_decoder()
 		self.create_decoder_cells()
 
-
-
 		''' User init code ends here '''
 		self.update_design()
-
-
-
 
 	def create_decoder_cells(self):
 		self.vdd_cell = self.fram_layout.create_cell("decoder_vdd")
 		self.gnd_cell = self.fram_layout.create_cell("decoder_gnd")
 
-
-
-
 		xpos = 0
 		ypos = 0
+
 		t = pya.Trans(xpos,ypos)
 		self.pre_decoder.place(self.vdd_cell , t , cell = self.pre_decoder.vdd_cell)
 		self.pre_decoder.place(self.gnd_cell , t , cell = self.pre_decoder.gnd_cell)
@@ -218,19 +210,20 @@ class Decoder:
 		self.cells.append(self.vdd_cell)
 		self.cells.append(self.gnd_cell)
 
-		dxpos = self.mos_pair.width
-		xpos = xpos - 1000
+		#dxpos = self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer]).height()
+		dxpos = self.mos_pair.find_dimensions(layer = self.layer_map[self.Config.boundary_layer])[0]
+		print(f"DEBUG:  dxpos = {dxpos}")
+		xpos = xpos - 5000
 		ypos = ypos +700
 		for i in range(self.addr_n):
-			xpos = xpos - dxpos
+			
 			
 			t = pya.Trans(xpos,ypos)
 			self.mos_pair.place(self.vdd_cell , t )
 			self.mos_pair.place(self.gnd_cell , t )
+			xpos = xpos - dxpos
 
 		self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer])
-
-
 
 	def import_predecoder_cells(self):
 		#def read_module_gds(self,names):
@@ -247,7 +240,7 @@ class Decoder:
 		self.pre_decoder = Pre_Decoder(self.pre_decoder_cells , self.Config) # Старый варик с отдельным классом, пошел в корзину
 		self.pre_decoder_pin_map = {"vdd":{},"gnd":{}}
 		layers = self.layer_map
-		mos_pair_pins = self.pre_decoder.find_pin_map([layers["M1_pin"],layers["M2_pin"]])
+		mos_pair_pins = self.pre_decoder.find_pin_map(self.fram_layout.pins_layers)
 
 	def y_size_check(self, y_size_array):
 		""" Если ты это читаешь: знай, я бы хотел бы сделать код и понятнее,
@@ -261,7 +254,11 @@ class Decoder:
 		#self.mos_pair_netlist = Netlist_Device(mos_pair_name,self.Config)
 		self.mos_pair = Module(mos_pair_cell, self.Config ,is_basic_cell = True )
 		self.fram_netlist.add_device(self.mos_pair.netlist_device)
+		layers = self.layer_map
+		self.mos_pair_pin_map = self.mos_pair.find_pin_map(self.fram_layout.pins_layers)
 		
+
+
 	def define_mosfets(self,mosfets):
 		''' Get mosfets modules to work with '''
 		self.nmos == None
