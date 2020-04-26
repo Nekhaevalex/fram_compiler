@@ -15,9 +15,9 @@ class Config:
 
 	lvs = False
 	#Horizontal size
-	word_size = 4
+	word_size = 32
 	#Vertical size
-	num_words = 4
+	num_words = 32
 
 	# Ferroelectric params
 	p00 = 1e-14 # Polarization (not working yet) # Default  = 1e-14
@@ -64,10 +64,11 @@ class Config:
 
 	width = {}
 
-	width['bl'] = 150 # Default  = 150
-	width['pl'] = 150 # Default  = 150
-	width['wl'] = 150 # Default  = 150
-	width['gnd'] = 150 # Default  = 150
+	width['bl'] = 130 # Default  = 150
+	width['pl'] = 130 # Default  = 150
+	width['wl'] = 130 # Default  = 150
+	width['gnd'] = 130 # Default  = 150
+	width['min'] = 120
 
 	layers_with_pins = ["M1_pin","M2_pin","M3_pin"]	
 	''' Create markers as: '''

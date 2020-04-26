@@ -144,7 +144,7 @@ class Side_Module():
 			h = h + 1
 		if (self.Config.debug_level > 2):
 			for this_map in pin_map:
-				print("Pins of map is:")
+				print(f"Pins of {self.cell_name} map is:")
 				print_pins(this_map)
 		self.pin_map = pin_map
 		return pin_map
@@ -197,6 +197,11 @@ class Decoder:
 		self.update_design()
 
 	def create_decoder_cells(self):
+		self.create_decoders_gds()
+		self.create_decoders_netlist()
+
+	def create_decoders_gds(self):
+		'''create_gds_of_decoders'''
 		self.vdd_cell = self.fram_layout.create_cell("decoder_vdd")
 		self.gnd_cell = self.fram_layout.create_cell("decoder_gnd")
 
@@ -212,18 +217,55 @@ class Decoder:
 
 		#dxpos = self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer]).height()
 		dxpos = self.mos_pair.find_dimensions(layer = self.layer_map[self.Config.boundary_layer])[0]
+		mos_pair_pins = self.mos_pair_pin_map
+		
+
+
+		# simple_path(cell, layer, start, end , width):
 		print(f"DEBUG:  dxpos = {dxpos}")
-		xpos = xpos - 5000
-		ypos = ypos +700
+		# For now I'll move decoder manually
+		debug_leveling = (-2770,700)
+		out_y_fix = 0
+		xpos = xpos + debug_leveling[0]
+		ypos = ypos + debug_leveling[1]
+
+		# Extra routing for the decoder here. (Connect "out_n" with "out_p" at the end):pya
+		simple_path(self.vdd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_p"].text.x ,ypos + mos_pair_pins["out_n"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x ,ypos + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
+		simple_path(self.gnd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_p"].text.x ,ypos + mos_pair_pins["out_n"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x ,ypos + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
+
+		#Connect decoder "out" to  "naddr" of pre-decoder
+		simple_path(self.vdd_cell, self.layer_map["M1"], pya.Point(xpos  + mos_pair_pins["out_p"].text.x ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y  ), pya.Point( self.pre_decoder_pin_map["vdd"]["naddr"].text.x , ypos - out_y_fix + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
+		simple_path(self.gnd_cell, self.layer_map["M1"], pya.Point(xpos  + mos_pair_pins["out_p"].text.x ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y  ), pya.Point( self.pre_decoder_pin_map["vdd"]["naddr"].text.x , ypos - out_y_fix + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
+		
+
+		# next line is for decoder OUT routing
+		simple_path(self.vdd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_p"].text.x ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * self.addr_n  ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
+		simple_path(self.gnd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_p"].text.x ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * self.addr_n  ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
+		
+
+		# Adding straps!
+		#nod_straps = [(self.layer_map["NP"], 460 , 0),(self.layer_map["M1"],200 , 1),(self.layer_map["OD"],200, 1)] #[(layer,width,lenth {0 = long } {1 = short} {2 = inverted long} , ),()]
+		#nod_straps_implant = [(self.layer_map["NP"], 460 , 0),(self.layer_map["M1"],200 , 1),(self.layer_map["OD"],200, 1),(self.layer_map["PP"], 460, 2 , 100)]# , True, (PP, 460 , 200)
+		#pod_tie_implant = MultipartPath( "pod_tie_implant",pod_pin_layer, pod_pin_size ,*pod_straps_implant)
+		#nod_tie_implant = MultipartPath( "nod_tie_implant" , nod_pin_layer, nod_pin_size,*nod_straps_implant) 
+
+		# Adding mos_pair cells itself!
 		for i in range(self.addr_n):
-			
-			
 			t = pya.Trans(xpos,ypos)
+			# Placement to "t" point
 			self.mos_pair.place(self.vdd_cell , t )
 			self.mos_pair.place(self.gnd_cell , t )
+			# Connect N mos to N mos
 			xpos = xpos - dxpos
-
+			if (i != self.addr_n - 1 ):
+				simple_path(self.vdd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_n"].text.x ,ypos + mos_pair_pins["out_n"].text.y ), pya.Point(xpos +  mos_pair_pins["gnd"].text.x + dxpos  ,ypos + mos_pair_pins["out_n"].text.y ) , self.Config.width["min"])
+				simple_path(self.gnd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_n"].text.x ,ypos + mos_pair_pins["out_n"].text.y ), pya.Point(xpos +  mos_pair_pins["gnd"].text.x + dxpos  ,ypos + mos_pair_pins["out_n"].text.y ) , self.Config.width["min"])
+			if (i == self.addr_n - 1):
+				pass # Add connection to gnd now
 		self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer])
+
+	def create_decoders_netlist(self):
+		pass
 
 	def import_predecoder_cells(self):
 		#def read_module_gds(self,names):
@@ -241,6 +283,8 @@ class Decoder:
 		self.pre_decoder_pin_map = {"vdd":{},"gnd":{}}
 		layers = self.layer_map
 		mos_pair_pins = self.pre_decoder.find_pin_map(self.fram_layout.pins_layers)
+		self.pre_decoder_pin_map["vdd"] = self.pre_decoder.find_cell_pin_map( self.pre_decoder.vdd_cell , self.fram_layout.pins_layers)
+		self.pre_decoder_pin_map["gnd"] = self.pre_decoder.find_cell_pin_map( self.pre_decoder.gnd_cell , self.fram_layout.pins_layers)
 
 	def y_size_check(self, y_size_array):
 		""" Если ты это читаешь: знай, я бы хотел бы сделать код и понятнее,
@@ -256,6 +300,7 @@ class Decoder:
 		self.fram_netlist.add_device(self.mos_pair.netlist_device)
 		layers = self.layer_map
 		self.mos_pair_pin_map = self.mos_pair.find_pin_map(self.fram_layout.pins_layers)
+
 		
 
 
@@ -375,5 +420,22 @@ class Pre_Decoder:
 				print("Pins of map is:")
 				print_pins(this_map)
 		self.pin_map = pin_map
+		return pin_map
+
+	def find_cell_pin_map(self, cell , layers):
+		'''create dictionary with text klayout.Text objects and its klayout.Point s'''
+		pin_map = {}
+		for layer in layers:
+			for i in cell.each_shape(layer):
+			#print("===== + 1 =======")
+				if (i.is_text()):
+					pin_map[i.text_string] = i
+					#pin_map[i.text_string+'_layer'] 
+					#print(i.text) - text object
+					#print(i.text_string)# - text itself
+		self.pin_map = pin_map
+		if (self.Config.debug_level > 2):
+			print(f"Pins of {cell.name} map is:")
+			print_pins(pin_map)
 		return pin_map
 
