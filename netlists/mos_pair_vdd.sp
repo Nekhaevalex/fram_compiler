@@ -10,5 +10,3 @@ M0 (out_n in in_p gnd) nsvt25 w=0.4 l=0.28
 M1 (out_p in vdd vdd) psvt25 w=0.4 l=0.28
 ends mos_pair
 // End of subcircuit definition.
-
-

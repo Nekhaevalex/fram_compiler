@@ -224,7 +224,8 @@ class Decoder:
 		# simple_path(cell, layer, start, end , width):
 		print(f"DEBUG:  dxpos = {dxpos}")
 		# For now I'll move decoder manually
-		debug_leveling = (-2770,700)
+		#debug_leveling = (-2770,700)
+		debug_leveling = (-2200,1020)
 		out_y_fix = 0
 		xpos = xpos + debug_leveling[0]
 		ypos = ypos + debug_leveling[1]
@@ -239,11 +240,17 @@ class Decoder:
 		
 
 		# next line is for decoder OUT routing
-		simple_path(self.vdd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_p"].text.x ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * self.addr_n  ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
-		simple_path(self.gnd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_p"].text.x ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * self.addr_n  ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
+		simple_path(self.vdd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_p"].text.x ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * (self.addr_n - 1 )  ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
+		simple_path(self.gnd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_p"].text.x ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * (self.addr_n - 1 )  ,ypos - out_y_fix + mos_pair_pins["out_p"].text.y ) , self.Config.width["min"])
 		
 
 		# Adding straps!
+
+		# GND strap conect
+		simple_path(self.gnd_cell, self.layer_map["M1"], pya.Point( self.pre_decoder_pin_map["gnd"]["naddr"].text.x ,ypos - out_y_fix + self.mos_pair_gnd_pins["gnd"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * (self.addr_n + 1 )  ,ypos - out_y_fix + self.mos_pair_gnd_pins["gnd"].text.y  ) , self.Config.width["strap"])
+		simple_path(self.vdd_cell, self.layer_map["M1"], pya.Point( self.pre_decoder_pin_map["vdd"]["naddr"].text.x ,ypos - out_y_fix + self.mos_pair_vdd_pins["vdd"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * (self.addr_n + 1 )  ,ypos - out_y_fix + self.mos_pair_gnd_pins["vdd"].text.y  ) , self.Config.width["strap"])
+
+
 		#nod_straps = [(self.layer_map["NP"], 460 , 0),(self.layer_map["M1"],200 , 1),(self.layer_map["OD"],200, 1)] #[(layer,width,lenth {0 = long } {1 = short} {2 = inverted long} , ),()]
 		#nod_straps_implant = [(self.layer_map["NP"], 460 , 0),(self.layer_map["M1"],200 , 1),(self.layer_map["OD"],200, 1),(self.layer_map["PP"], 460, 2 , 100)]# , True, (PP, 460 , 200)
 		#pod_tie_implant = MultipartPath( "pod_tie_implant",pod_pin_layer, pod_pin_size ,*pod_straps_implant)
@@ -253,8 +260,10 @@ class Decoder:
 		for i in range(self.addr_n):
 			t = pya.Trans(xpos,ypos)
 			# Placement to "t" point
-			self.mos_pair.place(self.vdd_cell , t )
-			self.mos_pair.place(self.gnd_cell , t )
+			#self.mos_pair.place(self.vdd_cell , t )
+			#self.mos_pair.place(self.gnd_cell , t )
+			self.mos_pair_vdd.place(self.vdd_cell , t )
+			self.mos_pair_gnd.place(self.gnd_cell , t )
 			# Connect N mos to N mos
 			xpos = xpos - dxpos
 			if (i != self.addr_n - 1 ):
@@ -262,6 +271,11 @@ class Decoder:
 				simple_path(self.gnd_cell, self.layer_map["M1"], pya.Point(xpos + mos_pair_pins["out_n"].text.x ,ypos + mos_pair_pins["out_n"].text.y ), pya.Point(xpos +  mos_pair_pins["gnd"].text.x + dxpos  ,ypos + mos_pair_pins["out_n"].text.y ) , self.Config.width["min"])
 			if (i == self.addr_n - 1):
 				pass # Add connection to gnd now
+
+		# Add connection to ground:
+
+		
+
 		self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer])
 
 	def create_decoders_netlist(self):
@@ -301,6 +315,15 @@ class Decoder:
 		layers = self.layer_map
 		self.mos_pair_pin_map = self.mos_pair.find_pin_map(self.fram_layout.pins_layers)
 
+		mos_pair_vdd_name = f"{mos_pair_name}_vdd"
+		mos_pair_gnd_name = f"{mos_pair_name}_gnd"
+		mos_pair_vdd_cell = self.fram_layout.read_cell_from_gds(mos_pair_vdd_name)
+		mos_pair_gnd_cell = self.fram_layout.read_cell_from_gds(mos_pair_gnd_name)
+		self.mos_pair_vdd = Module(mos_pair_vdd_cell, self.Config ,is_basic_cell = True )
+		self.mos_pair_gnd = Module(mos_pair_gnd_cell, self.Config ,is_basic_cell = True )
+
+		self.mos_pair_gnd_pins = self.mos_pair_gnd.find_pin_map(self.fram_layout.pins_layers)
+		self.mos_pair_vdd_pins = self.mos_pair_vdd.find_pin_map(self.fram_layout.pins_layers)
 		
 
 

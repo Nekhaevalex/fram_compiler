@@ -69,6 +69,7 @@ class Config:
 	width['wl'] = 130 # Default  = 150
 	width['gnd'] = 130 # Default  = 150
 	width['min'] = 120
+	width['strap'] = 200
 
 	layers_with_pins = ["M1_pin","M2_pin","M3_pin"]	
 	''' Create markers as: '''
