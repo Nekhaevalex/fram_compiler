@@ -47,7 +47,7 @@ class Module:
 					#print(i.text_string)# - text itself
 		self.pin_map = pin_map
 		if (self.Config.debug_level > 2):
-			print("Pins of map is:")
+			print(f"Pins of {self.cell.name} is:")
 			print_pins(pin_map)
 		return pin_map
 
@@ -192,7 +192,7 @@ class Decoder:
 		''' User init code starts here '''
 		self.init_pre_decoder()
 		self.create_decoder_cells()
-
+		#self.add_decoder_cells() # Now called in array core
 		''' User init code ends here '''
 		self.update_design()
 
@@ -276,7 +276,11 @@ class Decoder:
 
 		
 
-		self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer])
+		#self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer])
+
+
+			
+
 
 	def create_decoders_netlist(self):
 		pass

@@ -44,7 +44,6 @@ class Fram():
 		self.top_driver = self.read_top_driver()
 		self.Config.debug_message(3,f'All cells ready.. Creating core.')
 		self.create_array_core(self.core_cells) # Create array of bitlines
-
 		#self.fram_netlist.write_netlist()
 		self.gds_output() # Make output of gds
 		self.sp_output()
@@ -152,7 +151,7 @@ class Array_Core:
 
 
 		
-		self.layer_map = self.layout.layer_dict
+		self.layer_map = self.fram_layout.layer_dict
 		#self.memory_cell = Bitline.memory_cell
 
 		# \/   \/   You may define step from 2 sources: any boundary layer you want (specify layer). Or all cell polygon by default.
@@ -161,10 +160,10 @@ class Array_Core:
 		self.Y_step = self.memory_cell.height
 
 		#self.bitline = Bitline
-		self.bitline_cell = Module(self.layout.create_cell("bitline"),Config)
-		self.array_core_cell = Module(self.layout.create_cell(self.cell_name) , Config)
+		self.bitline_cell = Module(self.fram_layout.create_cell("bitline"),Config)
+		self.array_core_cell = Module(self.fram_layout.create_cell(self.cell_name) , Config)
 		#self.memory_cell = Bitline.memory_cell
-		self.layer_map = self.layout.layer_dict
+		self.layer_map = self.fram_layout.layer_dict
 
 		#self.X_step = self.memory_cell.width
 		
@@ -179,17 +178,17 @@ class Array_Core:
 			self.add_side_module(module)
 
 		''' Design update '''
-		self.design.update_design(self.layout , self.fram_netlist)
+		self.design.update_design(self.fram_layout , self.fram_netlist)
 
 		''' Now add decoders'''
 		self.add_decoders()
 
 	def unpack_design(self, design = None):
 		if (design == None ):
-			self.layout = 	self.design.return_layout()
+			self.fram_layout = 	self.design.return_layout()
 			self.fram_netlist = self.design.return_netlist()
 		else:
-			self.layout = design.return_layout()
+			self.fram_layout = design.return_layout()
 			self.fram_netlist = design.return_netlist()
 
 	def update_design_from(self, design_new):
@@ -199,10 +198,11 @@ class Array_Core:
 
 
 	def add_decoders(self):
-		self.design.update_design(self.layout , self.fram_netlist)
+		self.design.update_design(self.fram_layout , self.fram_netlist)
 		self.decoder = Decoder(self.Config , self.design)
 		self.update_design_from(self.decoder.design)
 		self.unpack_design()
+		self.add_decoder_cells_to_layout()
 
 
 
@@ -228,6 +228,7 @@ class Array_Core:
 				self.Config.debug_message(4,f'dx size of cell {cell.name} is {boundary.width()}')
 		X_step = max(dx)
 		self.Config.debug_message(3,f'Defines X - size  of {X_step}. By comparing of list {dx}')
+		self.fram_layout.X_step = X_step
 		return X_step
 				
 	def define_Y_step(self,modules):
@@ -239,6 +240,7 @@ class Array_Core:
 				boundary = module.find_cell_boundary(cell)	
 				dy.append(boundary.width())
 		Y_step = max(dy)
+		self.fram_layout.Y_step = Y_step
 		return Y_step
 
 	def find_cell_in_cells(self,name,cells):
@@ -376,6 +378,16 @@ class Array_Core:
 		bl_pinmap = self.array_core_cell.find_pin_map([M1_pin])
 		print_pins(bl_pinmap) # remove
 		'''
+
+	def add_decoder_cells_to_layout(self):
+		xpos = 0
+		ypos = 0
+		mode = 0
+		for i in range(self.Config.num_words):
+			t = pya.Trans(xpos , ypos)
+			self.decoder.place(self.array_core_cell,t,mode)
+			swich_mode(mode)
+			ypos = ypos + 2 * self.Y_step
 
 	def add_module_layout(self, module):
 
