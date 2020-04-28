@@ -212,8 +212,7 @@ class Decoder:
 		self.pre_decoder.place(self.vdd_cell , t , cell = self.pre_decoder.vdd_cell)
 		self.pre_decoder.place(self.gnd_cell , t , cell = self.pre_decoder.gnd_cell)
 
-		self.cells.append(self.vdd_cell)
-		self.cells.append(self.gnd_cell)
+
 
 		#dxpos = self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer]).height()
 		dxpos = self.mos_pair.find_dimensions(layer = self.layer_map[self.Config.boundary_layer])[0]
@@ -225,7 +224,7 @@ class Decoder:
 		print(f"DEBUG:  dxpos = {dxpos}")
 		# For now I'll move decoder manually
 		#debug_leveling = (-2770,700)
-		debug_leveling = (-2200,1020)
+		debug_leveling = (-2200,0)
 		out_y_fix = 0
 		xpos = xpos + debug_leveling[0]
 		ypos = ypos + debug_leveling[1]
@@ -278,6 +277,8 @@ class Decoder:
 
 		#self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer])
 
+		self.cells.append(self.vdd_cell)
+		self.cells.append(self.gnd_cell)
 
 			
 

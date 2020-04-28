@@ -380,13 +380,16 @@ class Array_Core:
 		'''
 
 	def add_decoder_cells_to_layout(self):
-		xpos = 0
+		#xpos = self.memory_cell.pin_map["wn"].text.x #- self.decoder.pin_map[0][self.decoder.connect_with[0]].text.x
+		#FIX TO : 
+		#xpos = self.memory_cell.pin_map[self.decoder.connect_to].text.x - self.decoder.pin_map[self.decoder.connect_with[0]].text.x
+		xpos = -10000
 		ypos = 0
 		mode = 0
-		for i in range(self.Config.num_words):
+		for i in range( int(self.Config.num_words / 2) ):
 			t = pya.Trans(xpos , ypos)
-			self.decoder.place(self.array_core_cell,t,mode)
-			swich_mode(mode)
+			self.decoder.place(self.array_core_cell.cell,t,mode)
+			mode = swich_mode(mode)
 			ypos = ypos + 2 * self.Y_step
 
 	def add_module_layout(self, module):
