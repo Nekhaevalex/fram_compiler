@@ -330,7 +330,7 @@ class Array_Core:
 				simple_path(self.array_core_cell.cell, self.layer_map[layer], pya.Point(xpos,ypos), pya.Point(self.x_offset, ypos) , self.Config.width[line_name])
 				ypos = ypos + self.Y_step
 		else: 
-			print("ERROR in orientation of {line_name}. Fix me")
+			print(f"ERROR in orientation of {line_name}. Fix me")
 		
 	def update_netlist(self , src):
 		self.fram_netlist = src.fram_netlist
@@ -381,16 +381,23 @@ class Array_Core:
 
 	def add_decoder_cells_to_layout(self):
 		#xpos = self.memory_cell.pin_map["wn"].text.x #- self.decoder.pin_map[0][self.decoder.connect_with[0]].text.x
-		#FIX TO : 
-		#xpos = self.memory_cell.pin_map[self.decoder.connect_to].text.x - self.decoder.pin_map[self.decoder.connect_with[0]].text.x
-		xpos = -10000
-		ypos = 0
+		#FIX TO :  "wl"
+		xpos = self.memory_cell.pin_map["wn"].text.x - self.decoder.gnd_cell_size[0]/2 - self.decoder.gnd_cell_size[0]/5 # - 100
+		#print(f"Decoder cell size:  ({self.decoder.gnd_cell_size[0]} , {self.decoder.gnd_cell_size[1]})")
+		#xpos = -10000
+		print(self.decoder.pin_map)
+		ypos1 = self.memory_cell.pin_map["wn"].text.y - self.decoder.pin_map[0][self.decoder.connect_with[0]].text.y
+		ypos2 = self.memory_cell.pin_map["wn"].text.y + self.Y_step * 2 - self.decoder.pin_map[0][self.decoder.connect_with[0]].text.y
 		mode = 0
 		for i in range( int(self.Config.num_words / 2) ):
-			t = pya.Trans(xpos , ypos)
+			if mode:
+				t = pya.Trans(0,True,xpos,ypos)
+			else:
+				t = pya.Trans(xpos , ypos)
 			self.decoder.place(self.array_core_cell.cell,t,mode)
 			mode = swich_mode(mode)
-			ypos = ypos + 2 * self.Y_step
+			ypos1 = ypos1 + 4 * self.Y_step
+			ypos2 = ypos2 + 4 * self.Y_step
 
 	def add_module_layout(self, module):
 

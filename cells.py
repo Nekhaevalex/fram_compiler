@@ -275,12 +275,49 @@ class Decoder:
 
 		
 
+
+		#Add neceseary text pins:
+
+		
+
 		#self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer])
 
 		self.cells.append(self.vdd_cell)
 		self.cells.append(self.gnd_cell)
 
-			
+		vdd_cell_boundary = self.find_cell_boundary(self.vdd_cell , layer = self.layer_map[self.Config.boundary_layer])
+		#gnd_cell_boundary = self.find_cell_boundary(self.gnd_cell , layer = self.layer_map[self.Config.boundary_layer])
+		gnd_cell_boundary = self.find_cell_boundary(self.gnd_cell)
+		self.vdd_cell_size = (vdd_cell_boundary.width(), vdd_cell_boundary.height()  )
+		self.gnd_cell_size = (gnd_cell_boundary.width() , gnd_cell_boundary.height() )
+
+
+
+		#self.pin_map = ({self.gnd_cell.find_pin_map(self.layer_map[self.Config.boundary_layer])},{self.vdd_cell.find_pin_map(self.layer_map[self.Config.boundary_layer])})
+		self.pin_map = ( self.find_cell_pin_map(self.vdd_cell)  ,  self.find_cell_pin_map(self.gnd_cell)  )
+
+
+	def find_cell_pin_map(self, cell, layers = None):
+		'''create dictionary with text klayout.Text objects and its klayout.Point s'''
+		pin_map = {}
+		if (layers == None):
+			layers = self.fram_layout.pins_layers
+			for layer in layers:
+				for i in cell.each_shape(layer):
+					if (i.is_text()):
+						pin_map[i.text_string] = i
+		else:
+			for layer in layers:
+				for i in cell.each_shape(layer):
+					if (i.is_text()):
+						pin_map[i.text_string] = i
+						#pin_map[i.text_string+'_layer'] 
+						#print(i.text) - text object
+						#print(i.text_string)# - text itself
+		if (self.Config.debug_level > 2):
+			print(f"Pins of {cell.name} is:")
+			print_pins(pin_map)
+		return pin_map
 
 
 	def create_decoders_netlist(self):
@@ -330,8 +367,6 @@ class Decoder:
 		self.mos_pair_gnd_pins = self.mos_pair_gnd.find_pin_map(self.fram_layout.pins_layers)
 		self.mos_pair_vdd_pins = self.mos_pair_vdd.find_pin_map(self.fram_layout.pins_layers)
 		
-
-
 	def define_mosfets(self,mosfets):
 		''' Get mosfets modules to work with '''
 		self.nmos == None
@@ -373,7 +408,6 @@ class Decoder:
 		self.pin_map = pin_map
 		return pin_map
 
-
 	def place(self,target,t,mode = 0):
 		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
@@ -394,7 +428,6 @@ class Decoder:
 	def update_design_from(self, new_source):
 		self.design = new_source.design
 		self.unpack_design()
-
 
 class Pre_Decoder:
 	vdd_strap = 0
@@ -466,4 +499,3 @@ class Pre_Decoder:
 			print(f"Pins of {cell.name} map is:")
 			print_pins(pin_map)
 		return pin_map
-
