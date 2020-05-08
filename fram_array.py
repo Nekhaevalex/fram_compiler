@@ -351,7 +351,7 @@ class Array_Core:
 			bitline_out_terminals.append(f"wl{i}")
 			bitline_out_terminals.append(f"pl{i}")
 		bitline_out_terminals.append("gnd")
-		self.bitline_netlist = Curcuit("bitline" , self.Config , bitline_out_terminals, self.memory_cell.netlist_device)
+		#self.bitline_netlist = Curcuit("bitline" , self.Config , bitline_out_terminals, self.memory_cell.netlist_device)
 		#self.fram_netlist.add_sub(bitline_netlist)
 		#self.bitline_netlist = bitline_netlist
 
@@ -385,19 +385,19 @@ class Array_Core:
 		xpos = self.memory_cell.pin_map["wn"].text.x - self.decoder.gnd_cell_size[0]/2 - self.decoder.gnd_cell_size[0]/5 # - 100
 		#print(f"Decoder cell size:  ({self.decoder.gnd_cell_size[0]} , {self.decoder.gnd_cell_size[1]})")
 		#xpos = -10000
-		print(self.decoder.pin_map)
-		ypos1 = self.memory_cell.pin_map["wn"].text.y - self.decoder.pin_map[0][self.decoder.connect_with[0]].text.y
-		ypos2 = self.memory_cell.pin_map["wn"].text.y + self.Y_step * 2 - self.decoder.pin_map[0][self.decoder.connect_with[0]].text.y
+		ypos = 0
+		ypos1 =  -self.memory_cell.pin_map["wn"].text.y + self.decoder.pin_map[0][self.decoder.connect_with[0]].text.y
+		ypos2 =  -( self.memory_cell.pin_map["wn"].text.y - self.Y_step * 2 ) + self.decoder.pin_map[1][self.decoder.connect_with[1]].text.y
 		mode = 0
 		for i in range( int(self.Config.num_words / 2) ):
 			if mode:
-				t = pya.Trans(0,True,xpos,ypos)
+				t = pya.Trans(0,True,xpos,ypos1)
 			else:
-				t = pya.Trans(xpos , ypos)
+				t = pya.Trans(xpos , ypos2)
 			self.decoder.place(self.array_core_cell.cell,t,mode)
 			mode = swich_mode(mode)
-			ypos1 = ypos1 + 4 * self.Y_step
-			ypos2 = ypos2 + 4 * self.Y_step
+			ypos1 = ypos1 + 2 * self.Y_step
+			ypos2 = ypos2 + 2 * self.Y_step
 
 	def add_module_layout(self, module):
 

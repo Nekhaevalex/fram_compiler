@@ -87,6 +87,15 @@ class Module:
 	def get_cell_name(self):
 		pass
 
+	def place_inst(self, n ,terminals ):
+		""" Place an instance of device in format ( 
+		mossfet.place_device([("d","net1"),("g","net2"),("s","net3"),("b",gnd)],[(L = 0.27),(W = 1)]]))"""
+		src = f"X{n}"
+		for terminal in terminals:
+			src = f"{src} {terminal}"
+		src = f"{src} {self.netlist_device.name}"
+		src = f"{src}\n"
+		return src
 
 
 
@@ -150,6 +159,7 @@ class Side_Module():
 		return pin_map
 
 
+
 	def place(self,target,t,mode = 0):
 		'''Add copy of this cell to {target} cell'''
 		istance = pya.CellInstArray(self.cells[mode].cell_index(),t)
@@ -174,19 +184,19 @@ class Decoder:
 	connect_with = ('WL0','WL1')
 	cells_in_cell = 2
 	cells = []
+	name = "decoder"
 
 	def __init__(self, Config , design):
 		self.Config = Config
 		self.addr_n = find_pwr2(self.Config.num_words ,0)
 		#self.mosfets = mosfets
 		self.design = design
-		self.unpack_design()
+		self.unpack_design() #Copy design into this class
 
 		self.pre_decoder_cells = self.import_predecoder_cells()
 
 		self.layer_map = self.fram_layout.layer_dict
 		self.import_mos_pair() # Import view of p-mos and n-mos merged cell to build a NAND - gate out of them.
-		#self.define_mosfets(mosfets)
 
 		self.cells_in_cell = len(self.cells)
 		''' User init code starts here '''
@@ -194,11 +204,11 @@ class Decoder:
 		self.create_decoder_cells()
 		#self.add_decoder_cells() # Now called in array core
 		''' User init code ends here '''
-		self.update_design()
+		self.update_design() # Pack design back, before return to higher tier function
 
 	def create_decoder_cells(self):
-		self.create_decoders_gds()
-		self.create_decoders_netlist()
+		self.create_decoders_gds() #Create decoders GDS
+		self.create_decoders_netlist() # Create decoders Netlist
 
 	def create_decoders_gds(self):
 		'''create_gds_of_decoders'''
@@ -221,7 +231,7 @@ class Decoder:
 
 
 		# simple_path(cell, layer, start, end , width):
-		print(f"DEBUG:  dxpos = {dxpos}")
+		
 		# For now I'll move decoder manually
 		#debug_leveling = (-2770,700)
 		debug_leveling = (-2200,0)
@@ -249,7 +259,7 @@ class Decoder:
 		simple_path(self.gnd_cell, self.layer_map["M1"], pya.Point( self.pre_decoder_pin_map["gnd"]["naddr"].text.x ,ypos - out_y_fix + self.mos_pair_gnd_pins["gnd"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * (self.addr_n + 1 )  ,ypos - out_y_fix + self.mos_pair_gnd_pins["gnd"].text.y  ) , self.Config.width["strap"])
 		simple_path(self.vdd_cell, self.layer_map["M1"], pya.Point( self.pre_decoder_pin_map["vdd"]["naddr"].text.x ,ypos - out_y_fix + self.mos_pair_vdd_pins["vdd"].text.y ), pya.Point(xpos +  mos_pair_pins["out_p"].text.x - dxpos * (self.addr_n + 1 )  ,ypos - out_y_fix + self.mos_pair_gnd_pins["vdd"].text.y  ) , self.Config.width["strap"])
 
-
+		#Лучше пока без процедурных стрэпов
 		#nod_straps = [(self.layer_map["NP"], 460 , 0),(self.layer_map["M1"],200 , 1),(self.layer_map["OD"],200, 1)] #[(layer,width,lenth {0 = long } {1 = short} {2 = inverted long} , ),()]
 		#nod_straps_implant = [(self.layer_map["NP"], 460 , 0),(self.layer_map["M1"],200 , 1),(self.layer_map["OD"],200, 1),(self.layer_map["PP"], 460, 2 , 100)]# , True, (PP, 460 , 200)
 		#pod_tie_implant = MultipartPath( "pod_tie_implant",pod_pin_layer, pod_pin_size ,*pod_straps_implant)
@@ -277,25 +287,37 @@ class Decoder:
 
 
 		#Add neceseary text pins:
+		self.cells.append(self.vdd_cell)
+		self.cells.append(self.gnd_cell)
 
-		
+		layer = self.layer_map["M2_pin"]
+		for cell in self.cells:
+			for pin in self.connect_with:
+				for subcell_index in cell.each_child_cell():
+					subcell = self.fram_layout.cell(subcell_index)
+					cell_pin_map = self.find_cell_pin_map(subcell)
+					for key in cell_pin_map:
+						if (key == pin):
+							cell.shapes(layer).insert(pya.Text(pin , cell_pin_map[key].text.x , cell_pin_map[key].text.y))
+
+		#self.vdd_cell.shapes(layer).insert(pya.Text( "SAMPLE_TEXT" , -1000, -1000)) # SAMPLE TEXT
 
 		#self.mos_pair.find_boundary(layer = self.layer_map[self.Config.boundary_layer])
 
-		self.cells.append(self.vdd_cell)
-		self.cells.append(self.gnd_cell)
+		self.vdd_cell = self.cells[0]
+		self.gnd_cell = self.cells[1] 
+
 
 		vdd_cell_boundary = self.find_cell_boundary(self.vdd_cell , layer = self.layer_map[self.Config.boundary_layer])
 		#gnd_cell_boundary = self.find_cell_boundary(self.gnd_cell , layer = self.layer_map[self.Config.boundary_layer])
 		gnd_cell_boundary = self.find_cell_boundary(self.gnd_cell)
-		self.vdd_cell_size = (vdd_cell_boundary.width(), vdd_cell_boundary.height()  )
+		self.vdd_cell_size = (vdd_cell_boundary.width(),  vdd_cell_boundary.height()  )
 		self.gnd_cell_size = (gnd_cell_boundary.width() , gnd_cell_boundary.height() )
-
-
 
 		#self.pin_map = ({self.gnd_cell.find_pin_map(self.layer_map[self.Config.boundary_layer])},{self.vdd_cell.find_pin_map(self.layer_map[self.Config.boundary_layer])})
 		self.pin_map = ( self.find_cell_pin_map(self.vdd_cell)  ,  self.find_cell_pin_map(self.gnd_cell)  )
 
+		self.Config.debug_message(2,f"Decoders layout cell created with no fatal errors.")
 
 	def find_cell_pin_map(self, cell, layers = None):
 		'''create dictionary with text klayout.Text objects and its klayout.Point s'''
@@ -321,7 +343,32 @@ class Decoder:
 
 
 	def create_decoders_netlist(self):
-		pass
+		devices = (self.pre_decoder.netlist_device , self.mos_pair.netlist_device )
+		in_terminals = []  # addr decoder
+		device_lines = []
+		n = 0
+
+		for i in range(self.addr_n):
+			in_terminals.append(f"in{i}")
+			device_lines.append(self.mos_pair.netlist_device)
+		in_terminals.append(f"pre")
+		out_terminals = [ *self.connect_with , *in_terminals , "vdd", "gnd"]
+
+
+		pre_decoder_inst_terminals = self.pre_decoder.netlist_device.pins
+		pre_decoder_inst = Netlist_Instance(self.pre_decoder.netlist_device , *pre_decoder_inst_terminals)
+		mos_pairs_inst = []
+		for i in range(self.addr_n):
+			mos_pairs_inst.append(Netlist_Instance( self.mos_pair.netlist_device, *self.mos_pair.netlist_device.pins  ))
+			#print(f"TRACE: {mos_pairs_inst[i].terminals}")
+		instances = [pre_decoder_inst , *mos_pairs_inst]
+		#self.Config.debug_message(2,f"============== TRACE========== \n instances: \n {type(instances)} \n ")
+		self.netlist = Curcuit( self.name , self.Config , out_terminals , instances) 
+		self.fram_netlist.add_sub(self.netlist)
+
+		self.Config.debug_message(2,f"Decoders netlist created with no fatal errors.")
+
+
 
 	def import_predecoder_cells(self):
 		#def read_module_gds(self,names):
@@ -343,9 +390,7 @@ class Decoder:
 		self.pre_decoder_pin_map["gnd"] = self.pre_decoder.find_cell_pin_map( self.pre_decoder.gnd_cell , self.fram_layout.pins_layers)
 
 	def y_size_check(self, y_size_array):
-		""" Если ты это читаешь: знай, я бы хотел бы сделать код и понятнее,
-		но к сожалению не уверен что его кто-то когда то будет читать (*((((
-		Так что уж лучше написать побыстрее!!!"""
+
 		pass
 
 	def import_mos_pair(self):
@@ -367,6 +412,7 @@ class Decoder:
 		self.mos_pair_gnd_pins = self.mos_pair_gnd.find_pin_map(self.fram_layout.pins_layers)
 		self.mos_pair_vdd_pins = self.mos_pair_vdd.find_pin_map(self.fram_layout.pins_layers)
 		
+	""" Delete later
 	def define_mosfets(self,mosfets):
 		''' Get mosfets modules to work with '''
 		self.nmos == None
@@ -379,6 +425,8 @@ class Decoder:
 		if (self.nmos == None ) or (self.pmos == None ):
 			self.Config.warning(getframeinfo(currentframe()))
 			self.Config.debug_message(-1,"WRNG_MSG: No pmos or nmos defined in define_mosfets in decoder class.")
+	"""
+
 
 	def find_cell_boundary(self, cell ,layer= None): #default layer is PR Bndry
 		k = 0
@@ -472,7 +520,7 @@ class Pre_Decoder:
 				for i in cell.each_shape(layer):
 					if (i.is_text()):
 						pin_map[h][i.text_string] = i
-						#pin_map[i.text_string+'_layer'] 
+						#pin_map[i.text_string+'_layer']
 						#print(i.text) - text object
 						#print(i.text_string)# - text itself
 			h = h + 1

@@ -17,18 +17,9 @@ class My_Layout(pya.Layout):
 		self.init_tec()
 		self.topcell = self.create_cell("TOP")
 
-
-
-
-
-
-
 	def create_mycell(self,cell):
 		mycell = Module(cell)
 		return mycell
-
-
-
 
 	def read_cell_from_gds(self,name):
 		'''Reads gds file and return topcell with name = (name)'''
@@ -48,8 +39,6 @@ class My_Layout(pya.Layout):
 		cells = []
 		cells[0] = self.create_cell(names[0])
 		cells[1] = self.create_cell(names[1])
-
-
 		self.if_file_exists("./gds_files/" + names[0] + ".gds")
 		self.if_file_exists("./gds_files/" + names[1] + ".gds")
 		n = 0

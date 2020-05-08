@@ -3,6 +3,9 @@ import os
 
 import pya
 
+
+""" Other usfull support functions avalible from all of the prjct"""
+
 def print_pins(pin_map):
 	for keys,val in pin_map.items():
 		print(f'{keys} = {val}')
@@ -64,6 +67,10 @@ def view_gds(Config):
 	if Config.view_gds == True:
 		Config.debug_message(1,f"Opening klayout to check the result.")
 		os.system(f"klayout ./gds_files/{Config.output_name}.gds")
+
+
+def add_inst(self , n , module , terminals):
+	module.place_inst( self.n , terminals )
 
 	
 	

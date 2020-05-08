@@ -1,7 +1,7 @@
 import pya
 
 class MultipartPath():
-	"""docstring for ClassName"""
+	"""Класс для генерации процедурных стрэпов питания. Условно работает. Пока не используется"""
 	num = 0
 	#straps = (layer, w)
 	def __init__(self, name,pin_layer,pin_size, *straps):

@@ -6,8 +6,8 @@ import os
 from inspect import currentframe, getframeinfo
 
 
-
 class Config:
+	"""Main Config class passed in almost every class in compiler. Consists of names, paths, params defined by a human."""
 	# Place for your parameters here.
 
 	debug_level = 5	# >1 for debug, 0 for no printout
@@ -15,11 +15,11 @@ class Config:
 
 	lvs = False
 	#Horizontal size
-	word_size = 32
+	word_size = 4
 	#Vertical size
-	num_words = 32
+	num_words = 4
 
-	# Ferroelectric params
+	# Ferroelectric params (NOT WORKING YET)
 	p00 = 1e-14 # Polarization (not working yet) # Default  = 1e-14
 
 	pdf_output = False # Nor working yet
